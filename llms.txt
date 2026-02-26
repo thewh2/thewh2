@@ -1,0 +1,20 @@
+# Chandan Kumar Thakur (The WH2)
+
+Nepal-based AI architect, web developer, and cybersecurity enthusiast focused on building sovereign digital ecosystems.
+
+## About
+Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
+
+## Core Projects
+- **Portfolio:** https://thewh2.netlify.app/
+- **SMM Store:** https://wh2store.netlify.app/
+- **TalkGPT:** AI platform for conversational excellence.
+- **Cybersecurity:** Ethical hacking and security audits.
+
+## Online Presence
+- **GitHub:** https://github.com/thewh2/
+- **LinkedIn:** https://www.linkedin.com/in/thewh2/
+- **Google Dev Profile:** https://g.dev/thewh2
+- **Email:** thewh2.official@gmail.com
+- **Nationality:** Nepali
+- **Focus Areas:** AI Driven Solutions, Web Development, Cybersecurity, Ethical Hacking
