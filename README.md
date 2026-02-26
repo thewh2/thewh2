@@ -17,9 +17,19 @@ With a strong **White Hat mindset**, I prioritize security, deployment, and impa
 ---
 
 ## 🛠️ My Digital Ecosystem
-- 🌐 **Portfolio:** [thewh2.netlify.app](https://thewh2.netlify.app/)
+- 🌟 **Main Portfolio:** [thewh2.netlify.app](https://thewh2.netlify.app/)
 - 🛒 **SMM Store:** [wh2store.netlify.app](https://wh2store.netlify.app/)
-- 🤖 **TalkGPT:** My custom AI platform for conversational intelligence.
+- 🌌 **3D Solar System:** [exploresolarsystem.netlify.app](https://exploresolarsystem.netlify.app/)
+- 🛰️ **Particle Controller:** [particle-controller.netlify.app](https://particle-controller.netlify.app/)
+- 🤖 **TalkGPT v2:** [talkgpt2.netlify.app](https://talkgpt2.netlify.app/)
+- 💬 **Secure Chat:** [wh2chat.netlify.app](https://wh2chat.netlify.app/)
+- 📝 **Cloud Notes:** [meronote.netlify.app](https://meronote.netlify.app/)
+- 💰 **Debt Tracker:** [meromoney.netlify.app](https://meromoney.netlify.app/)
+- ⚡ **Bill Tracker:** [wh2-bill.netlify.app](https://wh2-bill.netlify.app/)
+- ☁️ **Weather App:** [wh2-weather.netlify.app](https://wh2-weather.netlify.app/)
+- 🎮 **Game Hub:** [wh2-game.netlify.app](https://wh2-game.netlify.app/)
+- 🔍 **Knowledge Hub:** [wh2hub.netlify.app](https://wh2hub.netlify.app/)
+
 
 ---
 
@@ -43,8 +53,9 @@ With a strong **White Hat mindset**, I prioritize security, deployment, and impa
 ## 📬 Connect With Me
 - 💼 [LinkedIn](https://www.linkedin.com/in/thewh2/)
 - 🌐 [Google Developer Profile](https://g.dev/thewh2)
-- 📧 [Email](mailto:thewh2.official@gmail.com)
+- 📧 [Email](mailto:chandanthakur.nep@gmail.com)
 - 📺 [YouTube](https://www.youtube.com/@thewh2)
+- 🔵 [Facebook](https://www.facebook.com/thewh2)
 
 ---
 

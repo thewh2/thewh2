@@ -6,11 +6,37 @@ Nepal-based AI architect, web developer, and cybersecurity student at Herald Col
 Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. He is an ISO certified Frontend Web Developer, a BSc (Hons) Cybersecurity student, and currently works in Research & Development (R&D) at NavaNexa Pvt. Ltd. (Kupondole, Kathmandu) on the N-Traffic Jam project. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
 
 
+## Projects & Ecosystem
+### Core Applications (Full-Stack & Apps)
+- **WH2 Store (SMM Platform):** https://wh2store.netlify.app/ - Full-stack social media boosting platform with mobile app.
+- **TalkGPT v2 (AI Platform):** https://talkgpt2.netlify.app/ - Botpress-powered advanced AI conversational platform.
+- **TalkGPT App (Android):** https://www.webintoapp.com/download/apk/681111/app-release.apk - Native Android extension for mobile AI access.
+- **3D Solar System:** https://exploresolarsystem.netlify.app/ - Interactive 3D learning platform with 3D elements.
+- **WH2 Chat (E2E Encrypted):** https://wh2chat.netlify.app/ - Secure video/audio calling app via ConnectyCube.
+- **Particle Controller (Hand Gesture):** https://particle-controller.netlify.app/ - 3D hand gesture controlled particle system.
+- **WH2 Tube:** https://wh2tube.netlify.app/ - Ad-free YouTube alternative with premium free features.
+- **Mero Note:** https://meronote.netlify.app/ - Cloud-synced secure notebook web app.
+- **Milk Trace:** https://milk-trace.netlify.app/ - Dairy management and milk tracking application.
 
-## Core Projects
-- **Portfolio:** https://thewh2.netlify.app/
-- **SMM Store:** https://wh2store.netlify.app/
-- **TalkGPT:** AI platform for conversational excellence.
+### Specialized Tools & Utilities
+- **WH2 Knowledge Hub:** https://wh2hub.netlify.app/ - Platform for project hosting and knowledge sharing.
+- **Room Expense Tracker:** https://roomexpense.netlify.app/ - Group expense management with TalkGPT integration.
+- **WH2 Bill:** https://wh2-bill.netlify.app/ - Submeter electricity bill calculator for shared living.
+- **Mero Money:** https://meromoney.netlify.app/ - Cloud-based money lending and borrowing tracker.
+- **TS Convert:** https://tsconvert.netlify.app/ - High-precision Timestamp to Time converter utility.
+- **WH2 Weather:** https://wh2-weather.netlify.app/ - MySQL backed weather app with offline support.
+
+### Web & Entertainment
+- **Today IPL:** https://todayipl.netlify.app/ - Real-time IPL tracking, live streaming, and interactive games.
+- **3D Illusion Particles:** https://3dillusion.netlify.app/ - Immersive Three.js based visual experiment.
+- **GGSRC Robotics:** https://ggsrc.netlify.app/ - Official web portal for GoldenGate Science & Robotics club.
+- **WH2 Games:** https://wh2-game.netlify.app/ - Aggregated hub for retro and modern web games.
+- **Hamro Chatting:** https://hamrochatting.netlify.app/ - Real-time chat application built with Firebase.
+- **Hair Studio Demo:** https://npbarber.netlify.app/ - Frontend business showcase for barbershop growth.
+- **Evolution Cars:** https://evolutions.netlify.app/ - Interactive vehicle branding and showcase platform.
+- **Zackm Portfolio (Initial):** https://zackm.mystrikingly.com/ - First-ever drag-and-drop portfolio prototype.
+- **Friend Circle (ST):** https://cont.mystrikingly.com/ - Student community and networking portal.
+
 
 ## Education
 - **BSc (Hons) Cybersecurity:** Herald College Kathmandu (2025 - Present)
@@ -20,4 +46,10 @@ Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driv
 ## Skills
 HTML, CSS, JavaScript, PHP, Python, ReactJS, NodeJS, Docker, Git, Firebase, Supabase, PostgreSQL, MQTT, Canva.
 
-
+## Contact & Social
+- **Email:** chandanthakur.nep@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/thewh2/
+- **GitHub:** https://github.com/thewh2/
+- **Facebook:** https://www.facebook.com/thewh2
+- **Google Dev Profile:** https://g.dev/thewh2
+- **Website:** https://thewh2.netlify.app/
