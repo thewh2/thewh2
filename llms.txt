@@ -1,21 +1,23 @@
 # Chandan Kumar Thakur (The WH2)
 
-Nepal-based AI architect, web developer, and cybersecurity enthusiast focused on building sovereign digital ecosystems.
+Nepal-based AI architect, web developer, and cybersecurity student at Herald College Kathmandu (University of Wolverhampton).
 
 ## About
-Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
+Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. He is an ISO certified Frontend Web Developer, a BSc (Hons) Cybersecurity student, and currently works in Research & Development (R&D) at NavaNexa Pvt. Ltd. (Kupondole, Kathmandu) on the N-Traffic Jam project. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
+
+
 
 ## Core Projects
 - **Portfolio:** https://thewh2.netlify.app/
 - **SMM Store:** https://wh2store.netlify.app/
 - **TalkGPT:** AI platform for conversational excellence.
-- **Cybersecurity:** Ethical hacking and security audits.
 
-## Online Presence
-- **GitHub:** https://github.com/thewh2/
-- **LinkedIn:** https://www.linkedin.com/in/thewh2/
-- **Google Dev Profile:** https://g.dev/thewh2
-- **Email:** thewh2.official@gmail.com
-- **Nationality:** Nepali
-- **Focus Areas:** AI Driven Solutions, Web Development, Cybersecurity, Ethical Hacking
+## Education
+- **BSc (Hons) Cybersecurity:** Herald College Kathmandu (2025 - Present)
+- **Higher Secondary:** Golden Gate Int'l College (2023 - 2025)
+- **Secondary School:** Greenland H.S.E.B. School (SEE 2023)
+
+## Skills
+HTML, CSS, JavaScript, PHP, Python, ReactJS, NodeJS, Docker, Git, Firebase, Supabase, PostgreSQL, MQTT, Canva.
+
 
