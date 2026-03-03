@@ -1199,3 +1199,555 @@ section {
     margin-left: 0;
   }
 }
+
+/* --- Extracted from index.html --- */
+/* =========================================
+   Skills Section Custom Hover & Modal
+   ========================================= */
+.custom-skill-hover {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  /* fixed height for stable grid */
+}
+
+.custom-skill-hover:hover {
+  transform: scale(1.15) translateY(-5px);
+}
+
+.custom-skill-hover p {
+  opacity: 0;
+  transition: 0.3s;
+  position: absolute;
+  bottom: -20px;
+  white-space: nowrap;
+  background: #149ddd;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.custom-skill-hover:hover p {
+  opacity: 1;
+  bottom: 5px;
+}
+
+/* Modal Overlay */
+#skill-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(5, 13, 24, 0.8);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(6px);
+}
+
+#skill-modal-content {
+  background: #fff;
+  padding: 40px 30px 30px 30px;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+#skill-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #a0a0a0;
+  transition: 0.2s;
+  line-height: 1;
+}
+
+#skill-modal-close:hover {
+  color: #e74c3c;
+  transform: rotate(90deg);
+}
+
+#skill-modal-icon {
+  margin-bottom: 5px;
+}
+
+#skill-modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 10px 0 12px 0;
+  color: #149ddd;
+}
+
+#skill-modal-desc {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* =========================================
+   Contact Section Action Icons & Popup
+   ========================================= */
+.action-icon-custom {
+  cursor: pointer;
+  transition: 0.3s !important;
+}
+
+.action-icon-custom:hover {
+  background: #149ddd !important;
+  color: #fff !important;
+  transform: scale(1.05);
+}
+
+#call-popup a:hover {
+  background: #eaf4fb !important;
+}
+
+/* =========================================
+   Terminal Easter Egg & Cipher Styles
+   ========================================= */
+/* Terminal Styles */
+.wh2-term-widget {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 99999;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.term-trigger {
+  background: #050d18;
+  color: #18d26e;
+  border: 1px solid #149ddd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 14px;
+  transition: 0.3s;
+  opacity: 0.6;
+}
+
+.voice-trigger {
+  background: #149ddd;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s;
+  opacity: 0.8;
+  box-shadow: 0 4px 15px rgba(20, 157, 221, 0.3);
+}
+
+.voice-trigger i {
+  font-size: 14px;
+}
+
+.voice-trigger:hover,
+.term-trigger:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(24, 210, 110, 0.4);
+}
+
+.voice-trigger.listening {
+  background: #e74c3c;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
+.wh2-terminal {
+  display: none;
+  position: fixed;
+  bottom: 65px;
+  left: 20px;
+  width: 340px;
+  background: rgba(5, 13, 24, 0.95);
+  border: 1px solid #149ddd;
+  border-top: 3px solid #149ddd;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+  z-index: 99999;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+}
+
+.term-header {
+  background: #149ddd;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+}
+
+.term-close {
+  cursor: pointer;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.term-close:hover {
+  color: #ff4d4d;
+}
+
+.term-body {
+  padding: 10px;
+  height: 200px;
+  overflow-y: auto;
+  color: #18d26e;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+}
+
+.term-output {
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.term-input-line {
+  display: flex;
+  color: #18d26e;
+}
+
+.term-input-line span {
+  margin-right: 5px;
+}
+
+.term-input {
+  background: transparent;
+  border: none;
+  color: #18d26e;
+  outline: none;
+  flex-grow: 1;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+}
+
+/* Cipher Effect Styling Override */
+.section-title h2 {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Interactive Terminal Themes */
+.wh2-terminal.light-mode {
+  background: rgba(245, 248, 253, 0.95);
+  border-color: #e74c3c;
+  border-top-color: #e74c3c;
+}
+
+.wh2-terminal.light-mode .term-header {
+  background: #e74c3c;
+}
+
+.wh2-terminal.light-mode .term-body {
+  color: #333;
+}
+
+.wh2-terminal.light-mode .term-input-line span {
+  color: #e74c3c;
+}
+
+.wh2-terminal.light-mode .term-input {
+  color: #333;
+}
+
+/* Help Optimization */
+.help-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.help-cat {
+  border-left: 2px solid #18d26e;
+  padding-left: 8px;
+  margin-bottom: 10px;
+}
+
+.help-cat strong {
+  color: #18d26e;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cmd-hit {
+  color: #18d26e;
+  font-weight: bold;
+  background: rgba(24, 210, 110, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.wh2-terminal.light-mode .help-cat {
+  border-left-color: #e74c3c;
+}
+
+.wh2-terminal.light-mode .help-cat strong,
+.wh2-terminal.light-mode .cmd-hit {
+  color: #e74c3c;
+}
+
+.wh2-terminal.light-mode .cmd-hit {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* Glitch/Hack specific styling */
+.term-hack-text {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+/* Antigravity / Gravity Effect */
+.gravity-fall {
+  animation: fallDown 2.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards !important;
+  pointer-events: none;
+}
+
+@keyframes fallDown {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(150vh) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+/* System Crash Effect */
+.system-crash {
+  animation: violent-shake 0.1s infinite, color-shift-extreme 0.5s infinite !important;
+  pointer-events: none;
+}
+
+@keyframes violent-shake {
+  0% {
+    transform: translate(20px, 20px) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(-20px, -20px) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate(20px, -20px) rotate(1deg);
+  }
+
+  75% {
+    transform: translate(-20px, 20px) rotate(-1deg);
+  }
+
+  100% {
+    transform: translate(0) rotate(0deg);
+  }
+}
+
+@keyframes color-shift-extreme {
+  0% {
+    filter: hue-rotate(0deg) invert(0%) contrast(100%);
+  }
+
+  50% {
+    filter: hue-rotate(180deg) invert(100%) contrast(300%) grayscale(100%);
+  }
+
+  100% {
+    filter: hue-rotate(360deg) invert(0%) contrast(100%);
+  }
+}
+
+/* Glass Shatter Overlay */
+#hacker-attack-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hacker-text {
+  font-size: 5rem;
+  color: #ff0000;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-shadow: 2px 2px 10px #ff0000;
+  animation: hacker-blink 0.1s infinite;
+  z-index: 2;
+  text-align: center;
+}
+
+.shatter-glass {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(135deg, transparent 49%, rgba(255, 255, 255, 0.8) 50%, transparent 51%),
+    linear-gradient(45deg, transparent 49%, rgba(255, 255, 255, 0.8) 50%, transparent 51%),
+    linear-gradient(75deg, transparent 49%, rgba(255, 255, 255, 0.8) 50%, transparent 51%),
+    linear-gradient(15deg, transparent 49%, rgba(255, 255, 255, 0.8) 50%, transparent 51%);
+  background-size: 100% 100%;
+  opacity: 0.7;
+  transform: scale(1.2);
+  transform-origin: center;
+  animation: shatter 0.3s ease-out forwards;
+}
+
+@keyframes shatter {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.05);
+    opacity: 1;
+    backdrop-filter: blur(5px) contrast(200%);
+  }
+}
+
+@keyframes hacker-blink {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0);
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale(1.1) translate(10px, -10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-10px, 10px);
+  }
+}
+
+/* 1. Barrel Roll Effect */
+body.barrel-roll {
+  animation: roll-animation 2s ease-in-out;
+}
+
+@keyframes roll-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 2. Dark Web Mode (CRT Effect & Invert) */
+body.darkweb-mode {
+  filter: invert(1) hue-rotate(180deg) contrast(1.2);
+  background-color: #111;
+}
+
+body.darkweb-mode::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999999;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+/* 3. Matrix Rain Canvas */
+#matrix-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999998;
+  pointer-events: none;
+}
+
+/* 4. Snake Game Styling in Terminal */
+#snake-game {
+  background: #000;
+  border: 1px solid #18d26e;
+  display: block;
+  margin-top: 10px;
+}

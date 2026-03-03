@@ -30,6 +30,24 @@ With a strong **White Hat mindset**, I prioritize security, deployment, and impa
 - 🎮 **Game Hub:** [wh2-game.netlify.app](https://wh2-game.netlify.app/)
 - 🔍 **Knowledge Hub:** [wh2hub.netlify.app](https://wh2hub.netlify.app/)
 
+---
+
+## 💻 Terminal Easter Egg (WH2 Shell)
+One of the most unique features of this portfolio is the **Hidden Terminal Shell**. Experience it by clicking the `>_` icon or using the **Voice Trigger** ("Say Hello").
+
+### 🐍 Snake Game (v2.0)
+- **Multi-Difficulty:** Easy, Medium, Hard, and Expert tiers.
+- **Dynamic Physics:** Variable speeds and point scaling per level.
+- **Leaderboard:** LocalStorage-powered Top 3 High Scores tracker.
+- **Dual Display:** Play directly in the terminal or in cinematic Fullscreen.
+
+### ⌨️ Advanced Commands
+- `matrix`: Activate the green falling rain overlay.
+- `darkweb`: Apply retro CRT scanline filters to the entire site.
+- `sudo rm -rf`: Simulate a system crash with glass-shattering effects.
+- `destroy`: Trigger a gravity-based collapse of the DOM elements.
+- `hack content`: Make the entire website editable like a text document.
+- `help`: Categorized command center with fuzzy-logic typo suggestions.
 
 ---
 
@@ -44,9 +62,12 @@ With a strong **White Hat mindset**, I prioritize security, deployment, and impa
 
 ---
 
-##  GitHub Stats
-![The WH2's GitHub Stats](https://github-readme-stats.vercel.app/api?username=thewh2&show_icons=true&theme=dark)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=thewh2&layout=compact&theme=dark)
+## 📊 GitHub Stats
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=thewh2&show_icons=true&theme=react&hide_border=true" alt="GitHub Stats">
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=thewh2&layout=compact&theme=react&hide_border=true" alt="Top Languages">
+  <img src="https://streak-stats.demolab.com/?user=thewh2&theme=react&hide_border=true" alt="GitHub Streak">
+</p>
 
 ---
 

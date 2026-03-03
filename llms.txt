@@ -3,7 +3,7 @@
 Nepal-based AI architect, web developer, and cybersecurity student at Herald College Kathmandu (University of Wolverhampton).
 
 ## About
-Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. He is an ISO certified Frontend Web Developer, a BSc (Hons) Cybersecurity student, and currently works in Research & Development (R&D) at NavaNexa Pvt. Ltd. (Kupondole, Kathmandu) on the N-Traffic Jam project. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
+Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. He is an ISO certified Frontend Web Developer, a BSc (Hons) Cybersecurity student, and currently works in Research & Development (R&D) at NavaNexa Pvt. Ltd. (Kupondole, Kathmandu) on the N-Traffic Jam project. His portfolio features a highly advanced Terminal Easter Egg (WH2 Shell) containing an arcade-style Snake Game (with 4 difficulties and local leaderboards), Matrix overlays, and system simulation commands. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
 
 
 ## Projects & Ecosystem

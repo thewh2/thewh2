@@ -199,54 +199,55 @@
       <div class="container">
 
         <div class="section-title">
-          <h2>Facts</h2>
-          <p>With extensive experience in the industry, I craft custom web solutions tailored to your unique needs.
-            Whether you're a startup, entrepreneur, or creative professional, I collaborate closely to understand your
-            vision and turn it into reality through an innovative and seamless development process.</p>
+          <h2>Impact & Achievements</h2>
+          <p>Over the years, I have actively developed and scaled multiple real-world applications across different tech
+            stacks. My focus isn't just on writing code, but on solving practical problems—from AI architectures to
+            fully responsive full-stack websites—across personal and professional environments.</p>
         </div>
 
         <div class="row no-gutters">
 
           <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up">
             <div class="count-box">
-              <i class="bi bi-emoji-smile"></i>
-              <span data-purecounter-start="0" data-purecounter-end="44" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p><b>Happy Clients</b> are counted</p>
+              <i class="bi bi-laptop"></i>
+              <span data-purecounter-start="0" data-purecounter-end="35" data-purecounter-duration="1"
+                class="purecounter">+</span>
+              <p><b>Web & AI Projects</b> actively developed</p>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up" data-aos-delay="100">
             <div class="count-box">
               <i class="bi bi-journal-richtext"></i>
-              <span data-purecounter-start="0" data-purecounter-end="52" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p><b>Successful Projects</b> to date</p>
+              <span data-purecounter-start="0" data-purecounter-end="4" data-purecounter-duration="1"
+                class="purecounter">+</span>
+              <p><b>Years of Experience</b> building solutions</p>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up" data-aos-delay="200">
             <div class="count-box">
-              <i class="bi bi-headset"></i>
-              <span data-purecounter-start="0" data-purecounter-end="953" data-purecounter-duration="1"
+              <i class="bi bi-shield-check"></i>
+              <span data-purecounter-start="0" data-purecounter-end="3" data-purecounter-duration="1"
                 class="purecounter"></span>
-              <p><b>Hours Of Support</b> ensuring our clients receive</p>
+              <p><b>Core Domains:</b> Web, Cybersecurity, AI</p>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6 d-md-flex align-items-md-stretch" data-aos="fade-up" data-aos-delay="300">
             <div class="count-box">
-              <i class="bi bi-people"></i>
-              <span data-purecounter-start="0" data-purecounter-end="8" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p><b>Hard Workers/Supporter</b> dedicated to exceed client expectations</p>
+              <i class="bi bi-code-square"></i>
+              <span data-purecounter-start="0" data-purecounter-end="10" data-purecounter-duration="1"
+                class="purecounter">+</span>
+              <p><b>Tech Stacks</b> mastered natively</p>
             </div>
           </div>
 
         </div>
 
       </div>
-    </section><!-- End Facts Section -->
+    </section>
+    <!-- End Facts Section -->
 
     <!-- ======= Skills Section ======= -->
     <section id="skills" class="skills section-bg">
@@ -260,74 +261,85 @@
             PHP, and version control with Git & GitHub.</p>
         </div>
 
+
+        <div id="skill-modal-overlay" onclick="closeSkillModal(event)">
+          <div id="skill-modal-content" onclick="event.stopPropagation()">
+            <i class="bx bx-x" id="skill-modal-close" onclick="closeSkillModal()"></i>
+            <div id="skill-modal-icon"></div>
+            <h3 id="skill-modal-title"></h3>
+            <p id="skill-modal-desc"></p>
+          </div>
+        </div>
+
+
         <div class="skills-grid"
-          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 30px; text-align: center; justify-items: center; align-items: center;">
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="100">
-            <i class="devicon-html5-plain-wordmark colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">HTML</p>
-          </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="150">
-            <i class="devicon-css3-plain-wordmark colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">CSS</p>
-          </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="175">
-            <i class="devicon-sass-original colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Sass</p>
-          </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="200">
-            <img src="assets/img/js_logo.png" style="width: 60px; height: 60px; object-fit: contain;" alt="JavaScript">
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">JavaScript</p>
-          </div>
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 40px; text-align: center; justify-items: center; align-items: center; margin-top:20px;">
 
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="250">
-            <i class="devicon-php-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">PHP</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="100" onclick="openSkillModal('HTML')">
+            <i class="devicon-html5-plain-wordmark colored" style="font-size: 65px;"></i>
+            <p>HTML</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="300">
-            <img src="assets/img/python_logo.png" style="width: 60px; height: 60px; object-fit: contain;" alt="Python">
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Python</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="150" onclick="openSkillModal('CSS')">
+            <i class="devicon-css3-plain-wordmark colored" style="font-size: 65px;"></i>
+            <p>CSS</p>
           </div>
-
-
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="350">
-            <img src="assets/img/canva_logo.png" style="width: 60px; height: 60px; object-fit: contain;" alt="Canva">
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Canva</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="175" onclick="openSkillModal('Sass')">
+            <i class="devicon-sass-original colored" style="font-size: 65px;"></i>
+            <p>Sass</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="400">
-            <i class="devicon-git-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Git</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="200"
+            onclick="openSkillModal('JavaScript')">
+            <img src="assets/img/js_logo.png" style="width: 65px; height: 65px; object-fit: contain;" alt="JavaScript">
+            <p>JavaScript</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="450">
-            <i class="devicon-github-original-wordmark colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">GitHub</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="250" onclick="openSkillModal('PHP')">
+            <i class="devicon-php-plain colored" style="font-size: 65px;"></i>
+            <p>PHP</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="500">
-            <i class="devicon-docker-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Docker</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="300" onclick="openSkillModal('Python')">
+            <img src="assets/img/python_logo.png" style="width: 65px; height: 65px; object-fit: contain;" alt="Python">
+            <p>Python</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="550">
-            <i class="bx bx-broadcast colored" style="font-size: 60px; color: #149ddd;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">MQTT</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="350" onclick="openSkillModal('Canva')">
+            <img src="assets/img/canva_logo.png" style="width: 65px; height: 65px; object-fit: contain;" alt="Canva">
+            <p>Canva</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="600">
-            <i class="devicon-firebase-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Firebase</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="400" onclick="openSkillModal('Git')">
+            <i class="devicon-git-plain colored" style="font-size: 65px;"></i>
+            <p>Git</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="650">
-            <i class="devicon-react-original colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">ReactJS</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="450" onclick="openSkillModal('GitHub')">
+            <i class="devicon-github-original-wordmark colored" style="font-size: 65px;"></i>
+            <p>GitHub</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="700">
-            <i class="devicon-nodejs-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Node.js</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="500" onclick="openSkillModal('Docker')">
+            <i class="devicon-docker-plain colored" style="font-size: 65px;"></i>
+            <p>Docker</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="750">
-            <i class="devicon-supabase-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">Supabase</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="550" onclick="openSkillModal('MQTT')">
+            <i class="bx bx-broadcast colored" style="font-size: 65px; color: #149ddd;"></i>
+            <p>MQTT</p>
           </div>
-          <div class="skill-item" data-aos="zoom-in" data-aos-delay="800">
-            <i class="devicon-postgresql-plain colored" style="font-size: 60px;"></i>
-            <p style="font-size: 14px; margin-top: 5px; font-weight: 600;">PostgreSQL</p>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="600" onclick="openSkillModal('Firebase')">
+            <i class="devicon-firebase-plain colored" style="font-size: 65px;"></i>
+            <p>Firebase</p>
+          </div>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="650" onclick="openSkillModal('ReactJS')">
+            <i class="devicon-react-original colored" style="font-size: 65px;"></i>
+            <p>ReactJS</p>
+          </div>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="700" onclick="openSkillModal('Node.js')">
+            <i class="devicon-nodejs-plain colored" style="font-size: 65px;"></i>
+            <p>Node.js</p>
+          </div>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="750" onclick="openSkillModal('Supabase')">
+            <i class="devicon-supabase-plain colored" style="font-size: 65px;"></i>
+            <p>Supabase</p>
+          </div>
+          <div class="custom-skill-hover" data-aos="zoom-in" data-aos-delay="800"
+            onclick="openSkillModal('PostgreSQL')">
+            <i class="devicon-postgresql-plain colored" style="font-size: 65px;"></i>
+            <p>PostgreSQL</p>
           </div>
         </div>
 
@@ -344,7 +356,7 @@
           <h2>Resume</h2>
           <p>Chandan Kumar Thakur, a Cybersecurity Student from Kathmandu, excels in web design, front-end development,
             AI
-            integration, and digital artistry. Currently pursuing BSc (Hons) Cybersecurity, he
+            integration, and digital artistry. Currently pursuing BSc (Hons) Cybersecurity,
             crafts seamless and intelligent digital experiences with a focus on security and efficiency.</p>
 
         </div>
@@ -771,48 +783,48 @@
 
         <div class="section-title">
           <h2>Services</h2>
-          <p>Welcome to my services! I offer a range of professional services tailored to meet your digital needs. From
-            web development and design to graphic design and more, I am committed to delivering high-quality solutions
-            that exceed your expectations. Explore the services below to discover how I can help bring your digital
-            projects to life...</p>
+          <p>I specialize in building sovereign digital ecosystems, bringing innovative ideas to life through robust
+            engineering. With deep expertise spanning web development, artificial intelligence, and cybersecurity, I
+            deliver end-to-end solutions that are secure, scalable, and highly impactful. Explore my core capabilities
+            below.</p>
         </div>
 
         <div class="row">
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up">
-            <div class="icon"><i class="bi bi-briefcase"></i></div>
-            <h4 class="title"><a href="#contact">Website Redesigns</a></h4>
-            <p class="description">Help clients revamp and modernize their existing websites to improve aesthetics,
-              functionality, and overall user experience. </p>
+            <div class="icon"><i class="bi bi-window-desktop"></i></div>
+            <h4 class="title"><a href="#contact">Full-Stack Web Development</a></h4>
+            <p class="description">End-to-end development of dynamic, scalable, and secure web applications tailored to
+              your business needs using modern tech stacks.</p>
           </div>
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="100">
-            <div class="icon"><i class="bi bi-card-checklist"></i></div>
-            <h4 class="title"><a href="#contact">Front-End Development</a></h4>
-            <p class="description">Focus on front-end development services, including HTML, CSS, JavaScript, and
-              front-end frameworks like Bootstrap or React, to create interactive and dynamic web experiences.</p>
+            <div class="icon"><i class="bi bi-robot"></i></div>
+            <h4 class="title"><a href="#contact">AI Solutions & Integration</a></h4>
+            <p class="description">Building intelligent custom AI platforms, conversational bots (e.g., TalkGPT), and
+              integrating advanced AI capabilities into existing workflows.</p>
           </div>
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="200">
-            <div class="icon"><i class="bi bi-bar-chart"></i></div>
-            <h4 class="title"><a href="#contact">E-commerce Development</a></h4>
-            <p class="description">Develop custom e-commerce solutions for clients looking to sell products or services
-              online, including setting up online stores, payment gateways, and product management systems.</p>
+            <div class="icon"><i class="bi bi-shield-lock"></i></div>
+            <h4 class="title"><a href="#contact">Cybersecurity & Security Audits</a></h4>
+            <p class="description">Fortifying digital assets with end-to-end encryption, vulnerability assessments, and
+              implementing robust security architectures.</p>
           </div>
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="300">
-            <div class="icon"><i class="bi bi-binoculars"></i></div>
-            <h4 class="title"><a href="#contact">Ethical Hacking and Security Audits</a></h4>
-            <p class="description"> Help clients strengthen their cybersecurity posture and protect against potential
-              threats and attacks.</p>
+            <div class="icon"><i class="bi bi-phone"></i></div>
+            <h4 class="title"><a href="#contact">Mobile App Development</a></h4>
+            <p class="description">Developing native Android applications and Progressive Web Apps (PWAs) to deliver
+              seamless mobile user experiences.</p>
           </div>
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="400">
-            <div class="icon"><i class="bi bi-brightness-high"></i></div>
-            <h4 class="title"><a href="#contact">Graphic Design</a></h4>
-            <p class="description">Extend your services to include graphic design for website elements such as logos,
-              banners, icons, and other visual assets that complement the overall design.</p>
+            <div class="icon"><i class="bi bi-badge-3d"></i></div>
+            <h4 class="title"><a href="#contact">3D Web & Interactive UI</a></h4>
+            <p class="description">Crafting immersive 3D experiences, particle systems, and interactive UI/UX designs
+              utilizing modern web rendering technologies.</p>
           </div>
           <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="500">
-            <div class="icon"><i class="bi bi-calendar4-week"></i></div>
-            <h4 class="title"><a href="#contact">Consultation and Training</a></h4>
-            <p class="description">Provide consultation and training services to clients, guiding them on best practices
-              for website design, development, and AI integration.</p>
+            <div class="icon"><i class="bi bi-server"></i></div>
+            <h4 class="title"><a href="#contact">Backend & Cloud Infrastructure</a></h4>
+            <p class="description">Designing and managing reliable server-side architecture using Firebase, Supabase,
+              PostgreSQL, Docker, and scalable cloud solutions.</p>
           </div>
         </div>
 
@@ -922,23 +934,49 @@
 
           <div class="col-lg-5 d-flex align-items-stretch">
             <div class="info">
+
               <div class="address">
-                <i class="bi bi-geo-alt"></i>
+                <i class="bi bi-geo-alt action-icon-custom"
+                  onclick="window.open('https://maps.google.com/?q=M9Q2+W3G,+Kathmandu+44600','_blank')"
+                  title="Click for open in maps"></i>
                 <h4>Location:</h4>
                 <p>M9Q2+W3G, Kathmandu 44600</p>
               </div>
 
               <div class="email">
-                <i class="bi bi-envelope"></i>
+                <i class="bi bi-envelope action-icon-custom"
+                  onclick="window.location.href='mailto:chandanthakur.nep@gmail.com'" title="Click to send email"></i>
                 <h4>Email:</h4>
                 <p>chandanthakur.nep@gmail.com</p>
               </div>
 
-              <div class="phone">
-                <i class="bi bi-phone"></i>
+              <div class="phone" style="position: relative;">
+                <i class="bi bi-phone action-icon-custom" onclick="toggleCallPopup(event)"
+                  title="Click for calls / chat"></i>
                 <h4>Call:</h4>
                 <p>+977 9825728982</p>
+
+                <!-- Call/Chat Popup -->
+                <div id="call-popup"
+                  style="display: none; position: absolute; left: 60px; top: -10px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 100; min-width: 220px;">
+                  <h6
+                    style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color:#050d18; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Contact TheWH2</h6>
+                  <a href="tel:+9779825728982"
+                    style="display:flex; align-items:center; color:#333; text-decoration:none; padding:10px 12px; border-radius:4px; margin-bottom:8px; transition:0.2s; background:#f8f9fa;">
+                    <i class="bi bi-telephone"
+                      style="color:#149ddd; font-size:20px; width:auto; height:auto; background:none; margin:0 12px 0 0; padding:0; float:none;"></i>
+                    <span style="font-size: 15px; font-weight: 500;">Call TheWH2</span>
+                  </a>
+                  <a href="https://wa.me/9779825728982" target="_blank"
+                    style="display:flex; align-items:center; color:#333; text-decoration:none; padding:10px 12px; border-radius:4px; transition:0.2s; background:#f8f9fa;">
+                    <i class="bi bi-whatsapp"
+                      style="color:#25d366; font-size:20px; width:auto; height:auto; background:none; margin:0 12px 0 0; padding:0; float:none;"></i>
+                    <span style="font-size: 15px; font-weight: 500;">Contact on WhatsApp</span>
+                  </a>
+                </div>
               </div>
+
 
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d23680.73108642224!2d85.33317072520892!3d27.6896924271754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb19894e8de6c7%3A0xdc09ad3deb6a962a!2sM9Q2%2BW3G%2C%20Kathmandu%2044600!5e0!3m2!1sen!2snp!4v1706953606870!5m2!1sen!2snp"
@@ -949,28 +987,64 @@
           </div>
 
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-            <form action="https://formspree.io/f/mjkyaegl" method="post" role="form" class="php-email-form">
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label for="name">Your Name</label>
-                  <input type="text" name="name" class="form-control" id="name" required>
+            <div id="contact-form-wrapper"
+              style="width: 100%; padding: 30px; background: #fff; box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.12);">
+              <form id="contactForm" onsubmit="submitForm(event)" class="web3-custom-form">
+                <input type="hidden" name="access_key" value="bee825f1-e8e3-4065-8b8f-6262969f25dd">
+                <div class="row">
+                  <div class="form-group col-md-6 mb-3">
+                    <label for="name" style="padding-bottom:8px;"><i class="bi bi-person text-secondary"></i> Your
+                      Fullname <span style="color:red;" title="This field is required">*</span></label>
+                    <input type="text" name="name" class="form-control" id="name" required
+                      style="border-radius: 4px; padding: 10px 15px;">
+                  </div>
+                  <div class="form-group col-md-6 mb-3 mt-md-0">
+                    <label for="email" style="padding-bottom:8px;"><i class="bi bi-envelope text-secondary"></i> Email
+                      or Phone <span style="color:red;" title="This field is required">*</span></label>
+                    <input type="text" class="form-control" name="contact_info" id="email" required
+                      style="border-radius: 4px; padding: 10px 15px;">
+                  </div>
                 </div>
-                <div class="form-group col-md-6">
-                  <label for="name">Your Email</label>
-                  <input type="email" class="form-control" name="email" id="email" required>
+                <div class="form-group mb-3">
+                  <label for="subject" style="padding-bottom:8px;"><i class="bi bi-card-text text-secondary"></i>
+                    Subject <span style="color:red;" title="This field is required">*</span></label>
+                  <select class="form-control" name="subject" id="subject" required
+                    style="border-radius: 4px; padding: 10px 15px;">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="General Query">General Query</option>
+                    <option value="Feedback">Feedback</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="Business/Freelance Inquiry">Business/Freelance Inquiry</option>
+                    <option value="Others">Others</option>
+                  </select>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="name">Message</label>
-                <textarea class="form-control" name="message" rows="10" required></textarea>
-              </div>
-              <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
-              </div>
-              <div class="text-center"><button type="submit">Send Message</button></div>
-            </form>
+                <div class="form-group mb-3">
+                  <label for="message" style="padding-bottom:8px;"><i class="bi bi-chat-dots text-secondary"></i>
+                    Message Box <span style="color:red;" title="This field is required">*</span></label>
+                  <textarea class="form-control" name="message" id="message" rows="6" required
+                    style="border-radius: 4px; padding: 10px 15px; resize: none;"></textarea>
+                </div>
+
+                <!-- Fixed height status container prevents up-down jumping -->
+                <div class="my-3"
+                  style="min-height: 25px; display: flex; align-items: center; justify-content: center;">
+                  <div id="form-loading"
+                    style="display:none; text-align: center; color: #149ddd; font-weight: bold; font-size: 14px;">
+                    Sending message...</div>
+                  <div id="form-error" style="display:none; text-align: center; color: red; font-size: 14px;"></div>
+                  <div id="form-success"
+                    style="display:none; text-align: center; color: #18d26e; font-weight: 600; font-size: 14px;">Your
+                    message has been sent successfully! Thank you.</div>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" id="submit-btn"
+                    style="background: #149ddd; border: 0; padding: 10px 24px; color: #fff; transition: 0.4s; border-radius: 4px;">Send
+                    Message</button>
+                </div>
+              </form>
+            </div>
+
           </div>
 
         </div>
@@ -1055,6 +1129,32 @@
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
+
+  <!-- The WH2 Custom Easter Eggs & Cipher Effects -->
+
+  <div class="wh2-term-widget">
+    <div class="voice-trigger" id="voice-trigger" title="Voice Activation: Say 'Hello Chandan'">
+      <i class="bi bi-mic"></i>
+      <span>Say Hello</span>
+    </div>
+    <div class="term-trigger" id="term-trigger" title="Access Terminal">>_</div>
+    <div class="wh2-terminal" id="wh2-terminal">
+      <div class="term-header">
+        <span>WH2_SYSTEM_TERMINAL</span>
+        <span class="term-close" id="term-close">X</span>
+      </div>
+      <div class="term-body" id="term-body">
+        <div class="term-output" id="term-output">Authentication: OK
+          Connection Established.
+          Type 'help' for available commands.</div>
+        <div class="term-input-line">
+          <span>root@wh2:~$</span>
+          <input type="text" id="term-input" class="term-input" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
