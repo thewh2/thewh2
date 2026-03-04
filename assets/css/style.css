@@ -1361,56 +1361,13 @@ section {
   opacity: 0.6;
 }
 
-.voice-trigger {
-  background: #149ddd;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: 0.3s;
-  opacity: 0.8;
-  box-shadow: 0 4px 15px rgba(20, 157, 221, 0.3);
-}
 
-.voice-trigger i {
-  font-size: 14px;
-}
-
-.voice-trigger:hover,
 .term-trigger:hover {
   opacity: 1;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(24, 210, 110, 0.4);
 }
 
-.voice-trigger.listening {
-  background: #e74c3c;
-  animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-red {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
-  }
-
-  70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
-  }
-
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
-  }
-}
 
 .wh2-terminal {
   display: none;
