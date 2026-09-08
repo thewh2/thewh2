@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 3: Active vs Passive Reconnaissance, Bugcrowd Scope & OSINT Tooling | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 3 hands-on reconnaissance report from BugXploit (Koteshwor): Active vs Passive Recon, Bugcrowd scope analysis on Tesla, Subdomainfinder c99, DNSDumpster, Google Dorking, crt.sh Certificate Transparency, WHOIS, MXToolbox, Emkei spoofing analysis, NsLookup, Wayback Machine API hunting, and Shodan IoT reconnaissance.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 3, BugXploit Workshop, Active Reconnaissance, Passive Reconnaissance, Bugcrowd Tesla scope, Subdomainfinder c99, DNSDumpster, Google Dorking, crt.sh, Certificate Transparency, WHOIS, MXToolbox SuperTool, Emkei fake mailer, nslookup.io, Wayback Machine archive.org API hunting, Shodan, Shodan Dorks, CVE Shodan, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day3/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title"
+    content="Day 3: Active vs Passive Reconnaissance, Bugcrowd Scope & OSINT Tooling | BugXploit Workshop">
+  <meta property="og:description"
+    content="Day 3 practical reconnaissance lab report from BugXploit Ethical Hacking workshop: Active vs Passive recon, Bugcrowd Tesla target analysis, advanced Google Dorks, Subdomainfinder, DNSDumpster, crt.sh, WHOIS, MXToolbox, Wayback Machine, and Shodan IoT search engine.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day3/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 3: Active vs Passive Reconnaissance & OSINT Deep Dive | BugXploit">
+  <meta name="twitter:description"
+    content="Detailed Day 3 penetration testing notes: Active vs Passive Recon, Bugcrowd scope, Google Dorks, DNSDumpster, crt.sh, Wayback Machine, and Shodan. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for AI and Search Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 3: Active vs Passive Reconnaissance, Bugcrowd Scope & OSINT Tooling - BugXploit Workshop",
+    "description": "Exhaustive Day 3 ethical hacking report detailing active vs passive reconnaissance methodology, Bugcrowd Tesla scope inspection, and hands-on OSINT tooling including Subdomainfinder c99, DNSDumpster, Google Dorking syntax, crt.sh Certificate Transparency, WHOIS, MXToolbox, Emkei email spoofing mechanics, NsLookup, Wayback Machine historical API discovery, and Shodan IoT device search engines.",
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Reconnaissance & OSINT"
+      },
+      {
+        "@type": "Thing",
+        "name": "Active vs Passive Reconnaissance"
+      },
+      {
+        "@type": "Thing",
+        "name": "Google Dorking (Advanced Search Operators)"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bugcrowd Platform"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Shodan Search Engine"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "crt.sh Certificate Search"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2 Knowledge Hub",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "datePublished": "2026-09-08",
+    "inLanguage": "en",
+    "keywords": "Active Recon, Passive Recon, Bugcrowd, Tesla Bug Bounty, Google Dorking, DNSDumpster, crt.sh, WHOIS, MXToolbox, Emkei, nslookup.io, Wayback Machine, Shodan, CVE Shodan, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
+    "articleSection": "Cybersecurity & Ethical Hacking"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 3: Active &amp; Passive Reconnaissance <a href="../index.html"
+              style="font-size: 14px; background: #149ddd; color: #fff; padding: 5px 15px; border-radius: 5px; margin-left: 15px; text-decoration: none; vertical-align: middle;">Back
+              to Workshop</a></h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">BugXploit Workshop</a></li>
+            <li>Day 3</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 03 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 3: Active vs. Passive Reconnaissance, Bugcrowd Target Scoping &amp; OSINT Tooling
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> TheWH2</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit
+                    (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~12 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Scope</h4>
+                  <p class="mb-0 small">
+                    This session focused on open-source intelligence (OSINT) and legal attack surface mapping. All live
+                    target examples were evaluated strictly against public bug bounty guidelines (such as the Bugcrowd
+                    Tesla engagement) in compliance with documented Rules of Engagement.
+                  </p>
+                </div>
+
+                <h2>1. Core Concepts: Active vs. Passive Reconnaissance</h2>
+                <p>
+                  In offensive security and penetration testing, <strong>Reconnaissance (Information Gathering)</strong>
+                  is the vital first phase. More than 70% of a successful penetration test or bug bounty assessment
+                  depends on how comprehensively the attack surface is discovered and mapped.
+                </p>
+                <p>
+                  Instructor <strong>Birendra Sah</strong> introduced the core division between the two primary recon
+                  methodologies:
+                </p>
+
+                <div class="row g-3 my-3">
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-info text-dark">Stealth / Indirect</span>
+                        <h4 class="fw-bold fs-6 mb-0 text-dark">Passive Reconnaissance</h4>
+                      </div>
+                      <p class="small text-muted mb-2">
+                        Gathering intelligence about a target <strong>without directly interacting or sending network
+                          packets to the target’s infrastructure</strong>.
+                      </p>
+                      <ul class="small mb-0 ps-3 text-muted">
+                        <li>Uses public records, third-party databases, and search caches.</li>
+                        <li>Completely invisible to the target’s Web Application Firewalls (WAF), IDS/IPS, and server
+                          logs.</li>
+                        <li><strong>Tools:</strong> Google Dorking, DNSDumpster, crt.sh, WHOIS, Wayback Machine, Shodan.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-danger text-white">Direct / Interactive</span>
+                        <h4 class="fw-bold fs-6 mb-0 text-dark">Active Reconnaissance</h4>
+                      </div>
+                      <p class="small text-muted mb-2">
+                        Interacting <strong>directly with the target’s servers, network ports, or web
+                          applications</strong> to probe services, test inputs, and map live hosts.
+                      </p>
+                      <ul class="small mb-0 ps-3 text-muted">
+                        <li>Transmits probes, SYN packets, HTTP requests, or DNS queries directly to target IP
+                          addresses.</li>
+                        <li>Leaves traceable footprints in access logs and can trigger WAF rate-limiting or SOC alerts.
+                        </li>
+                        <li><strong>Tools:</strong> Nmap, directory brute-forcers (ffuf, dirsearch), live port pinging,
+                          interactive browser tests.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <h2>2. Target Scoping on Bugcrowd: Tesla Engagement</h2>
+                <p>
+                  Before conducting any reconnaissance, ethical hackers must identify the <strong>Rules of
+                    Engagement</strong> and strictly defined <strong>In-Scope vs. Out-of-Scope</strong> assets.
+                </p>
+                <p>
+                  We navigated to the public Bugcrowd bounty page for <strong>Tesla</strong>:
+                </p>
+                <div
+                  class="p-3 border rounded bg-light mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div>
+                    <strong>Engagement URL:</strong> <code>https://bugcrowd.com/engagements/tesla</code><br>
+                    <span class="small text-muted">Target: Tesla Global Web, Vehicle &amp; Energy Product
+                      Infrastructure</span>
+                  </div>
+                  <a href="https://bugcrowd.com/engagements/tesla" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-primary btn-sm">
+                    View Bugcrowd Program <i class="bi bi-box-arrow-up-right"></i>
+                  </a>
+                </div>
+                <p>
+                  <strong>Why Target Scoping Matters:</strong>
+                </p>
+                <ul>
+                  <li><strong>In-Scope Assets:</strong> Primary domains and wildcard subdomains (e.g.,
+                    <code>*.tesla.com</code>, <code>*.tesla.cn</code>, energy portals) where security reporting is
+                    authorized and rewarded.
+                  </li>
+                  <li><strong>Out-of-Scope Restrictions:</strong> Third-party hosted services, Denial of Service
+                    (DoS/DDoS) attacks, social engineering against employees, or physical attacks on
+                    superchargers/factories. Testing outside the scope is illegal and leads to platform bans.</li>
+                </ul>
+
+                <h2>3. Subdomain Enumeration via Subdomainfinder (c99.nl)</h2>
+                <p>
+                  Subdomains represent expanded attack surfaces. While <code>tesla.com</code> is protected by enterprise
+                  WAFs and hardened configurations, internal subdomains (staging, admin portals, beta APIs, development
+                  Jenkins pipelines) often run forgotten, vulnerable software.
+                </p>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-globe"></i> Subdomainfinder c99.nl</h5>
+                    <a href="https://subdomainfinder.c99.nl/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> An automated online OSINT aggregator that scrapes DNS records, search
+                    engine indexes, threat intelligence feeds, and historical web logs to discover active and inactive
+                    subdomains belonging to a root domain.
+                  </p>
+                  <p class="small text-muted mb-0">
+                    <strong>Benefits for Hackers:</strong> Instant list of subdomains with resolved IP addresses, HTTP
+                    response codes, and cloud hosting providers (AWS, Cloudflare, Akamai) without running noisy
+                    brute-force scripts locally.
+                  </p>
+                </div>
+
+                <h2>4. DNS Topology &amp; Attack Surface Mapping: DNSDumpster</h2>
+                <p>
+                  DNS records reveal who manages the domain, where email is routed, and what internal name servers are
+                  utilized.
+                </p>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-diagram-3-fill"></i> DNSDumpster</h5>
+                    <a href="https://dnsdumpster.com/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> A specialized domain research tool that discovers DNS records
+                    including A, MX, NS, SOA, and TXT records, and visually renders an interactive network topology map
+                    of the target organization's server infrastructure.
+                  </p>
+                  <p class="small text-muted mb-0">
+                    <strong>Key Benefits:</strong>
+                  </p>
+                  <ul class="small text-muted mb-0 ps-3">
+                    <li>Discovers mail servers (MX) and name servers (NS) to identify third-party SaaS vendors.</li>
+                    <li>Uncovers TXT records containing SPF configurations, DKIM verification keys, and legacy
+                      verification tokens.</li>
+                    <li>Generates an Excel/XLS export and interactive node graph of interconnected hostnames and network
+                      ranges.</li>
+                  </ul>
+                </div>
+
+                <h2>5. Google Dorking (Google Hacking Database - GHDB)</h2>
+                <p>
+                  <strong>Google Dorking</strong> (advanced search engine operators) allows security researchers to
+                  filter out millions of generic web pages and zero in on sensitive documents, forgotten configuration
+                  files, and unlinked endpoints.
+                </p>
+
+                <p>We practiced several core Google Dorks targeting the Tesla attack surface:</p>
+
+                <div class="table-responsive my-3">
+                  <table class="table table-bordered table-striped small">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Google Dork Operator</th>
+                        <th>Purpose &amp; Mechanism</th>
+                        <th>Security Implication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>site:*.tesla.com</code></td>
+                        <td>Discovers all indexed subdomains under the root domain <code>tesla.com</code>.</td>
+                        <td>Maps out forgotten customer portals, localized market sites, and regional sub-sites.</td>
+                      </tr>
+                      <tr>
+                        <td><code>site:*.tesla.com /signup</code></td>
+                        <td>Filters indexed Tesla subdomains specifically containing registration or sign-up endpoints.
+                        </td>
+                        <td>Identifies entry points for account creation vulnerabilities, user enumeration, and
+                          parameter testing.</td>
+                      </tr>
+                      <tr>
+                        <td><code>site:*.tesla.com -www</code></td>
+                        <td>Excludes the main marketing website (<code>www.tesla.com</code>) to reveal all other
+                          subdomains.</td>
+                        <td>Eliminates noise so penetration testers can focus exclusively on secondary infrastructure.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><code>site:tesla.com filetype:pdf OR filetype:xls OR filetype:docx</code></td>
+                        <td>Finds publicly indexed internal documents and spreadsheets.</td>
+                        <td>Can expose internal business processes, network layouts, and employee contact lists.</td>
+                      </tr>
+                      <tr>
+                        <td><code>site:tesla.com inurl:admin OR inurl:login</code></td>
+                        <td>Searches for internal login interfaces, administrative dashboards, or single sign-on (SSO)
+                          gateways.</td>
+                        <td>Pinpoints authentication portals that may be vulnerable to default credentials or
+                          brute-force.</td>
+                      </tr>
+                      <tr>
+                        <td><code>site:tesla.com ext:env OR ext:yaml OR ext:conf</code></td>
+                        <td>Searches for accidentally exposed server environment configurations.</td>
+                        <td>High-severity risk of database passwords, API secret keys, and AWS credentials leakage.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h2>6. Certificate Transparency Logs via crt.sh</h2>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-file-earmark-lock2"></i> crt.sh (Certificate
+                      Search)</h5>
+                    <a href="https://crt.sh/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> A public search engine for <strong>Certificate Transparency
+                      (CT)</strong> logs. CT is an open framework where Certificate Authorities (CAs) like Let's
+                    Encrypt, DigiCert, and Sectigo must publicly log every single SSL/TLS certificate issued for any
+                    domain on the internet.
+                  </p>
+                  <p class="small text-muted mb-2">
+                    <strong>Query Syntax:</strong> Searching for <code>%.tesla.com</code> lists every certificate ever
+                    requested for any Tesla subdomain.
+                  </p>
+                  <p class="small text-muted mb-0">
+                    <strong>Why Hackers Love crt.sh:</strong>
+                  </p>
+                  <ul class="small text-muted mb-0 ps-3">
+                    <li>Reveals brand-new staging and development subdomains the exact day developers request an SSL
+                      certificate—often <em>weeks before</em> the application is officially launched or listed in public
+                      DNS.</li>
+                    <li>Historical CT records remain permanent even if the domain is later decommissioned, revealing old
+                      endpoints.</li>
+                  </ul>
+                </div>
+
+                <h2>7. Domain Ownership &amp; Registration: WHOIS &amp; who.is</h2>
+                <p>
+                  Domain registration records provide essential details regarding ownership, creation date, renewal
+                  timelines, and authoritative registrar contacts.
+                </p>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <strong class="text-primary">WHOIS.com</strong>
+                        <a href="https://www.whois.com/whois/" target="_blank" rel="noopener noreferrer"
+                          class="btn btn-sm btn-outline-secondary">whois.com <i
+                            class="bi bi-box-arrow-up-right"></i></a>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        Provides authoritative lookup for ICANN domain registries, technical point of contact,
+                        administrative email, registrar name (e.g., MarkMonitor, GoDaddy), and name server delegations.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <strong class="text-primary">who.is</strong>
+                        <a href="https://who.is/" target="_blank" rel="noopener noreferrer"
+                          class="btn btn-sm btn-outline-secondary">who.is <i class="bi bi-box-arrow-up-right"></i></a>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        Offers clean UI breakdowns of DNS records, domain status codes (ClientTransferProhibited), ASN
+                        organization numbers, and reverse-IP co-hosted domains.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p class="small text-muted">
+                  <em>Note:</em> While modern privacy laws (GDPR) redact personal registrant names behind proxy guards,
+                  WHOIS remains crucial for discovering company registrar providers, expiration dates (for domain
+                  hijacking/takeover risks), and parent organizations.
+                </p>
+
+                <h2>8. Mail Servers &amp; Reverse IP: MXToolbox SuperTool</h2>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-envelope-check"></i> MXToolbox SuperTool</h5>
+                    <a href="https://mxtoolbox.com/SuperTool.aspx" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> A comprehensive network diagnostic suite capable of performing deep
+                    MX (Mail Exchange) lookups, Reverse IP lookups (PTR), DNS propagation checks, and SMTP server health
+                    diagnostics.
+                  </p>
+                  <p class="small text-muted mb-0">
+                    <strong>Key Security Auditing Applications:</strong>
+                  </p>
+                  <ul class="small text-muted mb-0 ps-3">
+                    <li><strong>SPF &amp; DMARC Validation:</strong> Checks whether the target domain has configured
+                      strict Sender Policy Framework (SPF) and DMARC policies (<code>p=reject</code> vs
+                      <code>p=none</code>). Weak policies allow attackers to spoof legitimate company emails.
+                    </li>
+                    <li><strong>Reverse IP Lookup:</strong> Identifies all other domains sharing the same server or IP
+                      address, opening secondary pivot avenues.</li>
+                    <li><strong>DNS Blacklist Check:</strong> Identifies if target mail servers are flagged for
+                      reputation issues or spam relays.</li>
+                  </ul>
+                </div>
+
+                <h2>9. Email Spoofing Mechanics &amp; Defense Analysis: Emkei.cz</h2>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-envelope-exclamation"></i> Emkei.cz (Fake
+                      Mailer)</h5>
+                    <a href="https://emkei.cz/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-danger">Visit Emkei <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> An online free fake mailer that sends emails with arbitrary sender
+                    addresses (From header spoofing) using direct SMTP connections without authentication.
+                  </p>
+                  <p class="small text-muted mb-2">
+                    <strong>How it was used in class:</strong> Birendra Sir demonstrated how unauthenticated SMTP allows
+                    anyone to craft an email claiming to originate from <code>ceo@tesla.com</code> or
+                    <code>admin@target.com</code>, illustrating why email authentication mechanisms are mandatory in
+                    defensive engineering.
+                  </p>
+                  <div class="callout-box mb-0">
+                    <strong>Defensive Engineering Countermeasures:</strong>
+                    <ul class="small mb-0 ps-3">
+                      <li><strong>SPF (Sender Policy Framework):</strong> Specifies authorized IP addresses permitted to
+                        send mail on behalf of the domain.</li>
+                      <li><strong>DKIM (DomainKeys Identified Mail):</strong> Cryptographically signs messages with a
+                        private key verified via public DNS.</li>
+                      <li><strong>DMARC (Domain-based Message Authentication):</strong> Instructs receiving mail servers
+                        to quarantine or reject spoofed emails failing SPF/DKIM validation.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <h2>10. In-Depth DNS Diagnostics: NsLookup.io</h2>
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-search"></i> NsLookup.io</h5>
+                    <a href="https://www.nslookup.io/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> A modern, zero-telemetry DNS query platform that performs real-time
+                    queries against authoritative name servers, Cloudflare (1.1.1.1), Google (8.8.8.8), and OpenDNS.
+                  </p>
+                  <p class="small text-muted mb-0">
+                    <strong>Penetration Testing Value:</strong>
+                  </p>
+                  <ul class="small text-muted mb-0 ps-3">
+                    <li>Inspects IPv4 (A) and IPv6 (AAAA) records, CNAME alias chains, and Canonical Name pointers.</li>
+                    <li>Detects DNS misconfigurations and broken CNAME pointers which can lead to <strong>Subdomain
+                        Takeover</strong> vulnerabilities (e.g., a CNAME pointing to an unclaimed AWS S3 bucket, GitHub
+                      Pages, or Zendesk helpdesk).</li>
+                  </ul>
+                </div>
+
+                <h2>11. Historical Reconnaissance: Wayback Machine (archive.org)</h2>
+                <p>
+                  Websites evolve constantly. Developers frequently remove links to sensitive endpoints from the main
+                  page navigation, but the underlying API routes or legacy login interfaces remain active on the web
+                  server!
+                </p>
+
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-archive-fill"></i> Internet Archive Wayback
+                      Machine</h5>
+                    <a href="https://web.archive.org/" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-primary">Visit Archive <i class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it does:</strong> Indexes snapshots of billions of web pages dating back over two
+                    decades.
+                  </p>
+                  <p class="small text-muted mb-2">
+                    <strong>Targeted API &amp; Endpoint Hunting:</strong> In class, we learned how querying targeted URL
+                    paths on <code>web.archive.org</code> reveals old, forgotten API structures, deprecated parameters,
+                    and development routes:
+                  </p>
+                  <div class="bg-dark p-3 rounded text-light small mb-2">
+                    <code>https://web.archive.org/web/*/https://tesla.com/*</code><br>
+                    <code>https://web.archive.org/web/*/https://tesla.com/api/*</code><br>
+                    <code>https://web.archive.org/web/*/https://tesla.com/api/user/*</code>
+                  </div>
+                  <p class="small text-muted mb-0">
+                    <strong>Security Impact:</strong> Hackers frequently discover deprecated API v1 endpoints that lack
+                    modern rate limiting or token authentication, allowing bypasses against backend databases.
+                  </p>
+                </div>
+
+                <h2>12. The Search Engine for the Internet of Everything: Shodan</h2>
+                <p>
+                  Unlike Google, which crawls web page content and links, <strong>Shodan</strong> crawls the entire
+                  internet scanning every IP address and indexing service banners, open ports, operational metadata, and
+                  IoT devices.
+                </p>
+
+                <div class="p-3 border rounded bg-light mb-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-broadcast-pin"></i> Shodan Dashboard &amp;
+                      Ecosystem</h5>
+                    <a href="https://www.shodan.io/dashboard?language=en" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline-danger">Shodan Dashboard <i
+                        class="bi bi-box-arrow-up-right"></i></a>
+                  </div>
+                  <p class="small text-muted mb-2">
+                    <strong>What it indexes:</strong> Webcams, routers, industrial control systems (SCADA), database
+                    servers (Elasticsearch, MongoDB), smart cars, medical devices, and exposed server ports worldwide.
+                  </p>
+
+                  <h6 class="fw-bold text-dark mt-3 mb-1">A. Shodan Dorks &amp; Filter Syntax</h6>
+                  <p class="small text-muted mb-2">
+                    Shodan filters enable surgical queries across specific organizations, cities, operating systems, and
+                    ports:
+                  </p>
+                  <pre><code># Find servers belonging to an organization
+org:"Tesla Motors"
+
+# Find exposed HTTP servers in a specific country with specific headers
+ssl:"Tesla" port:443
+
+# Find unauthenticated MongoDB instances
+"MongoDB Server Information" port:27017 -authentication
+
+# Find open webcams and surveillance feeds
+"default password" port:80,8080
+
+# Filter by country, city, and product
+product:"Apache httpd" country:"NP" city:"Kathmandu"</code></pre>
+                  <p class="small text-muted mb-2">
+                    Reference Cheat Sheet: <a href="https://www.scribd.com/document/834214733/Shodan-Dork-Cheat-sheet"
+                      target="_blank" rel="noopener noreferrer" class="text-primary fw-semibold">Shodan Dork Cheat Sheet
+                      on Scribd <i class="bi bi-box-arrow-up-right"></i></a>
+                  </p>
+
+                  <h6 class="fw-bold text-dark mt-3 mb-1">B. Shodan CVE Database (cvedb.shodan.io)</h6>
+                  <p class="small text-muted mb-2">
+                    We also explored <a href="https://cvedb.shodan.io/" target="_blank" rel="noopener noreferrer"
+                      class="text-danger fw-bold">cvedb.shodan.io</a>, Shodan’s dedicated vulnerability intelligence
+                    search engine:
+                  </p>
+                  <ul class="small text-muted mb-0 ps-3">
+                    <li>Cross-references Common Vulnerabilities and Exposures (CVEs) with live internet exposures.</li>
+                    <li>Allows researchers to search a CVE (e.g., Log4j CVE-2021-44228, OpenSSL vulnerabilities) and
+                      immediately identify how many vulnerable systems remain publicly reachable on the global internet.
+                    </li>
+                    <li>Provides EPSS (Exploit Prediction Scoring System) data and verified public exploit availability
+                      indicators.</li>
+                  </ul>
+                </div>
+
+                <h2>13. Day 3 Key Takeaways &amp; Methodology Summary</h2>
+                <div class="callout-box">
+                  <ul class="mb-0">
+                    <li><strong>Passive Reconnaissance First:</strong> Always exhaust passive OSINT techniques before
+                      sending active packets. Passive recon is undetectable, legal, and creates an exhaustive footprint
+                      map.</li>
+                    <li><strong>Respect Target Scope:</strong> Always verify Bugcrowd/HackerOne engagement scopes (like
+                      Tesla) to avoid unauthorized actions.</li>
+                    <li><strong>Subdomain Aggregation:</strong> Cross-reference automated tools (c99 Subdomainfinder),
+                      Certificate Transparency logs (crt.sh), and DNS record aggregators (DNSDumpster) for complete
+                      coverage.</li>
+                    <li><strong>Google Dorking Power:</strong> Operators like <code>site:</code>, <code>inurl:</code>,
+                      and <code>filetype:</code> reveal forgotten endpoints, registration portals, and credential leaks.
+                    </li>
+                    <li><strong>Email Protection Triad:</strong> Emkei.cz demonstrates the fragility of raw SMTP;
+                      organizations must enforce strict SPF, DKIM, and DMARC reject policies to prevent spoofing.</li>
+                    <li><strong>Historical Discovery:</strong> The Wayback Machine lets testers reconstruct dead API
+                      endpoints (<code>/api/user/</code>) that might still be alive on unpatched backend servers.</li>
+                    <li><strong>Global IoT Visibility:</strong> Shodan and CVE DB turn internet banners into actionable
+                      intelligence without firing a single probe directly from your machine.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      All intelligence gathering, subdomain searching, and OSINT techniques documented here must be
+                      performed strictly within the bounds of applicable laws and authorized bug bounty program scopes.
+                      Sending unauthorized spoofed emails, performing intrusive scanning on out-of-scope targets, or
+                      exploiting identified vulnerabilities without written consent is illegal under the Electronic
+                      Transactions Act (ETA) of Nepal and international cybercrime legislation. TheWH2 and BugXploit
+                      promote ethical, white-hat security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day2/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 2
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

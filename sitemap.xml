@@ -26,6 +26,11 @@
     <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>The WH2 Knowledge Hub &amp; Practical Cybersecurity Lab Logs</image:title>
+      <image:caption>Technical knowledge repository by Chandan Kumar Thakur</image:caption>
+    </image:image>
   </url>
 
   <url>
@@ -33,6 +38,11 @@
     <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Ethical Hacking and Penetration Testing Workshop at BugXploit Kathmandu</image:title>
+      <image:caption>2-week offensive security workshop syllabus and lab logs</image:caption>
+    </image:image>
   </url>
 
   <url>
@@ -40,6 +50,11 @@
     <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 1: Lab Foundations, VirtualBox, Metasploitable 2 &amp; Bugcrowd</image:title>
+      <image:caption>BugXploit workshop Day 1 lab report</image:caption>
+    </image:image>
   </url>
 
   <url>
@@ -47,6 +62,23 @@
     <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 2: Service Enumeration, VSFTPD CVE-2011-2523 &amp; Metasploit SSH Brute-Force</image:title>
+      <image:caption>BugXploit workshop Day 2 lab report</image:caption>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day3/</loc>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 3: Active vs Passive Reconnaissance, Bugcrowd Tesla Scope &amp; OSINT Tooling</image:title>
+      <image:caption>BugXploit workshop Day 3 lab report</image:caption>
+    </image:image>
   </url>
 
   <!-- ================= Project & Detail Pages ================= -->
