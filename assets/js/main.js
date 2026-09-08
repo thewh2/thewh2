@@ -498,6 +498,7 @@ const processCommand = (cmdStr) => {
         roll       - Evasion roll
       </div>
       <div class="help-cat"><strong>[ UTILS ]</strong><br>
+        learn    - Knowledge Hub<br>
         scroll   - Nav sections<br>
         call     - Phone dial<br>
         chat     - WhatsApp<br>
@@ -517,6 +518,8 @@ const processCommand = (cmdStr) => {
     'skills': 'Scanning host...<br>[+] ReactJS, Supabase, NodeJS<br>[+] Python, IoT, MQTT<br>[+] Pentesting & Exploit Dev.',
     'projects': 'Accessing project database...<br>1. TalkGPT - AI Conversational Platform<br>2. N-Traffic Jam - Real-time Traffic Systems<br>3. WH2 Store - Digital Architect Platform<br>Note: Use UI buttons above for full multimedia access.',
     'contact': 'Pinging secure line...<br>Status: Encrypted<br>Phone: +977 9825728982<br>Email: chandanthakur.nep@gmail.com',
+    'learn': 'REDIRECT_KNOWLEDGE',
+    'knowledge': 'REDIRECT_KNOWLEDGE',
     'matrix': 'MATRIX_MODE',
     'darkweb': 'DARKWEB_MODE',
     'roll': 'BARREL_ROLL',
@@ -635,6 +638,13 @@ termInput.addEventListener('keypress', (e) => {
         termOutput.innerHTML += 'Terminal visual mode toggled.';
         const bodyObj = document.getElementById('term-body');
         if (bodyObj) bodyObj.scrollTop = bodyObj.scrollHeight;
+      } else if (response === 'REDIRECT_KNOWLEDGE') {
+        termOutput.innerHTML += '<span style="color:#18d26e;">[+] Route Authorized.</span> Opening The WH2 Knowledge Hub &amp; Workshops...<br>';
+        const bodyObj = document.getElementById('term-body');
+        if (bodyObj) bodyObj.scrollTop = bodyObj.scrollHeight;
+        setTimeout(() => {
+          window.location.href = 'knowledge/index.html';
+        }, 900);
       } else if (response === 'EXIT_TERMINAL') {
         termOutput.innerHTML += 'Terminating session...';
         setTimeout(() => {

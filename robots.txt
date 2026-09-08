@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /
+
+# Canonical Sitemaps
+Sitemap: https://www.chandankumarthakur.com.np/sitemap.xml
+
+# LLM & AI Search Engine Directives
+# Standard context file: https://www.chandankumarthakur.com.np/llms.txt
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /

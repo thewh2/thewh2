@@ -1708,3 +1708,330 @@ body.darkweb-mode::after {
   display: block;
   margin-top: 10px;
 }
+
+/*--------------------------------------------------------------
+# Knowledge Hub & Workshops Styles
+--------------------------------------------------------------*/
+/* Hide left sidebar panel and expand layout to full width */
+body.knowledge-page #header {
+  display: none !important;
+}
+
+body.knowledge-page #main,
+body.knowledge-page #footer {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+body.knowledge-page .mobile-nav-toggle {
+  display: none !important;
+}
+
+.knowledge-section {
+  padding: 40px 0;
+  background: #f5f8fd;
+  min-height: calc(100vh - 100px);
+}
+
+.knowledge-header {
+  margin-bottom: 30px;
+}
+
+.knowledge-header h1,
+.knowledge-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #173b6c;
+  margin-bottom: 12px;
+}
+
+.knowledge-header p {
+  color: #555;
+  font-size: 16px;
+  max-width: 850px;
+}
+
+.knowledge-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(20, 157, 221, 0.15);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.knowledge-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(20, 157, 221, 0.18);
+  border-color: #149ddd;
+}
+
+.knowledge-card-banner {
+  background: linear-gradient(135deg, #040b14 0%, #0d2744 50%, #149ddd 100%);
+  padding: 24px 20px;
+  color: #ffffff;
+  position: relative;
+}
+
+.knowledge-card-banner .badge-pill {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.badge-pill.status-live {
+  background: #18d26e;
+  color: #000;
+}
+
+.badge-pill.status-soon {
+  background: #ffc107;
+  color: #212529;
+}
+
+.knowledge-card-body {
+  padding: 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.knowledge-card-body h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.knowledge-card-body h3 a {
+  color: #173b6c;
+  transition: color 0.2s;
+}
+
+.knowledge-card-body h3 a:hover {
+  color: #149ddd;
+}
+
+.knowledge-meta-info {
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.knowledge-meta-info span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.knowledge-meta-info i {
+  color: #149ddd;
+}
+
+.knowledge-card-footer {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #edf2f7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Lesson Grid & List */
+.day-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.25s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-card:hover {
+  border-color: #149ddd;
+  box-shadow: 0 8px 24px rgba(20, 157, 221, 0.12);
+  transform: translateY(-3px);
+}
+
+.day-card.disabled {
+  opacity: 0.65;
+  background: #fafbfc;
+  cursor: not-allowed;
+}
+
+.day-card.disabled:hover {
+  transform: none;
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.day-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(20, 157, 221, 0.12);
+  color: #149ddd;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.day-card.disabled .day-number-badge {
+  background: #eaedf2;
+  color: #8c98a4;
+}
+
+/* Lesson Detailed Article Styling */
+.lesson-article {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 35px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef2f6;
+  margin-bottom: 40px;
+}
+
+.lesson-article h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #173b6c;
+  margin-top: 30px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(20, 157, 221, 0.15);
+}
+
+.lesson-article h3 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #040b14;
+  margin-top: 22px;
+  margin-bottom: 12px;
+}
+
+.lesson-article p,
+.lesson-article li {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: #334155;
+}
+
+.lesson-article ul,
+.lesson-article ol {
+  padding-left: 24px;
+  margin-bottom: 20px;
+}
+
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.lesson-article pre {
+  background: #0b1320;
+  color: #e2e8f0;
+  padding: 18px 20px;
+  padding-right: 50px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: auto;
+  border: 1px solid #1e293b;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.code-copy-btn:hover {
+  background: rgba(20, 157, 221, 0.25);
+  border-color: #149ddd;
+  color: #38bdf8;
+}
+
+.code-copy-btn.copied {
+  background: rgba(24, 210, 110, 0.25);
+  border-color: #18d26e;
+  color: #18d26e;
+}
+
+.lesson-article code {
+  color: #0284c7;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13.5px;
+}
+
+.lesson-article pre code {
+  color: #38bdf8;
+  background: transparent;
+  padding: 0;
+}
+
+.callout-box {
+  background: rgba(20, 157, 221, 0.07);
+  border-left: 4px solid #149ddd;
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin: 22px 0;
+}
+
+.callout-box.security-notice {
+  background: rgba(239, 68, 68, 0.08);
+  border-left-color: #ef4444;
+}
+
+.callout-box.security-notice h4 {
+  color: #b91c1c;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.lesson-nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding-top: 25px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 35px;
+}

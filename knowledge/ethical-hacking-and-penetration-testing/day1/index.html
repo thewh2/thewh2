@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 1: Orientation, Lab Setup & Cybersecurity Foundations | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 1 notes and comprehensive report from the 2-week Ethical Hacking and Penetration Testing workshop at BugXploit (Koteshwor). Lab configuration, virtualization, ethical boundaries, and initial toolchain.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 1, BugXploit Workshop, Penetration Testing Nepal, Kali Linux Lab Setup, VirtualBox, Metasploitable 2 download, Kali Linux 2026.2 ISO, ifconfig, ping test, nmap introduction, Cyber Ethics Nepal, The WH2, Chandan Kumar Thakur, Birendra Sah, Bishal Shrestha, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day1/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title" content="Day 1: Lab Setup, VirtualBox, Metasploitable 2 & Kali Linux | BugXploit Workshop">
+  <meta property="og:description"
+    content="Day 1 notes from BugXploit Ethical Hacking workshop: Metasploitable 2 & Kali Linux setup in VirtualBox, network adapter config, ifconfig, ping, and Nmap introduction.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day1/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 1: Ethical Hacking & Penetration Testing | BugXploit">
+  <meta name="twitter:description"
+    content="Hands-on Day 1 report from BugXploit (Koteshwor) workshop. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for AI and Search Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 1: Orientation, Lab Setup & Cybersecurity Foundations - BugXploit Workshop",
+    "description": "Day 1 hands-on lab setup: downloading Metasploitable 2, Kali Linux 2026.2, Oracle VirtualBox configuration, network discovery via ifconfig, ping connectivity testing, and Nmap introduction at BugXploit (Koteshwor).",
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Ethical Hacking"
+      },
+      {
+        "@type": "Thing",
+        "name": "Penetration Testing"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Kali Linux"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Metasploitable 2"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Nmap"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2 Knowledge Hub",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "datePublished": "2026-09-08",
+    "inLanguage": "en",
+    "keywords": "Ethical Hacking, BugXploit, Penetration Testing, Kali Linux, Metasploitable 2, VirtualBox, Nmap, ifconfig, ping, Day 1 Notes, Nepal, Kathmandu",
+    "articleSection": "Cybersecurity & Ethical Hacking"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 1: Orientation &amp; Lab Foundations <a href="../index.html" style="font-size: 14px; background: #149ddd; color: #fff; padding: 5px 15px; border-radius: 5px; margin-left: 15px; text-decoration: none; vertical-align: middle;">Back to Workshop</a></h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">BugXploit Workshop</a></li>
+            <li>Day 1</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 01 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 1: Orientation, Lab Setup &amp; Ethical Hacking Foundations
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> Chandan Kumar
+                    Thakur (The WH2)</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit
+                    (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~6 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Context</h4>
+                  <p class="mb-0 small">
+                    This documentation captures authentic hands-on lab exercises performed in a strictly isolated
+                    virtual environment during Day 1 of the Ethical Hacking and Penetration Testing Workshop at
+                    <strong>BugXploit</strong> (Koteshwor).
+                  </p>
+                </div>
+
+                <h2>1. Workshop Kickoff &amp; Objectives</h2>
+                <p>
+                  Day 1 at <strong>BugXploit</strong>, led by instructors <strong>Birendra
+                    Sah</strong> and <strong>Bishal Shrestha</strong>, was focused entirely on practical offensive
+                  security foundations: provisioning hypervisors, sourcing verified penetration testing images,
+                  configuring virtual network adapters, and validating end-to-end host connectivity between our attacker
+                  machine and our target machine.
+                </p>
+
+                <h2>2. Virtual Machine Images &amp; Downloads</h2>
+                <p>
+                  To conduct real-world security assessments safely without causing harm to live production networks, we
+                  initialized two core virtual machines inside <strong>Oracle VM VirtualBox</strong>:
+                </p>
+
+                <!-- Software Download Cards -->
+                <div class="row g-3 my-3">
+                  <!-- Metasploitable 2 Card -->
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <span class="badge bg-danger">Vulnerable Target</span>
+                          <span class="badge bg-secondary">ZIP Archive</span>
+                        </div>
+                        <h4 class="fw-bold fs-6 mb-1 text-dark">Metasploitable 2</h4>
+                        <p class="small text-muted mb-3">
+                          An intentionally vulnerable Linux virtual machine configured for practicing exploitation,
+                          service auditing, and vulnerability testing.
+                        </p>
+                      </div>
+                      <div>
+                        <a href="https://sourceforge.net/projects/metasploitable/" target="_blank"
+                          rel="noopener noreferrer" class="btn btn-sm btn-outline-danger w-100 fw-semibold">
+                          <i class="bi bi-download me-1"></i> Download Metasploitable 2
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Kali Linux ISO Card -->
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <span class="badge bg-primary">Attacker Machine</span>
+                          <span class="badge bg-dark">v2026.2 AMD64</span>
+                        </div>
+                        <h4 class="fw-bold fs-6 mb-1 text-dark">Kali Linux (2026.2 Installer)</h4>
+                        <p class="small text-muted mb-3">
+                          The industry-standard Debian-derived distribution equipped with pre-installed security
+                          auditing and penetration testing tools.
+                        </p>
+                      </div>
+                      <div>
+                        <a href="https://cdimage.kali.org/kali-2026.2/kali-linux-2026.2-installer-amd64.iso" download
+                          id="kali-download-btn"
+                          class="btn btn-sm btn-primary w-100 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                          <i class="bi bi-cloud-arrow-down-fill" id="kali-download-icon"></i>
+                          <span id="kali-download-text">Direct Download Kali ISO (2026.2)</span>
+                        </a>
+                        <div id="kali-download-status" class="small text-center text-success mt-2 d-none"
+                          style="font-weight: 500;">
+                          <i class="bi bi-check-circle-fill me-1"></i> Download initiated! Check browser downloads.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h2>3. Step-by-Step Lab Setup in Oracle VirtualBox</h2>
+                <ol>
+                  <li>
+                    <strong>Extracting Metasploitable 2:</strong> Downloaded the Metasploitable 2 zip package from
+                    SourceForge, extracted the archive to get the virtual machine disk file (<code>.vmdk</code>), and
+                    mounted it into Oracle VM VirtualBox.
+                  </li>
+                  <li>
+                    <strong>Configuring Network Adapters:</strong>
+                    Configured the virtual network adapter settings for the Metasploitable 2 virtual machine so it
+                    properly receives an IP address and establishes network/internet communication within the subnet
+                    alongside Kali Linux.
+                  </li>
+                  <li>
+                    <strong>Spinning up Kali Linux:</strong> Mounted the Kali Linux 2026.2 installer ISO, started the
+                    attacker environment, and confirmed basic system packages and terminal tools were operational.
+                  </li>
+                  <li>
+                    <strong>Concurrent Machine Execution:</strong> Launched both virtual machines (Kali Linux Attacker +
+                    Metasploitable 2 Target) simultaneously inside VirtualBox.
+                  </li>
+                </ol>
+
+                <h2>4. Network Identification &amp; Ping Connectivity Test</h2>
+                <p>
+                  Once both machines were running, the first step was identifying the private IP assigned to the
+                  vulnerable target machine.
+                </p>
+
+                <h3>Step A: Checking Metasploitable 2 IP Address</h3>
+                <p>Logged into Metasploitable 2 (default credentials: <code>msfadmin</code> / <code>msfadmin</code>) and
+                  retrieved the active network interface details using:</p>
+
+                <pre><code>ifconfig</code></pre>
+                <p class="small text-muted">
+                  This revealed the assigned <code>inet addr</code> (e.g. <code>192.168.x.x</code> or
+                  <code>10.0.x.x</code> depending on the adapter mode).
+                </p>
+
+                <h3>Step B: Testing Connectivity from Kali Linux via Ping</h3>
+                <p>
+                  Switched over to the Kali Linux terminal and verified whether the attacker machine could reach
+                  Metasploitable 2 across the network:
+                </p>
+
+                <pre><code># Replace metasploitable_ip with the actual IP obtained from ifconfig
+ping metasploitable_ip
+
+# Example ping with count flag:
+ping -c 4 192.168.1.50</code></pre>
+
+                <p>
+                  Successful ICMP echo replies confirmed that both virtual machines were operating on the same virtual
+                  network and could communicate seamlessly without packet loss.
+                </p>
+
+                <h2>5. Introduction to Nmap</h2>
+                <p>
+                  With network reachability confirmed via ICMP ping, we were officially introduced to <strong>Nmap
+                    (Network Mapper)</strong>—the industry-benchmark open-source utility for network discovery, port
+                  scanning, and vulnerability detection.
+                </p>
+                <p>
+                  We discussed how Nmap sends raw IP packets to determine what hosts are available on the network, what
+                  services (application name and version) those hosts are offering, and what operating systems they are
+                  running.
+                </p>
+
+                <pre><code># Basic target availability and port sweep introduced:
+nmap metasploitable_ip
+
+# Fast scan of the most common ports:
+nmap -F metasploitable_ip</code></pre>
+
+                <h2>6. Day 1 Key Takeaways</h2>
+                <div class="callout-box">
+                  <ul class="mb-0">
+                    <li><strong>Virtual Isolation:</strong> A properly configured virtual lab ensures safe
+                      experimentation without exposing target services to untrusted external networks.</li>
+                    <li><strong>Pre-Exploitation Hygiene:</strong> Before attempting any scan or exploit, validating IP
+                      assignments with <code>ifconfig</code> and confirming ICMP round-trip reachability with
+                      <code>ping</code> is an essential prerequisite.
+                    </li>
+                    <li><strong>Tool Foundation:</strong> Setting up Metasploitable 2 and Kali Linux prepares our lab
+                      for the upcoming deep dive into Nmap scanning flags, service fingerprinting, and vulnerability
+                      identification in Day 2.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      Do not attempt any unauthorized scanning, enumeration, or exploitation against networks, servers,
+                      or devices that you do not own or lack explicit, documented authorization to test. Performing
+                      unauthorized penetration testing or cyberattacks is illegal under the Electronic Transactions Act
+                      (ETA) of Nepal and cybercrime statutes globally. TheWH2 and BugXploit promote strictly ethical
+                      security practices and white-hat security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Workshop Overview
+                </a>
+                <span class="text-muted small">Day 1 of 14</span>
+                <a href="../day2/index.html" class="btn btn-primary" title="Proceed to Day 2 Report">
+                  Next: Day 2 <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Interactive Download Feedback Handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const downloadBtn = document.getElementById('kali-download-btn');
+      const downloadIcon = document.getElementById('kali-download-icon');
+      const downloadText = document.getElementById('kali-download-text');
+      const downloadStatus = document.getElementById('kali-download-status');
+
+      if (!downloadBtn) return;
+
+      let isDownloading = false;
+
+      downloadBtn.addEventListener('click', function (e) {
+        if (isDownloading) {
+          e.preventDefault();
+          return false;
+        }
+
+        isDownloading = true;
+
+        // Step 1: Immediate Click Feedback - Spinner & Initializing state
+        downloadIcon.className = 'spinner-border spinner-border-sm';
+        downloadText.textContent = 'Starting Download...';
+        downloadBtn.classList.add('disabled', 'opacity-75');
+        downloadBtn.style.pointerEvents = 'none';
+
+        // Step 2: Show confirmation badge and transition to Active Download
+        setTimeout(function () {
+          downloadIcon.className = 'bi bi-arrow-repeat text-white';
+          downloadIcon.style.animation = 'spin 1.2s linear infinite';
+          downloadText.textContent = 'Downloading ISO (4.5 GB)...';
+          if (downloadStatus) {
+            downloadStatus.classList.remove('d-none');
+          }
+        }, 1200);
+
+        // Step 3: Keep button in disabled completed state to prevent multi-clicking heavy ISO
+        setTimeout(function () {
+          downloadIcon.style.animation = '';
+          downloadIcon.className = 'bi bi-check2-circle text-white';
+          downloadText.textContent = 'Download Started';
+          downloadBtn.classList.remove('btn-primary');
+          downloadBtn.classList.add('btn-success');
+        }, 3200);
+      });
+    });
+
+    // Automatic Clipboard Copy Button for all code blocks
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        // Create wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        // Create copy button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

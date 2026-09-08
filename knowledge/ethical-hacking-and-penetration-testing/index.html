@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Ethical Hacking & Penetration Testing Workshop | BugXploit | The WH2</title>
+  <meta name="description"
+    content="Official workshop log and syllabus for the 2-week Ethical Hacking and Penetration Testing training at BugXploit (Koteshwor, Kathmandu), documented by Chandan Kumar Thakur (The WH2).">
+  <meta name="keywords"
+    content="Ethical Hacking, Penetration Testing, BugXploit, BugXploit Workshop, Koteshwor, Kathmandu, Nepal, Ethical Hacking Nepal, Penetration Testing Course Kathmandu, BugXploit Koteshwor, Birendra Sah, Bishal Shrestha, The WH2, Chandan Kumar Thakur, Cybersecurity Training, Kali Linux, Metasploitable, Nmap scanning, offensive security workshop, CEH Nepal, OSCP prep Nepal">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical" href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title" content="Ethical Hacking & Penetration Testing Workshop | BugXploit | The WH2">
+  <meta property="og:description"
+    content="Official 2-week Ethical Hacking & Penetration Testing workshop log at BugXploit (Koteshwor, Kathmandu). Real-world methodology, labs, and tools documented by The WH2.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ethical Hacking & Penetration Testing Workshop | BugXploit">
+  <meta name="twitter:description"
+    content="Day-by-day practical cybersecurity workshop log at BugXploit, Koteshwor. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD Schema (Course & Organization) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Ethical Hacking and Penetration Testing 2-Week Workshop",
+    "courseCode": "BX-EHPT-2026",
+    "description": "2-week hands-on offensive security, network penetration testing, and web application security workshop held at BugXploit in Koteshwor, Kathmandu.",
+    "educationalCredentialAwarded": "Certificate of Completion in Ethical Hacking & Penetration Testing",
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "Onsite",
+      "location": "BugXploit, Koteshwor, Kathmandu, Nepal"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "BugXploit",
+      "url": "https://bugxploit.com/",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Koteshwor",
+        "addressRegion": "Kathmandu",
+        "addressCountry": "NP"
+      }
+    },
+    "instructor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    }
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Ethical Hacking &amp; Penetration Testing <a href="../index.html"
+              style="font-size: 14px; background: #149ddd; color: #fff; padding: 5px 15px; border-radius: 5px; margin-left: 15px; text-decoration: none; vertical-align: middle;">Back
+              to Knowledge</a></h2>
+          <ol>
+            <li><a href="../../index.html">Home</a></li>
+            <li><a href="../index.html">Knowledge</a></li>
+            <li>BugXploit Workshop</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Workshop Hub Section ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <!-- Banner Card -->
+        <div class="p-4 p-md-5 mb-4 rounded text-white bg-dark shadow-sm"
+          style="background: linear-gradient(135deg, #040b14 0%, #0d2744 60%, #149ddd 100%) !important; border-radius: 14px;">
+          <div class="col-md-10 px-0">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <span class="badge-pill bg-success text-dark fw-bold">Workshop</span>
+              <span class="badge-pill bg-dark">2 Weeks</span>
+            </div>
+            <h1 class="display-6 fw-bold text-white mb-2">Ethical Hacking and Penetration Testing</h1>
+            <p class="lead my-3 text-light" style="font-size: 16.5px;">
+              Intensive offensive security workshop delivered by <a href="https://bugxploit.com/" target="_blank"
+                rel="noopener noreferrer" class="text-info text-decoration-underline fw-bold">BugXploit</a> at
+              Koteshwor, Kathmandu. Documenting real-time methodology, reconnaissance workflows, exploitation
+              techniques, and defense counter-measures.
+            </p>
+            <div class="d-flex flex-wrap gap-3 mt-4 text-light align-items-center" style="font-size: 14px;">
+              <div><i class="bi bi-geo-alt-fill text-info"></i> <strong>Institute:</strong> BugXploit, Koteshwor,
+                Kathmandu</div>
+              <div><i class="bi bi-clock-fill text-info"></i> <strong>Duration:</strong> 2 Weeks Daily Labs</div>
+              <div>
+                <i class="bi bi-person-video3 text-info"></i> <strong>Instructors:</strong>
+                <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                  class="text-white text-decoration-underline ms-1 me-2 fw-semibold">
+                  Birendra Sah <i class="bi bi-linkedin text-info" style="font-size: 13px;"></i>
+                </a>
+                and
+                <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                  class="text-white text-decoration-underline ms-1 fw-semibold">
+                  Bishal Shrestha <i class="bi bi-linkedin text-info" style="font-size: 13px;"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Intro & Day List -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-bold mb-1" style="color: #173b6c;">Workshop Session</h3>
+            <p class="text-muted mb-0">Select any sessions below to read in-depth reports, command cheat-sheets, and lab
+              findings.</p>
+          </div>
+          <a href="../index.html" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> All
+            Tracks</a>
+        </div>
+
+        <div class="row g-3">
+
+          <!-- Day 1 Card (ACTIVE) -->
+          <div class="col-lg-6 col-md-6">
+            <div class="day-card border-primary" style="border-width: 2px;">
+              <div class="d-flex justify-content-between align-items-start">
+                <span class="day-number-badge">01</span>
+                <span class="badge bg-success">Completed</span>
+              </div>
+              <h4 class="fw-bold mt-2" style="font-size: 18px;"><a href="day1/index.html" style="color: #173b6c;">Day 1:
+                  Lab Setup, VirtualBox &amp; Nmap Intro</a></h4>
+              <p class="text-muted small flex-grow-1">
+                Downloading &amp; configuring Metasploitable 2 and Kali Linux 2026.2 in VirtualBox, network adapter
+                configuration, IP discovery via ifconfig, ping verification, and Nmap introduction.
+              </p>
+              <div class="pt-3 border-top mt-2">
+                <a href="day1/index.html" class="btn btn-primary btn-sm w-100 fw-bold">
+                  Read Day 1 Report <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day 2 Card (ACTIVE) -->
+          <div class="col-lg-6 col-md-6">
+            <div class="day-card border-primary" style="border-width: 2px;">
+              <div class="d-flex justify-content-between align-items-start">
+                <span class="day-number-badge">02</span>
+                <span class="badge bg-success">Completed</span>
+              </div>
+              <h4 class="fw-bold mt-2" style="font-size: 18px;"><a href="day2/index.html" style="color: #173b6c;">Day 2:
+                  Service Enumeration, VSFTPD (CVE-2011-2523) &amp; SSH Brute-Force</a></h4>
+              <p class="text-muted small flex-grow-1">
+                Port versioning with <code>nmap -sV</code>, browser web enumeration, triggering vsftpd 2.3.4 backdoor (CVE-2011-2523) to gain root shell on port 6200, Metasploit <code>ssh_login</code> brute-force, and legacy RSA SSH login.
+              </p>
+              <div class="pt-3 border-top mt-2">
+                <a href="day2/index.html" class="btn btn-primary btn-sm w-100 fw-bold">
+                  Read Day 2 Report <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Days 3 to 14 (Temporarily hidden until sessions are completed)
+          <div class="col-lg-4 col-md-6">
+            <div class="day-card disabled">
+              <div class="d-flex justify-content-between align-items-start">
+                <span class="day-number-badge">03</span>
+                <span class="badge bg-secondary">Upcoming</span>
+              </div>
+              <h4 class="fw-bold mt-2 text-muted" style="font-size: 18px;">Day 3: Network Scanning &amp; Port Auditing</h4>
+              <p class="text-muted small flex-grow-1">Nmap advanced scripting (NSE), TCP/UDP handshake analysis, and service auditing.</p>
+              <div class="pt-3 border-top mt-2">
+                <button class="btn btn-light btn-sm w-100 disabled text-muted">Session Pending</button>
+              </div>
+            </div>
+          </div>
+          -->
+
+        </div>
+
+      </div>
+    </section><!-- End Workshop Hub Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../assets/vendor/aos/aos.js"></script>
+  <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../assets/js/main.js"></script>
+
+</body>
+
+</html>
