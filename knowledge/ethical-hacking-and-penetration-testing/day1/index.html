@@ -91,9 +91,12 @@
       }
     },
     "datePublished": "2026-09-08",
+    "dateModified": "2026-09-09",
     "inLanguage": "en",
+    "proficiencyLevel": "Beginner",
     "keywords": "Ethical Hacking, BugXploit, Penetration Testing, Kali Linux, Metasploitable 2, VirtualBox, Nmap, ifconfig, ping, Day 1 Notes, Nepal, Kathmandu",
-    "articleSection": "Cybersecurity & Ethical Hacking"
+    "articleSection": "Cybersecurity & Ethical Hacking",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day1/"
   }
   </script>
 
@@ -190,7 +193,31 @@
                   </p>
                 </div>
 
-                <h2>1. Workshop Kickoff &amp; Objectives</h2>
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents
+                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#workshop-kickoff" class="text-decoration-none">1. Workshop Kickoff &amp; Objectives</a></li>
+                          <li><a href="#vm-downloads" class="text-decoration-none">2. Virtual Machine Images &amp; Downloads</a></li>
+                          <li><a href="#lab-setup" class="text-decoration-none">3. Step-by-Step Lab Setup in VirtualBox</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#connectivity-test" class="text-decoration-none">4. Network Identification &amp; Ping Test</a></li>
+                          <li><a href="#intro-nmap" class="text-decoration-none">5. Introduction to Nmap</a></li>
+                          <li><a href="#day1-takeaways" class="text-decoration-none">6. Day 1 Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h2 id="workshop-kickoff">1. Workshop Kickoff &amp; Objectives</h2>
                 <p>
                   Day 1 at <strong>BugXploit</strong>, led by instructors <strong>Birendra
                     Sah</strong> and <strong>Bishal Shrestha</strong>, was focused on practical offensive
@@ -208,7 +235,7 @@
                   hackers legally hunt and report vulnerabilities in enterprise scopes.
                 </p>
 
-                <h2>2. Virtual Machine Images &amp; Downloads</h2>
+                <h2 id="vm-downloads">2. Virtual Machine Images &amp; Downloads</h2>
                 <p>
                   To conduct real-world security assessments safely without causing harm to live production networks, we
                   initialized two core virtual machines inside <strong>Oracle VM VirtualBox</strong>:
@@ -269,7 +296,7 @@
                   </div>
                 </div>
 
-                <h2>3. Step-by-Step Lab Setup in Oracle VirtualBox</h2>
+                <h2 id="lab-setup">3. Step-by-Step Lab Setup in Oracle VirtualBox</h2>
                 <ol>
                   <li>
                     <strong>Extracting Metasploitable 2:</strong> Downloaded the Metasploitable 2 zip package from
@@ -292,7 +319,7 @@
                   </li>
                 </ol>
 
-                <h2>4. Network Identification &amp; Ping Connectivity Test</h2>
+                <h2 id="connectivity-test">4. Network Identification &amp; Ping Connectivity Test</h2>
                 <p>
                   Once both machines were running, the first step was identifying the private IP assigned to the
                   vulnerable target machine.
@@ -325,7 +352,7 @@ ping -c 4 192.168.1.50</code></pre>
                   network and could communicate seamlessly without packet loss.
                 </p>
 
-                <h2>5. Introduction to Nmap</h2>
+                <h2 id="intro-nmap">5. Introduction to Nmap</h2>
                 <p>
                   With network reachability confirmed via ICMP ping, we were officially introduced to <strong>Nmap
                     (Network Mapper)</strong>—the industry-benchmark open-source utility for network discovery, port
@@ -343,7 +370,7 @@ nmap metasploitable_ip
 # Fast scan of the most common ports:
 nmap -F metasploitable_ip</code></pre>
 
-                <h2>6. Day 1 Key Takeaways</h2>
+                <h2 id="day1-takeaways">6. Day 1 Key Takeaways</h2>
                 <div class="callout-box">
                   <ul class="mb-0">
                     <li><strong>Virtual Isolation:</strong> A properly configured virtual lab ensures safe

@@ -91,9 +91,12 @@
       }
     },
     "datePublished": "2026-09-08",
+    "dateModified": "2026-09-09",
     "inLanguage": "en",
+    "proficiencyLevel": "Intermediate",
     "keywords": "vsftpd 2.3.4, Nmap -sV, telnet 6200, Metasploit, msfconsole, auxiliary/scanner/ssh/ssh_login, SSH brute-force, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
-    "articleSection": "Cybersecurity & Ethical Hacking"
+    "articleSection": "Cybersecurity & Ethical Hacking",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day2/"
   }
   </script>
 
@@ -190,7 +193,32 @@
                   </p>
                 </div>
 
-                <h2>1. Pre-Flight Connectivity Verification</h2>
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents
+                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#preflight-connectivity" class="text-decoration-none">1. Pre-Flight Connectivity Verification</a></li>
+                          <li><a href="#nmap-enumeration" class="text-decoration-none">2. Service &amp; Version Enumeration via Nmap</a></li>
+                          <li><a href="#web-recon" class="text-decoration-none">3. Web Surface Reconnaissance in Browser</a></li>
+                          <li><a href="#vsftpd-backdoor" class="text-decoration-none">4. VSFTPD 2.3.4 Backdoor (CVE-2011-2523)</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#msf-ssh-bruteforce" class="text-decoration-none">5. Metasploit SSH Brute-Force Attack</a></li>
+                          <li><a href="#ssh-legacy-login" class="text-decoration-none">6. Logging In via SSH (Legacy Key Exchange)</a></li>
+                          <li><a href="#day2-takeaways" class="text-decoration-none">7. Day 2 Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h2 id="preflight-connectivity">1. Pre-Flight Connectivity Verification</h2>
                 <p>
                   We booted up both virtual machines in Oracle VM VirtualBox: our <strong>Kali Linux</strong> attacker VM and the <strong>Metasploitable 2</strong> target. Before launching scans, we confirmed mutual network reachability using ICMP:
                 </p>
@@ -202,7 +230,7 @@ ping -c 4 &lt;metasploitable_ip&gt;</code></pre>
                   Zero packet loss and immediate reply packets verified that our virtual host-only adapter was routing traffic properly between both machines.
                 </p>
 
-                <h2>2. Service &amp; Version Enumeration via Nmap</h2>
+                <h2 id="nmap-enumeration">2. Service &amp; Version Enumeration via Nmap</h2>
                 <p>
                   Rather than performing a blind ping sweep or basic port scan, we leveraged Nmap's service detection flag <code>-sV</code> to probe open ports and grab exact application banners and version strings:
                 </p>
@@ -219,7 +247,7 @@ nmap -sV &lt;metasploitable_ip&gt;</code></pre>
                   <li>And numerous additional ports (RPC, NetBIOS, MySQL, PostgreSQL, etc.).</li>
                 </ul>
 
-                <h2>3. Web Surface Reconnaissance in Browser</h2>
+                <h2 id="web-recon">3. Web Surface Reconnaissance in Browser</h2>
                 <p>
                   Since Port 80 (HTTP) was open, we navigated to <code>http://&lt;metasploitable_ip&gt;</code> in the browser to explore what web services were hosted.
                 </p>
@@ -227,7 +255,7 @@ nmap -sV &lt;metasploitable_ip&gt;</code></pre>
                   We investigated various pre-installed applications (e.g., TWiki, phpMyAdmin, DVWA, Mutillidae). We attempted manual testing across login and sign-up interfaces, observing form inputs, cookie headers, and default credential possibilities. While the web interface gave us a high-level map of the target's purpose, manual login attempts did not yield direct administrative access—directing our focus toward the outdated network daemons discovered during the Nmap scan.
                 </p>
 
-                <h2>4. The Infamous VSFTPD 2.3.4 Backdoor Exploitation (CVE-2011-2523)</h2>
+                <h2 id="vsftpd-backdoor">4. The Infamous VSFTPD 2.3.4 Backdoor Exploitation (CVE-2011-2523)</h2>
                 <p>
                   Looking closely at our Nmap scan, <strong>Port 21</strong> was running <strong>vsftpd 2.3.4</strong>. Researching this specific version revealed a critical security historical event: <strong>the vsftpd 2.3.4 backdoor (tracked as CVE-2011-2523)</strong>. In July 2011, the official source archive of vsftpd 2.3.4 was compromised with an intentional, malicious supply-chain backdoor.
                 </p>
@@ -266,7 +294,7 @@ id</code></pre>
                   </p>
                 </div>
 
-                <h2>5. Metasploit Framework: SSH Brute-Force Attack</h2>
+                <h2 id="msf-ssh-bruteforce">5. Metasploit Framework: SSH Brute-Force Attack</h2>
                 <p>
                   Next, instructors <strong>Birendra Sah</strong> and <strong>Bishal Shrestha</strong> introduced us to the <strong>Metasploit Framework (MSF)</strong> to demonstrate automated credential auditing against Port 22 (SSH).
                 </p>
@@ -310,7 +338,7 @@ run</code></pre>
                   <strong class="text-success">[+] Success: 'msfadmin:msfadmin'</strong>
                 </p>
 
-                <h2>6. Logging In via SSH (Handling Legacy RSA Key Exchange)</h2>
+                <h2 id="ssh-legacy-login">6. Logging In via SSH (Handling Legacy RSA Key Exchange)</h2>
                 <p>
                   With the credentials <code>msfadmin:msfadmin</code> recovered, we opened a new terminal in Kali Linux and attempted a direct SSH connection:
                 </p>
@@ -336,7 +364,7 @@ ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa msfadmin@
                   The connection succeeded immediately, dropping us into an interactive user session on the target!
                 </p>
 
-                <h2>7. Day 2 Key Takeaways</h2>
+                <h2 id="day2-takeaways">7. Day 2 Key Takeaways</h2>
                 <div class="callout-box">
                   <ul class="mb-0">
                     <li><strong>Service Fingerprinting (-sV):</strong> Finding out that an FTP port is open is only half the battle; knowing the exact version (<code>vsftpd 2.3.4</code>) allowed us to identify a known backdoor vulnerability within seconds.</li>

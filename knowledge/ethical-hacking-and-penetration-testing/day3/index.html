@@ -96,9 +96,12 @@
       }
     },
     "datePublished": "2026-09-08",
+    "dateModified": "2026-09-09",
     "inLanguage": "en",
+    "proficiencyLevel": "Intermediate",
     "keywords": "Active Recon, Passive Recon, Bugcrowd, Tesla Bug Bounty, Google Dorking, DNSDumpster, crt.sh, WHOIS, MXToolbox, Emkei, nslookup.io, Wayback Machine, Shodan, CVE Shodan, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
-    "articleSection": "Cybersecurity & Ethical Hacking"
+    "articleSection": "Cybersecurity & Ethical Hacking",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day3/"
   }
   </script>
 
@@ -195,7 +198,38 @@
                   </p>
                 </div>
 
-                <h2>1. Core Concepts: Active vs. Passive Reconnaissance</h2>
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents
+                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#recon-concepts" class="text-decoration-none">1. Active vs. Passive Reconnaissance</a></li>
+                          <li><a href="#bugcrowd-scoping" class="text-decoration-none">2. Bugcrowd Target Scoping: Tesla</a></li>
+                          <li><a href="#subdomainfinder" class="text-decoration-none">3. Subdomainfinder (c99.nl)</a></li>
+                          <li><a href="#dnsdumpster" class="text-decoration-none">4. DNS Topology via DNSDumpster</a></li>
+                          <li><a href="#google-dorking" class="text-decoration-none">5. Google Dorking (GHDB)</a></li>
+                          <li><a href="#crt-sh" class="text-decoration-none">6. Certificate Transparency (crt.sh)</a></li>
+                          <li><a href="#whois-lookup" class="text-decoration-none">7. WHOIS Domain Registration</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#mxtoolbox" class="text-decoration-none">8. MXToolbox SuperTool</a></li>
+                          <li><a href="#emkei-spoofing" class="text-decoration-none">9. Email Spoofing Analysis (Emkei)</a></li>
+                          <li><a href="#nslookup-io" class="text-decoration-none">10. In-Depth DNS via NsLookup.io</a></li>
+                          <li><a href="#wayback-machine" class="text-decoration-none">11. Wayback Machine (archive.org)</a></li>
+                          <li><a href="#shodan-iot" class="text-decoration-none">12. Shodan IoT Search Engine</a></li>
+                          <li><a href="#day3-takeaways" class="text-decoration-none">13. Day 3 Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h2 id="recon-concepts">1. Core Concepts: Active vs. Passive Reconnaissance</h2>
                 <p>
                   In offensive security and penetration testing, <strong>Reconnaissance (Information Gathering)</strong>
                   is the vital first phase. More than 70% of a successful penetration test or bug bounty assessment
@@ -249,7 +283,7 @@
                   </div>
                 </div>
 
-                <h2>2. Target Scoping on Bugcrowd: Tesla Engagement</h2>
+                <h2 id="bugcrowd-scoping">2. Target Scoping on Bugcrowd: Tesla Engagement</h2>
                 <p>
                   Before conducting any reconnaissance, ethical hackers must identify the <strong>Rules of
                     Engagement</strong> and strictly defined <strong>In-Scope vs. Out-of-Scope</strong> assets.
@@ -282,7 +316,7 @@
                     superchargers/factories. Testing outside the scope is illegal and leads to platform bans.</li>
                 </ul>
 
-                <h2>3. Subdomain Enumeration via Subdomainfinder (c99.nl)</h2>
+                <h2 id="subdomainfinder">3. Subdomain Enumeration via Subdomainfinder (c99.nl)</h2>
                 <p>
                   Subdomains represent expanded attack surfaces. While <code>tesla.com</code> is protected by enterprise
                   WAFs and hardened configurations, internal subdomains (staging, admin portals, beta APIs, development
@@ -306,7 +340,7 @@
                   </p>
                 </div>
 
-                <h2>4. DNS Topology &amp; Attack Surface Mapping: DNSDumpster</h2>
+                <h2 id="dnsdumpster">4. DNS Topology &amp; Attack Surface Mapping: DNSDumpster</h2>
                 <p>
                   DNS records reveal who manages the domain, where email is routed, and what internal name servers are
                   utilized.
@@ -334,7 +368,7 @@
                   </ul>
                 </div>
 
-                <h2>5. Google Dorking (Google Hacking Database - GHDB)</h2>
+                <h2 id="google-dorking">5. Google Dorking (Google Hacking Database - GHDB)</h2>
                 <p>
                   <strong>Google Dorking</strong> (advanced search engine operators) allows security researchers to
                   filter out millions of generic web pages and zero in on sensitive documents, forgotten configuration
@@ -393,7 +427,7 @@
                   </table>
                 </div>
 
-                <h2>6. Certificate Transparency Logs via crt.sh</h2>
+                <h2 id="crt-sh">6. Certificate Transparency Logs via crt.sh</h2>
                 <div class="p-3 border rounded bg-light mb-3">
                   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                     <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-file-earmark-lock2"></i> crt.sh (Certificate
@@ -423,7 +457,7 @@
                   </ul>
                 </div>
 
-                <h2>7. Domain Ownership &amp; Registration: WHOIS &amp; who.is</h2>
+                <h2 id="whois-lookup">7. Domain Ownership &amp; Registration: WHOIS &amp; who.is</h2>
                 <p>
                   Domain registration records provide essential details regarding ownership, creation date, renewal
                   timelines, and authoritative registrar contacts.
@@ -463,7 +497,7 @@
                   hijacking/takeover risks), and parent organizations.
                 </p>
 
-                <h2>8. Mail Servers &amp; Reverse IP: MXToolbox SuperTool</h2>
+                <h2 id="mxtoolbox">8. Mail Servers &amp; Reverse IP: MXToolbox SuperTool</h2>
                 <div class="p-3 border rounded bg-light mb-3">
                   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                     <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-envelope-check"></i> MXToolbox SuperTool</h5>
@@ -490,7 +524,7 @@
                   </ul>
                 </div>
 
-                <h2>9. Email Spoofing Mechanics &amp; Defense Analysis: Emkei.cz</h2>
+                <h2 id="emkei-spoofing">9. Email Spoofing Mechanics &amp; Defense Analysis: Emkei.cz</h2>
                 <div class="p-3 border rounded bg-light mb-3">
                   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                     <h5 class="fw-bold mb-0 text-danger"><i class="bi bi-envelope-exclamation"></i> Emkei.cz (Fake
@@ -521,7 +555,7 @@
                   </div>
                 </div>
 
-                <h2>10. In-Depth DNS Diagnostics: NsLookup.io</h2>
+                <h2 id="nslookup-io">10. In-Depth DNS Diagnostics: NsLookup.io</h2>
                 <div class="p-3 border rounded bg-light mb-3">
                   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                     <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-search"></i> NsLookup.io</h5>
@@ -543,7 +577,7 @@
                   </ul>
                 </div>
 
-                <h2>11. Historical Reconnaissance: Wayback Machine (archive.org)</h2>
+                <h2 id="wayback-machine">11. Historical Reconnaissance: Wayback Machine (archive.org)</h2>
                 <p>
                   Websites evolve constantly. Developers frequently remove links to sensitive endpoints from the main
                   page navigation, but the underlying API routes or legacy login interfaces remain active on the web
@@ -577,7 +611,7 @@
                   </p>
                 </div>
 
-                <h2>12. The Search Engine for the Internet of Everything: Shodan</h2>
+                <h2 id="shodan-iot">12. The Search Engine for the Internet of Everything: Shodan</h2>
                 <p>
                   Unlike Google, which crawls web page content and links, <strong>Shodan</strong> crawls the entire
                   internet scanning every IP address and indexing service banners, open ports, operational metadata, and
@@ -638,7 +672,7 @@ product:"Apache httpd" country:"NP" city:"Kathmandu"</code></pre>
                   </ul>
                 </div>
 
-                <h2>13. Day 3 Key Takeaways &amp; Methodology Summary</h2>
+                <h2 id="day3-takeaways">13. Day 3 Key Takeaways &amp; Methodology Summary</h2>
                 <div class="callout-box">
                   <ul class="mb-0">
                     <li><strong>Passive Reconnaissance First:</strong> Always exhaust passive OSINT techniques before
@@ -691,6 +725,9 @@ product:"Apache httpd" country:"NP" city:"Kathmandu"</code></pre>
                 </a>
                 <a href="../index.html" class="btn btn-primary">
                   <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+                <a href="../day4/index.html" class="btn btn-outline-primary">
+                  Next: Day 4 <i class="bi bi-arrow-right"></i>
                 </a>
               </div>
 
