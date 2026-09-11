@@ -1109,6 +1109,27 @@ section {
   color: #a8a9b4;
 }
 
+#footer .footer-contact p {
+  line-height: 28px;
+}
+
+#footer .footer-contact p i {
+  color: #149ddd;
+  font-size: 16px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+#footer .footer-contact a {
+  color: #a8a9b4;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+#footer .footer-contact a:hover {
+  color: #149ddd;
+}
+
 #footer .footer-links {
   margin-bottom: 30px;
 }
