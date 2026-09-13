@@ -105,6 +105,18 @@
     </image:image>
   </url>
 
+  <url>
+    <loc>https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day6/</loc>
+    <lastmod>2026-09-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 6: Automated Vulnerability Scanning with Nuclei &amp; GitHub Secret Reconnaissance</image:title>
+      <image:caption>BugXploit workshop Day 6 lab report</image:caption>
+    </image:image>
+  </url>
+
   <!-- ================= Project & Detail Pages ================= -->
   <url>
     <loc>https://www.chandankumarthakur.com.np/pages/wh2hub.html</loc>
