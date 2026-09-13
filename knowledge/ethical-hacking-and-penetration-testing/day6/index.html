@@ -61,6 +61,14 @@
       {
         "@type": "SoftwareSourceCode",
         "name": "streaak/keyhacks"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "PentestGPT by GreyDGL"
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "gwen001/pentest-tools"
       }
     ],
     "author": {
@@ -441,6 +449,7 @@
                           <li><a href="#github-hunting-tools" class="text-decoration-none">11. Advanced Secret Hunting: iscan.today, Benji Trapp &amp; TruffleHog</a></li>
                           <li><a href="#defense-remediation" class="text-decoration-none">12. Defensive Engineering: Pre-Commit Hooks &amp; Secret Hygiene</a></li>
                           <li><a href="#day6-takeaways" class="text-decoration-none">13. Day 6 Summary &amp; Key Takeaways</a></li>
+                          <li><a href="#curated-resources" class="text-decoration-none">14. Curated Pentesting &amp; Secret Hunting Resources</a></li>
                         </ul>
                       </div>
                     </div>
@@ -1029,6 +1038,71 @@
                     <li><strong>Source Code is the New Perimeter:</strong> Finding leaked secrets on GitHub via targeted dorking frequently grants access to internal systems without touching a network firewall.</li>
                     <li><strong>Verify Non-Destructively:</strong> Using <code>keyhacks</code> and tools like <code>TruffleHog</code> allows ethical researchers to prove vulnerability impact without corrupting data or violating client trust.</li>
                   </ul>
+                </div>
+
+                <!-- Section 14: Curated Resources -->
+                <h2 id="curated-resources">14. Curated Pentesting &amp; Secret Hunting Resources</h2>
+                <p>
+                  To accelerate security assessments and automated reconnaissance, here is a curated repository list of cutting-edge tools and attack playbooks referenced during our training sessions:
+                </p>
+
+                <div class="card mb-4 border-primary border-opacity-25 shadow-sm" style="background: #f8fafc;">
+                  <div class="card-body p-4">
+                    <div class="list-group list-group-flush bg-transparent">
+
+                      <!-- PentestGPT -->
+                      <div class="list-group-item bg-transparent px-0 py-3 border-bottom">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                          <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-robot text-primary me-2"></i>
+                            <a href="https://github.com/GreyDGL/PentestGPT" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-none">
+                              GreyDGL / PentestGPT
+                            </a>
+                          </h5>
+                          <span class="badge bg-primary">AI Penetration Testing</span>
+                        </div>
+                        <p class="mb-1 text-secondary" style="font-size: 14.5px;">
+                          An LLM-empowered penetration testing tool that automates security workflows, targets triage, reasoning parsing, and context-aware exploit generation using large language models.
+                        </p>
+                        <small class="text-muted"><i class="bi bi-github"></i> <a href="https://github.com/GreyDGL/PentestGPT" target="_blank" rel="noopener noreferrer">https://github.com/GreyDGL/PentestGPT</a></small>
+                      </div>
+
+                      <!-- pentest-tools by gwen001 -->
+                      <div class="list-group-item bg-transparent px-0 py-3 border-bottom">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                          <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-tools text-primary me-2"></i>
+                            <a href="https://github.com/gwen001/pentest-tools" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-none">
+                              gwen001 / pentest-tools
+                            </a>
+                          </h5>
+                          <span class="badge bg-dark">Exploits &amp; Automation</span>
+                        </div>
+                        <p class="mb-1 text-secondary" style="font-size: 14.5px;">
+                          A widely respected Swiss-army collection of custom standalone scripts and reconnaissance automation utilities crafted for offensive security research and bug bounty hunters.
+                        </p>
+                        <small class="text-muted"><i class="bi bi-github"></i> <a href="https://github.com/gwen001/pentest-tools" target="_blank" rel="noopener noreferrer">https://github.com/gwen001/pentest-tools</a></small>
+                      </div>
+
+                      <!-- keyhacks by streaak -->
+                      <div class="list-group-item bg-transparent px-0 py-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                          <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-key-fill text-primary me-2"></i>
+                            <a href="https://github.com/streaak/keyhacks" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-none">
+                              streaak / keyhacks
+                            </a>
+                          </h5>
+                          <span class="badge bg-danger">Secret Validation</span>
+                        </div>
+                        <p class="mb-1 text-secondary" style="font-size: 14.5px;">
+                          An essential bug bounty playbook containing verified, non-destructive API commands to check validity, identify permissions, and prove the business impact of leaked API credentials.
+                        </p>
+                        <small class="text-muted"><i class="bi bi-github"></i> <a href="https://github.com/streaak/keyhacks" target="_blank" rel="noopener noreferrer">https://github.com/streaak/keyhacks</a></small>
+                      </div>
+
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Ethical Use & Legal Warning Notice -->
