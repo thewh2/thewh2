@@ -117,6 +117,18 @@
     </image:image>
   </url>
 
+  <url>
+    <loc>https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day7/</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 7: Android Penetration Testing, Static Analysis with MobSF &amp; JADX Decompilation</image:title>
+      <image:caption>BugXploit workshop Day 7 lab report</image:caption>
+    </image:image>
+  </url>
+
   <!-- ================= Project & Detail Pages ================= -->
   <url>
     <loc>https://www.chandankumarthakur.com.np/pages/wh2hub.html</loc>
