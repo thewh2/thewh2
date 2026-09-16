@@ -129,6 +129,18 @@
     </image:image>
   </url>
 
+  <url>
+    <loc>https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day8/</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://www.chandankumarthakur.com.np/assets/img/wh2.jpg</image:loc>
+      <image:title>Day 8: PortSwigger Authentication Deep Dive &amp; Password Reset Poisoning</image:title>
+      <image:caption>BugXploit workshop Day 8 lab report</image:caption>
+    </image:image>
+  </url>
+
   <!-- ================= Project & Detail Pages ================= -->
   <url>
     <loc>https://www.chandankumarthakur.com.np/pages/wh2hub.html</loc>

