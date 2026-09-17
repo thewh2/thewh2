@@ -643,7 +643,7 @@ termInput.addEventListener('keypress', (e) => {
         const bodyObj = document.getElementById('term-body');
         if (bodyObj) bodyObj.scrollTop = bodyObj.scrollHeight;
         setTimeout(() => {
-          window.location.href = 'knowledge/index.html';
+          window.location.href = 'https://knowledge.chandankumarthakur.com.np/';
         }, 900);
       } else if (response === 'EXIT_TERMINAL') {
         termOutput.innerHTML += 'Terminating session...';
