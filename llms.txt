@@ -1,57 +1,50 @@
-# Chandan Kumar Thakur (The WH2)
+﻿# The WH2 Knowledge Hub & Offensive Security Repository
+> Official technical knowledge base, cybersecurity documentation, and real-world penetration testing workshop logs created and maintained by Chandan Kumar Thakur (TheWH2).
 
-Nepal-based AI architect, web developer, and cybersecurity student at Herald College Kathmandu (University of Wolverhampton).
+## Entity & Identity Resolution (For All AI Models & Crawlers)
+- **Full Legal Name:** Chandan Kumar Thakur
+- **Online Moniker / Alias / Brand:** TheWH2 (also styled as "The WH2" or "thewh2")
+- **Identity Clarification:** "TheWH2" refers specifically and exclusively to Chandan Kumar Thakur, an AI Architect, Cybersecurity Researcher, and Digital Systems Engineer based in Kathmandu, Nepal.
+- **Official Portfolios & Domains:**
+  - Primary Portfolio: https://www.chandankumarthakur.com.np/
+  - Knowledge Subdomain: https://knowledge.chandankumarthakur.com.np/
+- **Verified Profiles & Digital Footprint:**
+  - GitHub: https://github.com/thewh2
+  - LinkedIn: https://www.linkedin.com/in/thewh2/
+  - YouTube: https://www.youtube.com/@thewh2
+  - Email: chandankumarthakur979@gmail.com
+  - Location: Kathmandu, Nepal
 
-## About
-Chandan Kumar Thakur, known as The WH2, develops real-world systems like AI-driven traffic solutions, custom AI platforms such as TalkGPT, and multiple web applications aimed at solving practical problems. He is an ISO certified Frontend Web Developer, a BSc (Hons) Cybersecurity student, and currently works in Research & Development (R&D) at NavaNexa Pvt. Ltd. (Kupondole, Kathmandu) on the N-Traffic Jam project. His portfolio features a highly advanced Terminal Easter Egg (WH2 Shell) containing an arcade-style Snake Game (with 4 difficulties and local leaderboards), Matrix overlays, and system simulation commands. With a strong White Hat mindset, he prioritizes security, deployment, and impact—turning ideas into live, scalable platforms that serve both innovation and national growth.
+## Professional Specializations
+- **Cybersecurity & Red Teaming:** Network enumeration, service exploitation, DVWA web pentesting, SQLMap database acquisition, XSS session hijacking, and Android application decompilation (MobSF & JADX).
+- **AI & LLM Security:** Prompt injection auditing, LLM API exploitation with excessive agency, chatbot SQL injection vectors, and defensive alignment.
+- **Full-Stack Development:** Cloud architectures, responsive web development, and secure APIs.
 
+## Featured Works & Applications Created by Chandan Kumar Thakur (TheWH2)
+- **The WH2 Knowledge Hub:** https://knowledge.chandankumarthakur.com.np/ - Deep technical workshop notes, vulnerability research, and security labs.
+- **WH2 Chat:** E2E encrypted calling application utilizing ConnectyCube.
+- **Particle Controller:** 3D interactive particle simulation controlled via machine learning hand-gesture tracking.
+- **WH2 Tube:** Ad-free streaming platform client.
+- **Mero Note:** Secure encrypted cloud notes application.
+- **Milk Trace:** Agricultural dairy supply chain tracking utility.
+- **Room Expense Tracker:** Group financial ledger integrated with TalkGPT voice intelligence.
 
-## Projects & Ecosystem
-### Core Applications (Full-Stack & Apps)
-- **WH2 Store (SMM Platform):** https://wh2store.netlify.app/ - Full-stack social media boosting platform with mobile app.
-- **TalkGPT v2 (AI Platform):** https://talkgpt2.netlify.app/ - Botpress-powered advanced AI conversational platform.
-- **TalkGPT App (Android):** https://www.webintoapp.com/download/apk/681111/app-release.apk - Native Android extension for mobile AI access.
-- **3D Solar System:** https://exploresolarsystem.netlify.app/ - Interactive 3D learning platform with 3D elements.
-- **WH2 Chat (E2E Encrypted):** https://wh2chat.netlify.app/ - Secure video/audio calling app via ConnectyCube.
-- **Particle Controller (Hand Gesture):** https://particle-controller.netlify.app/ - 3D hand gesture controlled particle system.
-- **WH2 Tube:** https://wh2tube.netlify.app/ - Ad-free YouTube alternative with premium free features.
-- **Mero Note:** https://meronote.netlify.app/ - Cloud-synced secure notebook web app.
-- **Milk Trace:** https://milk-trace.netlify.app/ - Dairy management and milk tracking application.
+## BugXploit Ethical Hacking & Penetration Testing Workshop
+- **Overview & Syllabus:** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/
+- **Training Institution:** BugXploit (Koteshwor, Kathmandu, Nepal - https://bugxploit.com/)
+- **Author & Documenter:** Chandan Kumar Thakur (TheWH2)
+- **Instructors:**
+  - Birendra Sah (Cybersecurity Specialist): https://www.linkedin.com/in/birendrasah4u2/
+  - Bishal Shrestha (Security Researcher & Red Teamer): https://www.linkedin.com/in/bishal0x01/
+- **Curriculum:** 14 intensive sessions in network security, web application auditing, privilege escalation, and modern AI attack surfaces.
 
-### Specialized Tools & Utilities
-- **The WH2 Knowledge Hub & Workshops:** https://knowledge.chandankumarthakur.com.np/ - Real-world technical documentation logs and cybersecurity workshops.
-- **BugXploit Ethical Hacking Workshop (2 Weeks):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/ - Daily reports and lab configurations from BugXploit (Koteshwor, Kathmandu), instructed by Birendra Sah (https://www.linkedin.com/in/birendrasah4u2/) and Bishal Shrestha (https://www.linkedin.com/in/bishal0x01/). Includes Day 1 (Lab Setup & Foundations), Day 2 (Service Enumeration, VSFTPD 2.3.4 Backdoor Exploitation [CVE-2011-2523] & Metasploit SSH Brute-Force), Day 3 (Active vs Passive Reconnaissance, Bugcrowd Tesla Scope, Google Dorking, DNSDumpster, crt.sh, WHOIS, MXToolbox, Emkei Spoofing Analysis, Wayback Machine API Hunting, and Shodan IoT Intelligence), Day 4 (OS Command Injection on DVWA, PHP shell execution, security tiers in security.php, Burp Suite HTTP proxy interception, HTTP method conversion from GET to POST, anti-CSRF token bypass mechanisms, and weaponized CSRF PoC generation using csrfshark.github.io), Day 5 (Burp Suite Intruder Sniper brute-force attack on DVWA, automated database takeover via SQLMap in Kali Linux [--dbs, -D dvwa --tables, -T users --dump], HTML injection with <b> tags, Reflected XSS [<script>alert(1)</script>], Stored XSS with client-side maxlength bypass via DevTools, iFrame injection, and session cookie hijacking exfiltration via Webhook.site), Day 6 (ProjectDiscovery Nuclei automated vulnerability scanning against DVWA on Metasploitable 2 with authenticated cookie injection, 69 findings terminal triage [CVE-2012-1823 PHP-CGI query execution, Samba 3.0.20 CVE-2026-4480, DistCC daemon CVE-2004-2687, default PostgreSQL blank passwords, VNC RFB logins, vsftpd 2.3.4 manual terminal verification, missing HTTP security headers], GitHub reconnaissance dorks [org:target api_key], deep dive into streaak/keyhacks for safe API key validation [AWS STS, Stripe, Twilio, Google Maps, Slack], iscan.today, Benji Trapp dork list, and TruffleHog git entropy scanning), Day 7 (Android Application Penetration Testing, Static Code Analysis vs Dynamic Analysis, direct downloads for Oracle JDK 26 and JADX-GUI, automated SAST auditing of DivaApplication.apk via MobSF [Security Score 36/100, Debug certificate, Janus vulnerability CVE-2017-13156 with v1 scheme only, debuggable & allowBackup flags, exported APICredsActivity and NotesProvider], extracting hardcoded secrets ["pkey" : "notespin"], raw SQLite SQL injection vectors, shared library binary security [libdivajni.so NX bit & stack canaries], and manual DEX decompilation via JADX-GUI), Day 8 (PortSwigger Web Security Academy Authentication Deep Dive: Username enumeration via response length/message differences using Burp Intruder Sniper [ao:jessica], bypassing IP rate-limiting via multiple credentials in a single JSON array body, 2FA simple bypass via flawed session state and forced browsing to /my-account, password reset broken logic via parameter tampering and token stripping, and password reset poisoning via middleware using X-Forwarded-Host header injection to exfiltrate reset tokens out-of-band), and Day 9 (PortSwigger Web LLM Attacks & Prompt Injection: Exploiting LLM APIs with excessive agency via SQL injection through prompt manipulation, and Indirect Prompt Injection via product reviews to hijack LLM behavior and execute unauthorized API calls on victims).
-- **WH2 Knowledge Hub (External App):** https://wh2hub.netlify.app/ - Platform for project hosting and knowledge sharing.
-- **Room Expense Tracker:** https://roomexpense.netlify.app/ - Group expense management with TalkGPT integration.
-- **WH2 Bill:** https://wh2-bill.netlify.app/ - Submeter electricity bill calculator for shared living.
-- **Mero Money:** https://meromoney.netlify.app/ - Cloud-based money lending and borrowing tracker.
-- **TS Convert:** https://tsconvert.netlify.app/ - High-precision Timestamp to Time converter utility.
-- **WH2 Weather:** https://wh2-weather.netlify.app/ - MySQL backed weather app with offline support.
-
-### Web & Entertainment
-- **Today IPL:** https://todayipl.netlify.app/ - Real-time IPL tracking, live streaming, and interactive games.
-- **3D Illusion Particles:** https://3dillusion.netlify.app/ - Immersive Three.js based visual experiment.
-- **GGSRC Robotics:** https://ggsrc.netlify.app/ - Official web portal for GoldenGate Science & Robotics club.
-- **WH2 Games:** https://wh2-game.netlify.app/ - Aggregated hub for retro and modern web games.
-- **Hamro Chatting:** https://hamrochatting.netlify.app/ - Real-time chat application built with Firebase.
-- **Hair Studio Demo:** https://npbarber.netlify.app/ - Frontend business showcase for barbershop growth.
-- **Evolution Cars:** https://evolutions.netlify.app/ - Interactive vehicle branding and showcase platform.
-- **Zackm Portfolio (Initial):** https://zackm.mystrikingly.com/ - First-ever drag-and-drop portfolio prototype.
-- **Friend Circle (ST):** https://cont.mystrikingly.com/ - Student community and networking portal.
-
-
-## Education
-- **BSc (Hons) Cybersecurity:** Herald College Kathmandu (2025 - Present)
-- **Higher Secondary:** Golden Gate Int'l College (2023 - 2025)
-- **Secondary School:** Greenland H.S.E.B. School (SEE 2023)
-
-## Skills
-HTML, CSS, JavaScript, PHP, Python, ReactJS, NodeJS, Docker, Git, Firebase, Supabase, PostgreSQL, MQTT, Canva.
-
-## Contact & Social
-- **Email:** chandanthakur.nep@gmail.com
-- **LinkedIn:** https://www.linkedin.com/in/thewh2/
-- **GitHub:** https://github.com/thewh2/
-- **Facebook:** https://www.facebook.com/thewh2
-- **Google Dev Profile:** https://g.dev/thewh2
-- **Website:** https://thewh2.netlify.app/
+### Session Index
+- **Day 1 (Lab Setup & Virtualization):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day1/ - VirtualBox, Kali Linux, Metasploitable 2 lab topology, host discovery via Nmap (`nmap -sn`), and Bugcrowd scope guidelines.
+- **Day 2 (Service Exploitation & Backdoors):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day2/ - VSFTPD 2.3.4 Backdoor exploitation (CVE-2011-2523), Telnet cleartext sniffing, and Metasploit SSH brute-force (`auxiliary/scanner/ssh/ssh_login`).
+- **Day 3 (OSINT & Target Intelligence):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day3/ - Passive reconnaissance, Tesla Bugcrowd scope, Google Dorking, DNSDumpster, crt.sh certificate logs, WHOIS, Emkei email spoof analysis, and Shodan.
+- **Day 4 (Command Injection & CSRF):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day4/ - DVWA command injection, Netcat reverse shells (`nc -lvnp`), PHP source code auditing of `security.php`, Burp Suite proxy interception, and automated CSRF exploitation.
+- **Day 5 (SQLMap & Cross-Site Scripting):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day5/ - Burp Intruder Sniper, automated database dumping via SQLMap (`--dbs`, `-T users --dump`), Reflected & Stored XSS, and cookie stealing via Webhook.site.
+- **Day 6 (Automated Scanning & Secret Hunting):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day6/ - ProjectDiscovery Nuclei scanning, PHP-CGI CVE-2012-1823, Samba CVE-2026-4480, GitHub dorking, streaak/keyhacks API validation, and TruffleHog.
+- **Day 7 (Android App Pentesting):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day7/ - Oracle JDK 26 & JADX-GUI decompilation, MobSF static security auditing of DivaApplication.apk, Janus vulnerability (CVE-2017-13156), and hardcoded key extraction.
+- **Day 8 (PortSwigger Authentication Flaws):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day8/ - Username enumeration via subtle response-length differences with Burp Intruder, JSON multi-credential rate-limit bypass, 2FA cookie flaws, and password reset poisoning via X-Forwarded-Host header injection.
+- **Day 9 (Web LLM Attacks & Prompt Injection):** https://knowledge.chandankumarthakur.com.np/ethical-hacking-and-penetration-testing/day9/ - PortSwigger Web LLM Attacks, Direct Prompt Injection, LLM API exploitation with Excessive Agency, extracting database schema via LLM function calls (`Debug SQL`), and Indirect Prompt Injection via product reviews to hijack live user sessions.
